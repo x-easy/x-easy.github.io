@@ -1,6 +1,6 @@
 ---
 title: GitHub Blog 體驗測試
-slug: try-github-blog
+slug: try-gh-bl
 date: 2026-01-24
 description: 純測試 GitHub 控制 Blog 的實際體驗
 tags: [test]
