@@ -1,0 +1,56 @@
+{
+  "name": "x-easy-blog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Flagship Markdown-driven blog system for GitHub Pages with optional Blogger integration",
+
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "node ./bin/build.js",
+    "dev": "node ./bin/build.js --watch --drafts",
+    "lint": "eslint . --ext .js",
+    "validate": "node ./bin/validate-content.js",
+    "deploy": "npm run clean && npm run build",
+    "analyze": "node ./bin/manifest-gen.js"
+  },
+
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.0.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "markdown-it-container": "^4.0.0",
+    "slugify": "^1.6.6",
+    "js-yaml": "^4.1.0",
+    "sharp": "^0.33.2"
+  },
+
+  "devDependencies": {
+    "chokidar": "^3.6.0",
+    "rimraf": "^5.0.5",
+    "eslint": "^8.56.0"
+  },
+
+  "engines": {
+    "node": ">=18.18"
+  },
+
+  "packageManager": "npm@10",
+
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2022": true
+    },
+    "extends": ["eslint:recommended"],
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-unused-vars": ["warn"],
+      "no-console": "off"
+    }
+  }
+}
