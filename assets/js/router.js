@@ -3,29 +3,37 @@ import { TOOL_REGISTRY } from "./registry.js";
 import { pushPage, popPage } from "./stack.js";
 
 const titleEl = document.getElementById("title");
-const backBtn = document.getElementById("btnBack");
-
-backBtn.onclick = () => popPage();
+document.getElementById("btnBack").onclick = popPage;
 
 export async function navigate(id) {
   const tool = TOOL_REGISTRY.find(t => t.id === id);
-  if (!tool) return;
 
   const page = document.createElement("section");
   page.className = "page";
 
+  if (!tool) {
+    page.innerHTML = `<p style="padding:16px">❌ 找不到頁面：${id}</p>`;
+    pushPage(page);
+    return;
+  }
+
   try {
     const view = await tool.view();
     view.render(page);
-  } catch (e) {
-    page.innerHTML = `<p style="padding:16px;color:red">載入失敗：${id}</p>`;
+    titleEl.textContent = tool.name;
+  } catch (err) {
+    page.innerHTML = `
+      <div style="padding:16px;color:red">
+        <h3>載入失敗</h3>
+        <pre>${err.message}</pre>
+      </div>
+    `;
   }
 
-  titleEl.textContent = tool.name;
   pushPage(page);
 }
 
-/* 🔑 關鍵修補：確保第一次一定執行 */
-setTimeout(() => {
+// 🔒 永遠保證有首頁
+window.addEventListener("DOMContentLoaded", () => {
   navigate("dashboard");
-}, 0);
+});
