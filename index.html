@@ -5,41 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>MobiSpace</title>
 
-  <link rel="stylesheet" href="assets/css/base.css">
-  <link rel="stylesheet" href="assets/css/app.css">
-  <link rel="stylesheet" href="assets/css/theme.css">
+  <!-- =========================
+       基礎樣式 / 響應式修正
+       ========================= -->
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111;
+      --muted: #888;
+      --primary: #00c853;
+      --header-h: 52px;
+      --nav-h: 56px;
+    }
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      height: 100dvh;
+      overflow: hidden; /* 關鍵：避免整頁滾動 */
+    }
+
+    /* =========================
+       Header（像 LINE）
+       ========================= */
+    header {
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid #eee;
+      background: #fff;
+      position: relative;
+      z-index: 10;
+    }
+
+    header button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      padding: 6px;
+    }
+
+    header h1 {
+      font-size: 16px;
+      margin: 0 0 0 8px;
+      font-weight: 600;
+    }
+
+    /* =========================
+       Stack 容器（核心）
+       ========================= */
+    main#stack {
+      position: relative;
+      height: calc(100dvh - var(--header-h) - var(--nav-h));
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* =========================
+       Page（每一頁）
+       ========================= */
+    .page {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      transform: translateX(100%);
+      transition: transform 0.28s ease;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .page.active {
+      transform: translateX(0);
+      z-index: 2;
+    }
+
+    .page.prev {
+      transform: translateX(-30%);
+    }
+
+    /* =========================
+       Bottom Nav（像 LINE）
+       ========================= */
+    nav {
+      height: var(--nav-h);
+      display: flex;
+      border-top: 1px solid #eee;
+      background: #fff;
+    }
+
+    nav button {
+      flex: 1;
+      border: none;
+      background: none;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    nav button.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* =========================
+       UI 元件
+       ========================= */
+    .card {
+      border-radius: 12px;
+      padding: 16px;
+      background: #f6f6f6;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-size: 14px;
+    }
+  </style>
 </head>
 
-<body class="theme-dark">
+<body>
 
-  <!-- Top Bar -->
-  <header class="topbar">
-    <button id="btnBack" class="icon">←</button>
-    <span id="title">MobiSpace</span>
-    <button id="btnMenu" class="icon">☰</button>
+  <!-- =========================
+       Header
+       ========================= -->
+  <header>
+    <button onclick="popPage()">←</button>
+    <h1>MobiSpace</h1>
   </header>
 
-  <!-- Page Stack -->
-<main id="stack" class="stack">
-  <!-- 永遠存在的 Base Page -->
-  <section class="page active">
-    <div style="padding:16px">
-      <h2>載入中…</h2>
-      <p>初始化 MobiSpace</p>
-    </div>
-  </section>
-</main>
-  <!-- Sidebar Drawer -->
-  <ms-sidebar></ms-sidebar>
+  <!-- =========================
+       Stack（至少一頁）
+       ========================= -->
+  <main id="stack">
 
-  <script type="module">
-    import "./assets/components/ms-sidebar.js";
-    import "./assets/js/router.js";
-    import "./assets/js/command.js";
-    import "./assets/js/pwa.js";
+    <!-- Boot / Home Page -->
+    <section class="page active" data-page="home">
+      <div class="card">
+        <h2>首頁</h2>
+        <p>這是一個「不模組化」但完整可運作的 App 結構。</p>
+        <button class="btn" onclick="pushPage('tools')">前往工具頁</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================
+       Bottom Navigation
+       ========================= -->
+  <nav>
+    <button class="active" onclick="goRoot()">首頁</button>
+    <button onclick="pushPage('tools')">工具</button>
+    <button onclick="pushPage('settings')">設定</button>
+  </nav>
+
+  <!-- =========================
+       JavaScript（單檔）
+       ========================= -->
+  <script>
+    const stack = document.getElementById('stack');
+
+    /* -------------------------
+       建立頁面（動態）
+       ------------------------- */
+    function createPage(name) {
+      const page = document.createElement('section');
+      page.className = 'page';
+      page.dataset.page = name;
+
+      if (name === 'tools') {
+        page.innerHTML = `
+          <div class="card">
+            <h2>工具頁</h2>
+            <p>這裡之後可以放 Command Palette / 搜尋。</p>
+          </div>
+        `;
+      }
+
+      if (name === 'settings') {
+        page.innerHTML = `
+          <div class="card">
+            <h2>設定</h2>
+            <p>主題、功能開關都可以放這。</p>
+          </div>
+        `;
+      }
+
+      return page;
+    }
+
+    /* -------------------------
+       Push Page（像 LINE）
+       ------------------------- */
+    function pushPage(name) {
+      const pages = stack.querySelectorAll('.page');
+      const current = pages[pages.length - 1];
+
+      const page = createPage(name);
+      stack.appendChild(page);
+
+      requestAnimationFrame(() => {
+        current.classList.add('prev');
+        page.classList.add('active');
+      });
+    }
+
+    /* -------------------------
+       Pop Page（返回）
+       ------------------------- */
+    function popPage() {
+      const pages = stack.querySelectorAll('.page');
+      if (pages.length <= 1) return;
+
+      const current = pages[pages.length - 1];
+      const prev = pages[pages.length - 2];
+
+      current.classList.remove('active');
+      prev.classList.remove('prev');
+
+      setTimeout(() => current.remove(), 300);
+    }
+
+    /* -------------------------
+       回到根頁
+       ------------------------- */
+    function goRoot() {
+      const pages = stack.querySelectorAll('.page');
+      pages.forEach((p, i) => {
+        if (i > 0) p.remove();
+        p.classList.remove('prev');
+        p.classList.add('active');
+      });
+    }
   </script>
+
 </body>
 </html>
+
