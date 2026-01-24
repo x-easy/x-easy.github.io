@@ -1,7 +1,7 @@
-self.addEventListener("fetch", e => {
-  e.respondWith(
+self.addEventListener("install", e => {
+  e.waitUntil(
     caches.open("mobispace").then(c =>
-      c.match(e.request).then(r => r || fetch(e.request))
+      c.addAll(["/", "/index.html"])
     )
   );
 });
