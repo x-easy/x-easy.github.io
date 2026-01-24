@@ -1,7 +1,8 @@
 .page {
   position: absolute;
   inset: 0;
-  background: var(--bg);
+  background: #fff;
+  overflow-y: auto;
   transform: translateX(100%);
   transition: transform 0.25s ease;
 }
@@ -11,5 +12,5 @@
 }
 
 .page.enter {
-  z-index: 10;
+  will-change: transform;
 }
