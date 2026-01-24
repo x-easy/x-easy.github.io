@@ -1,0 +1,82 @@
+/* ===== 基礎變數 ===== */
+:root {
+  --bg: #121212;
+  --panel: #1e1e1e;
+  --text: #e5e5e5;
+  --accent: #ffd54f;
+}
+
+/* ===== Dark Theme ===== */
+body.theme-dark {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: system-ui, -apple-system;
+}
+
+/* ===== Top Bar ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--panel);
+}
+
+.global-search {
+  flex: 1;
+  border-radius: 8px;
+  border: none;
+  padding: 8px 12px;
+  background: #2a2a2a;
+  color: var(--text);
+}
+
+/* ===== App Shell ===== */
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr 64px;
+  height: calc(100vh - 48px);
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background: #181818;
+  transition: transform 0.24s cubic-bezier(.4,0,.2,1);
+}
+
+.sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+.nav-item {
+  padding: 12px;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: #2a2a2a;
+}
+
+/* ===== Main ===== */
+.main-canvas {
+  padding: 24px;
+}
+
+/* ===== Right Rail ===== */
+.right-rail {
+  background: #181818;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px;
+}
+
+.fab {
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+  width: 48px;
+  height: 48px;
+}
