@@ -1,10 +1,9 @@
 // assets/js/stack.js
 const stack = document.getElementById("stack");
-const pages = [];
+const pages = Array.from(stack.children);
 
 export function pushPage(el) {
   el.style.zIndex = pages.length + 1;
-  el.classList.add("enter");
   stack.appendChild(el);
   pages.push(el);
 
@@ -14,13 +13,9 @@ export function pushPage(el) {
 }
 
 export function popPage() {
-  if (pages.length <= 1) return;
+  if (pages.length <= 1) return; // 👈 永遠保留一頁
 
   const page = pages.pop();
   page.classList.remove("active");
-  page.addEventListener(
-    "transitionend",
-    () => page.remove(),
-    { once: true }
-  );
+  page.addEventListener("transitionend", () => page.remove(), { once: true });
 }
