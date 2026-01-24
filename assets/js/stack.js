@@ -3,7 +3,8 @@ const stack = document.getElementById("stack");
 const pages = [];
 
 export function pushPage(el) {
-  el.className = "page enter";
+  el.style.zIndex = pages.length + 1;
+  el.classList.add("enter");
   stack.appendChild(el);
   pages.push(el);
 
@@ -17,5 +18,9 @@ export function popPage() {
 
   const page = pages.pop();
   page.classList.remove("active");
-  page.addEventListener("transitionend", () => page.remove(), { once: true });
+  page.addEventListener(
+    "transitionend",
+    () => page.remove(),
+    { once: true }
+  );
 }
