@@ -2,67 +2,37 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MobiSpace</title>
 
-  <!-- SEO / 結構化基礎 -->
-  <title>MobiSpace · 工具平台</title>
-  <meta name="description" content="MobiSpace 工具平台｜GitHub Pages 靜態 App Shell 架構" />
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="assets/css/theme.css">
 
-  <!-- 主樣式 -->
-  <link rel="stylesheet" href="assets/css/app.css" />
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body class="theme-dark">
-  <!-- ===== Top Bar ===== -->
+
+  <!-- Top Bar -->
   <header class="topbar">
-    <!-- 左：漢堡選單 -->
-    <button class="icon-btn" id="btnSidebar">
-      ☰
-    </button>
-
-    <!-- 中：全域搜尋 -->
-    <input
-      type="search"
-      class="global-search"
-      placeholder="⌘K 搜尋工具 / 頁面"
-    />
-
-    <!-- 右：工具區 -->
-    <div class="top-actions">
-      <button class="icon-btn">🔔</button>
-      <button class="icon-btn">🧩</button>
-      <img class="avatar" src="https://via.placeholder.com/32" />
-    </div>
+    <button id="btnBack" class="icon">←</button>
+    <span id="title">MobiSpace</span>
+    <button id="btnMenu" class="icon">☰</button>
   </header>
 
-  <!-- ===== App Layout ===== -->
-  <div class="app-shell">
-    <!-- 左側導覽 -->
-    <aside class="sidebar" id="sidebar">
-      <nav>
-        <ul class="nav-list">
-          <li class="nav-item active">Dashboard</li>
-          <li class="nav-item">Tools</li>
-          <li class="nav-item">Notes</li>
-        </ul>
-      </nav>
-    </aside>
+  <!-- Page Stack -->
+  <main id="stack" class="stack"></main>
 
-    <!-- 主內容 -->
-    <main class="main-canvas">
-      <h1>主內容區</h1>
-      <p>此區域渲染工具頁 / Dashboard</p>
-    </main>
+  <!-- Sidebar Drawer -->
+  <ms-sidebar></ms-sidebar>
 
-    <!-- 右側工具列 -->
-    <aside class="right-rail">
-      <button class="fab">＋</button>
-      <button class="rail-btn">🌓</button>
-      <button class="rail-btn">💬</button>
-    </aside>
-  </div>
-
-  <!-- JS -->
-  <script src="assets/js/app.js"></script>
+  <script type="module">
+    import "./assets/components/ms-sidebar.js";
+    import "./assets/js/router.js";
+    import "./assets/js/command.js";
+    import "./assets/js/pwa.js";
+  </script>
 </body>
 </html>
