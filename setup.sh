@@ -1,84 +1,44 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-echo "== Mobispace / GitHub Pages 升級腳本 =="
+# =================================================================
+# X-Easy 2026 旗艦版架構自動生成腳本 (基於 Blogger 100% 高仿結構)
+# 技術棧：WebGPU, Wasm, HTMX 2.0, PWA 2.0, AEO, DSD, View Transitions
+# =================================================================
 
-# ---------- 1. 建立必要目錄（若已存在不會報錯） ----------
-echo "[1/4] 建立目錄結構"
-mkdir -p \
-  src/tpl/layouts \
-  src/tpl/partials \
-  src/scripts \
-  public
+echo "🚀 [2026 旗艦版] 開始構建檔案結構樹..."
 
-# ---------- 2. 建立 404.html（僅在不存在時建立） ----------
-if [ ! -f src/tpl/layouts/404.html ]; then
-  echo "[2/4] 新增 404.html（Blogger 舊網址轉跳緩衝）"
-  cat > src/tpl/layouts/404.html <<'EOF'
-<!doctype html>
-<html lang="zh-Hant">
-<head>
-  <meta charset="utf-8">
-  <title>404</title>
-  <script>
-    const p = location.pathname;
-    fetch('/manifest.json')
-      .then(r => r.json())
-      .then(list => {
-        const hit = list.find(x =>
-          x.blogger_url && new URL(x.blogger_url).pathname === p
-        );
-        location.replace(hit ? hit.url : '/');
-      })
-      .catch(() => location.replace('/'));
-  </script>
-</head>
-<body>Redirecting…</body>
-</html>
-EOF
-else
-  echo "[2/4] 404.html 已存在，略過"
-fi
+# 1. 建立所有層級目錄 (包含深度路徑)
+mkdir -p assets/css assets/images assets/fonts \
+         engine/gpu engine/wasm engine/transport \
+         scripts/htmx scripts/components \
+         data/schema data/content
 
-# ---------- 3. 建立 SEO partial ----------
-if [ ! -f src/tpl/partials/seo.html ]; then
-  echo "[3/4] 新增 SEO partial"
-  cat > src/tpl/partials/seo.html <<'EOF'
-<title>{{ title }}</title>
-<meta name="description" content="{{ description }}">
-<link rel="canonical" href="{{ canonical }}">
+# 2. 建立第一層核心檔案 (Root)
+touch index.html manifest.json sw.js
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "{{ title }}",
-  "datePublished": "{{ date }}",
-  "author": {
-    "@type": "Person",
-    "name": "{{ author }}"
-  }
-}
-</script>
-EOF
-else
-  echo "[3/4] seo.html 已存在，略過"
-fi
+# 3. 建立 assets 資源檔案
+touch assets/css/global.core.css \
+      assets/images/icon.svg \
+      assets/fonts/main.woff2
 
-# ---------- 4. 建立 manifest.json（僅在不存在時） ----------
-if [ ! -f public/manifest.json ]; then
-  echo "[4/4] 建立 manifest.json（暫用手動版）"
-  cat > public/manifest.json <<'EOF'
-[
-  {
-    "title": "GitHub 控制 Blogger 的實驗",
-    "url": "/posts/try-gh-bl/",
-    "blogger_url": "https://example.blogspot.com/2026/01/try-gh-bl.html"
-  }
-]
-EOF
-else
-  echo "[4/4] manifest.json 已存在，略過"
-fi
+# 4. 建立 engine 核心引擎檔案
+touch engine/gpu/pipeline.js \
+      engine/gpu/shaders.wgsl \
+      engine/wasm/runtime.wasm \
+      engine/wasm/loader.js \
+      engine/transport/stream.js
 
-echo "== 完成：Repo 已具備 404 / SEO / Blogger 轉跳基礎 =="
+# 5. 建立 scripts 交互邏輯檔案
+touch scripts/htmx/config.js \
+      scripts/components/post-engine.js \
+      scripts/components/nav-system.js
+
+# 6. 建立 data 數據與 AEO 內容
+touch data/schema/blog.jsonld \
+      data/content/latest-posts.html
+
+# 7. 建立 .gitkeep 確保 Git 追蹤所有空目錄 (SEO 優化)
+find assets engine scripts data -type d -empty -exec touch {}/.gitkeep \;
+
+echo "✅ [成功] 檔案結構清單已生成完成！"
+echo "📂 準備執行 Git 分支操作..."
