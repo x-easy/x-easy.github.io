@@ -16,3 +16,15 @@ btnSidebar.addEventListener('click', () => {
 if (localStorage.getItem('sidebar') === 'off') {
   sidebar.classList.add('collapsed');
 }
+
+// assets/js/app.js
+export const AppState = {
+  currentView: "dashboard",
+  theme: "dark",
+  musicPlaying: false
+};
+
+export function setState(patch) {
+  Object.assign(AppState, patch);
+  render();
+}
