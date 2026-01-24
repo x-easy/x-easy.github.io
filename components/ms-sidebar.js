@@ -5,15 +5,15 @@ import { navigate } from "../js/router.js";
 customElements.define("ms-sidebar", class extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
-      <nav>
+      <aside class="drawer">
         ${TOOL_REGISTRY.map(t =>
-          `<button data-id="${t.id}">${t.icon} ${t.name}</button>`
+          `<button data-id="${t.id}">${t.name}</button>`
         ).join("")}
-      </nav>
+      </aside>
     `;
 
-    this.querySelectorAll("button").forEach(btn =>
-      btn.onclick = () => navigate(btn.dataset.id)
-    );
+    this.querySelectorAll("button").forEach(btn => {
+      btn.onclick = () => navigate(btn.dataset.id);
+    });
   }
 });
