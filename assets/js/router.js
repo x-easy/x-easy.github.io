@@ -2,8 +2,10 @@
 import { TOOL_REGISTRY } from "./registry.js";
 import { pushPage, popPage } from "./stack.js";
 
-const title = document.getElementById("title");
-document.getElementById("btnBack").onclick = popPage;
+const titleEl = document.getElementById("title");
+const backBtn = document.getElementById("btnBack");
+
+backBtn.onclick = () => popPage();
 
 export async function navigate(id) {
   const tool = TOOL_REGISTRY.find(t => t.id === id);
@@ -12,12 +14,18 @@ export async function navigate(id) {
   const page = document.createElement("section");
   page.className = "page";
 
-  const view = await tool.view();
-  view.render(page);
+  try {
+    const view = await tool.view();
+    view.render(page);
+  } catch (e) {
+    page.innerHTML = `<p style="padding:16px;color:red">載入失敗：${id}</p>`;
+  }
 
-  title.textContent = tool.name;
+  titleEl.textContent = tool.name;
   pushPage(page);
 }
 
-// 初始頁
-navigate("dashboard");
+/* 🔑 關鍵修補：確保第一次一定執行 */
+setTimeout(() => {
+  navigate("dashboard");
+}, 0);
