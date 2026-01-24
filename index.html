@@ -1,1 +1,506 @@
-測試中
+
+以下示範將整個系統依照功能模組分為多個 Web Component，每個功能使用 Shadow DOM 完全封裝，互不影響全域樣式，同時保持運行正常：
+
+功能模組規劃
+	1.	<app-header>：負責標題、帳號操作、模式切換
+	2.	<app-login>：會員登入模組
+	3.	<app-content>：主內容區域（SPA 內容動態載入）
+	4.	<app-audio>：音樂播放器（包含播放清單、控制與進度條）
+	5.	<app-nav>：右側導航列
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旗艦會員系統 SPA</title>
+  <style>
+    body { font-family: sans-serif; margin: 0; background: #f8f9fa; }
+    .floating-panel { position: fixed; bottom: 1rem; right: 1rem; background: #007bff; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <app-header></app-header>
+  <app-nav></app-nav>
+  <main>
+    <app-login></app-login>
+    <app-content></app-content>
+  </main>
+  <app-audio></app-audio>
+
+  <div class="floating-panel" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ 返回頂部</div>
+
+  <script type="module">
+    /* -----------------
+       1. Header Component
+    ----------------- */
+    class AppHeader extends HTMLElement {
+      constructor(){
+        super();
+        this.attachShadow({mode:'open'});
+	•	        this.shadowRoot.innerHTML = `
+	•	          <style>
+            header { background: #343a40; color: white; padding: 1rem; display:flex; justify-content:space-between; align-items:center; }
+            #mode-toggle { background:none; border:none; cursor:pointer; width:32px;height:32px; color:white; }
+          </style>
+          <header>
+            <h1>🌐 旗艦會員系統 SPA</h1>
+            <div>
+              <button id="logout-btn" class="hidden">登出</button>
+              <button id="switch-btn" class="hidden">切換帳號</button>
+              <button id="clear-cache" class="hidden">清除快取</button>
+              <button id="reload-btn">重新載入</button>
+              <button id="mode-toggle" title="切換邏輯模式">
+                <svg id="mode-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+              </button>
+            </div>
+          </header>
+        `;
+      }
+      connectedCallback(){
+        const modeToggle = this.shadowRoot.getElementById('mode-toggle');
+        const modeIcon = this.shadowRoot.getElementById('mode-icon');
+        let darkMode = false;
+        modeToggle.onclick = () => {
+          darkMode = !darkMode;
+          document.body.style.background = darkMode?'#212529':'#f8f9fa';
+          document.body.style.color = darkMode?'#f8f9fa':'#212529';
+	•	          modeIcon.innerHTML = darkMode 
+            ? '<path d="M12 3a9 9 0 1 0 9 9 9 9 0 0 1-9-9Z" />'
+            : '<circle cx="12" cy="12" r="5"></circle>';
+        }
+      }
+    }
+    customElements.define('app-header', AppHeader);
+
+    /* -----------------
+       2. Login Component
+    ----------------- */
+    class AppLogin extends HTMLElement {
+      constructor(){
+        super();
+        this.attachShadow({mode:'open'});
+        this.shadowRoot.innerHTML = `
+          <style>
+	•	            .login-panel { margin: 1rem 0; padding: 1rem; background: #e9ecef; border-radius: 6px; }
+            .login-panel input, .login-panel select { display:block; margin:0.5rem 0; width: 100%; padding: 0.25rem; }
+          </style>
+          <section class="login-panel">
+            <h2>會員登入</h2>
+            <input type="text" placeholder="帳號">
+            <input type="password" placeholder="密碼">
+            <select>
+              <option value="basic">基本會員</option>
+              <option value="premium">高級會員</option>
+              <option value="vip">VIP 會員</option>
+            </select>
+            <button>登入</button>
+            <div id="status"></div>
+          </section>
+        `;
+      }
+    }
+	•	    customElements.define('app-login', AppLogin);
+	•	
+    /* -----------------
+       3. Content Component
+    ----------------- */
+    class AppContent extends HTMLElement {
+      constructor(){
+        super();
+        this.attachShadow({mode:'open'});
+        this.shadowRoot.innerHTML = `
+          <style>
+            #content-area { background:white; border-radius:8px; padding:1rem; min-height:400px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+          </style>
+          <div id="content-area">歡迎使用旗艦會員系統</div>
+        `;
+      }
+    }
+    customElements.define('app-content', AppContent);
+
+    /* -----------------
+	•	       4. Nav Component
+    ----------------- */
+    class AppNav extends HTMLElement {
+      constructor(){
+        super();
+        this.attachShadow({mode:'open'});
+        this.chapters = [
+          {title:'第一章', page:'ch1', level:'basic'},
+          {title:'第二章', page:'ch2', level:'basic'},
+          {title:'第三章', page:'ch3', level:'premium'},
+          {title:'第四章', page:'ch4', level:'premium'},
+          {title:'第五章', page:'ch5', level:'vip'}
+        ];
+        this.render();
+      }
+      render(){
+        this.shadowRoot.innerHTML = `
+          <style>
+            nav { position: fixed; right: 1rem; top: 5rem; background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 0.5rem; width: 180px; }
+            a { display: block; padding: 0.25rem 0; color: #007bff; text-decoration: none; font-size: 0.9rem; }
+            a:hover { text-decoration: underline; }
+          </style>
+          <nav>${this.chapters.map(ch => `<a href="#${ch.page}" data-level="${ch.level}">${ch.title}</a>`).join('')}</nav>
+        `;
+      }
+    }
+    customElements.define('app-nav', AppNav);
+
+    /* -----------------
+       5. Audio Component
+    ----------------- */
+    class AppAudio extends HTMLElement {
+      constructor(){
+        super();
+	•	        this.attachShadow({mode:'open'});
+        this.playlist = [
+          {title:'背景音樂1', src:'./music/bg.mp3'},
+          {title:'背景音樂2', src:'./music/bg2.mp3'},
+          {title:'背景音樂3', src:'./music/bg3.mp3'}
+        ];
+        this.currentTrack = 0;
+        this.isLoop = false;
+        this.render();
+      }
+      render(){
+        this.shadowRoot.innerHTML = `
+          <style>
+            :host { position:fixed; bottom:1rem; left:1rem; background:#fff; border:1px solid #ddd; padding:0.5rem; border-radius:6px; width:240px; display:block; }
+	•	            button { margin:0 0.25rem; }
+            #playlist { max-height:100px; overflow-y:auto; font-size:0.85rem; }
+            #playlist div { cursor:pointer; padding:0.25rem; border-radius:4px; }
+            #playlist div:hover { background:#f1f1f1; }
+          </style>
+          <audio id="bg-music"></audio>
+          <div>
+            <button id="prev">⏮</button>
+            <button id="play">▶</button>
+            <button id="pause">⏸</button>
+            <button id="next">⏭</button>
+            <button id="loop">🔁</button>
+            <button id="mute">🔇</button>
+          </div>
+          <input id="progress" type="range" min="0" max="100" value="0">
+          <input id="volume" type="range" min="0" max="1" step="0.05" value="0.5">
+          <div id="playlist"></div>
+        `;
+      }
+      connectedCallback(){
+        this.bg = this.shadowRoot.getElementById('bg-music');
+        this.progress = this.shadowRoot.getElementById('progress');
+        this.volume = this.shadowRoot.getElementById('volume');
+        this.playlistDiv = this.shadowRoot.getElementById('playlist');
+
+        this.renderPlaylist();
+        this.loadTrack(this.currentTrack);
+
+        this.shadowRoot.getElementById('play').onclick = () => this.bg.play();
+	•	        this.shadowRoot.getElementById('pause').onclick = () => this.bg.pause();
+        this.shadowRoot.getElementById('prev').onclick = () => {
+          this.currentTrack = (this.currentTrack-1+this.playlist.length)%this.playlist.length;
+          this.loadTrack(this.currentTrack); this.bg.play();
+        }
+        this.shadowRoot.getElementById('next').onclick = () => {
+          this.currentTrack = (this.currentTrack+1)%this.playlist.length;
+          this.loadTrack(this.currentTrack); this.bg.play();
+        }
+        this.shadowRoot.getElementById('loop').onclick = () => {
+          this.isLoop = !this.isLoop;
+        }
+	•	        this.shadowRoot.getElementById('mute').onclick = () => {
+          this.bg.muted = !this.bg.muted;
+        }
+        this.volume.oninput = e=> this.bg.volume = e.target.value;
+        this.progress.oninput = e=> this.bg.currentTime = (this.bg.duration * e.target.value)/100;
+
+        this.bg.addEventListener('timeupdate', ()=>{
+	•	          this.progress.value = (this.bg.currentTime/this.bg.duration)*100 || 0;
+        });
+        this.bg.addEventListener('ended', ()=>{
+          if(this.isLoop) this.bg.play(); else this.shadowRoot.getElementById('next').click();
+        });
+      }
+      renderPlaylist(){
+        this.playlistDiv.innerHTML = '';
+        this.playlist.forEach((track, idx)=>{
+          const div = document.createElement('div');
+          div.textContent = (idx===this.currentTrack?'▶ ':'') + track.title;
+          div.onclick = ()=>{ this.loadTrack(idx); this.bg.play(); }
+          this.playlistDiv.appendChild(div);
+        });
+      }
+      loadTrack(index){
+        this.currentTrack = index;
+        this.bg.src = this.playlist[index].src;
+        this.bg.load();
+        this.renderPlaylist();
+      }
+    }
+    customElements.define('app-audio', AppAudio);
+  </script>
+</body>
+</html>
+#007bff; text-decoration: none; font-size: 0.9rem; }
+    nav a.hidden { display: none; }
+    nav a:hover { text-decoration: underline; }
+    main { max-width: 960px; margin: 2rem auto; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); min-height:400px; }
+    .hidden { display: none; }
+    .login-panel { margin: 1rem 0; padding: 1rem; background: #e9ecef; border-radius: 6px; }
+    .login-panel input, .login-panel select { display:block; margin:0.5rem 0; width: 100%; padding: 0.25rem; }
+    .floating-panel { position: fixed; bottom: 1rem; right: 1rem; background: #007bff; color: white; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+    .loading { text-align:center; padding:2rem; font-size:1.2rem; color:#777; }
+    #notification { position:fixed; top:1rem; left:50%; transform:translateX(-50%); background:#333; color:white; padding:0.5rem 1rem; border-radius:6px; display:none; }
+    #audio-player { position:fixed; bottom:1rem; left:1rem; background:#fff; border:1px solid #ddd; padding:0.5rem; border-radius:6px; width:240px; }
+    #audio-player button { margin:0 0.25rem; }
+    #playlist { max-height: 100px; overflow-y: auto; margin-top: 0.25rem; font-size: 0.85rem; }
+    #playlist div { cursor: pointer; padding: 0.25rem; border-radius: 4px; }
+    #playlist div:hover { background: #f1f1f1; }
+    #progress { width: 100%; margin: 0.25rem 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌐 旗艦會員系統 SPA</h1>
+    <div>
+      <button id="logout-btn" class="hidden">登出</button>
+      <button id="switch-btn" class="hidden">切換帳號</button>
+      <button id="clear-cache" class="hidden">清除快取</button>
+      <button id="reload-btn">重新載入</button>
+    </div>
+  </header>
+
+  <nav id="nav">
+    <a href="#ch1" data-page="ch1" data-level="basic">第一章</a>
+    <a href="#ch2" data-page="ch2" data-level="basic">第二章</a>
+    <a href="#ch3" data-page="ch3" data-level="premium">第三章</a>
+    <a href="#ch4" data-page="ch4" data-level="premium">第四章</a>
+    <a href="#ch5" data-page="ch5" data-level="vip">第五章</a>
+  </nav>
+
+  <main>
+    <div id="notification"></div>
+    <section class="login-panel" id="login-panel">
+      <h2>會員登入</h2>
+      <input type="text" id="username" placeholder="帳號">
+      <input type="password" id="password" placeholder="密碼">
+      <select id="level">
+        <option value="basic">基本會員</option>
+        <option value="premium">高級會員</option>
+        <option value="vip">VIP 會員</option>
+      </select>
+      <button onclick="login()">登入</button>
+      <div id="login-status"></div>
+    </section>
+    <div id="content-area"></div>
+  </main>
+
+  <div class="floating-panel" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ 返回頂部</div>
+  <div id="audio-player">
+    <audio id="bg-music"></audio>
+    <div>
+      <button id="prev-btn">⏮</button>
+      <button id="play-btn">▶</button>
+      <button id="pause-btn">⏸</button>
+      <button id="next-btn">⏭</button>
+      <button id="loop-btn">🔁</button>
+      <button id="mute-btn">🔇</button>
+    </div>
+    <input id="progress" type="range" min="0" max="100" value="0">
+    <input id="volume-slider" type="range" min="0" max="1" step="0.05" value="0.5">
+    <div id="playlist"></div>
+  </div>
+
+  <script type="module">
+    const contentArea = document.getElementById('content-area');
+    const nav = document.getElementById('nav');
+    const loginPanel = document.getElementById('login-panel');
+    const notification = document.getElementById('notification');
+    const bgMusic = document.getElementById('bg-music');
+
+    // 音樂播放器元素
+    const playBtn = document.getElementById('play-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const muteBtn = document.getElementById('mute-btn');
+    const volumeSlider = document.getElementById('volume-slider');
+    const progress = document.getElementById('progress');
+    const loopBtn = document.getElementById('loop-btn');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const playlistDiv = document.getElementById('playlist');
+
+    const playlist = [
+      {title:'背景音樂1', src:'./music/bg.mp3'},
+      {title:'背景音樂2', src:'./music/bg2.mp3'},
+      {title:'背景音樂3', src:'./music/bg3.mp3'}
+    ];
+    let currentTrack = 0;
+    let isLoop = false;
+
+    function loadTrack(index){
+      currentTrack = index;
+      bgMusic.src = playlist[index].src;
+      bgMusic.load();
+      highlightPlaylist();
+    }
+
+    function highlightPlaylist(){
+      playlistDiv.innerHTML = '';
+      playlist.forEach((track, idx)=>{
+        const div = document.createElement('div');
+        div.textContent = (idx===currentTrack?'▶ ':'')+track.title;
+        div.onclick = ()=>{ loadTrack(idx); bgMusic.play(); };
+        playlistDiv.appendChild(div);
+      });
+    }
+
+    playBtn.onclick = () => bgMusic.play();
+    pauseBtn.onclick = () => bgMusic.pause();
+    muteBtn.onclick = () => {
+      bgMusic.muted = !bgMusic.muted;
+      muteBtn.textContent = bgMusic.muted ? '🔊' : '🔇';
+    };
+    volumeSlider.addEventListener('input', e => {
+      bgMusic.volume = e.target.value;
+    });
+    progress.addEventListener('input', e => {
+      bgMusic.currentTime = (bgMusic.duration * e.target.value)/100;
+    });
+
+    bgMusic.addEventListener('timeupdate', () => {
+	⁃	      progress.value = (bgMusic.currentTime / bgMusic.duration) * 100 || 0;
+    });
+
+    loopBtn.onclick = () => {
+      isLoop = !isLoop;
+      loopBtn.style.color = isLoop ? 'red' : 'black';
+    };
+
+    bgMusic.addEventListener('ended', () => {
+      if(isLoop){
+        bgMusic.play();
+      } else {
+        nextBtn.click();
+      }
+    });
+
+    prevBtn.onclick = () => {
+      currentTrack = (currentTrack-1+playlist.length)%playlist.length;
+      loadTrack(currentTrack);
+      bgMusic.play();
+    }
+
+    nextBtn.onclick = () => {
+      currentTrack = (currentTrack+1)%playlist.length;
+      loadTrack(currentTrack);
+      bgMusic.play();
+    }
+
+    loadTrack(currentTrack);
+
+    // 其餘會員系統與內容載入程式碼與之前相同...
+  </script>
+</body>
+</html>onclick = () => bgMusic.pause();
+    muteBtn.onclick = () => {
+      bgMusic.muted = !bgMusic.muted;
+      muteBtn.textContent = bgMusic.muted ? '取消靜音' : '靜音';
+    };
+    volumeSlider.addEventListener('input', e => {
+      bgMusic.volume = e.target.value;
+    });
+  </script>
+</body>
+	1.	</html>極旗艦級拆解表
+	2.	🔹 專案級結構優勢解析
+	3.	🔹 簡易產品級範例
+	4.	🔹 AI 擴充內容與建議
+	5.	🔹 多格式分享與下載
+
+> 浮動右側導覽列：支援快速跳轉、章節高亮、返回首頁按鈕
+
+---
+
+第一章｜網站七層級架構概覽
+
+<details>
+<summary>📖 點此展開 / 收起章節</summary>
+
+網站七層級拆解：
+頁面角色層 － 這頁是工具？文章？入口？
+語義結構層 － header、main、article…
+功能模組層 － 密碼產生器、導覽列、搜尋列
+互動控制層 － input、button、JS 綁定
+元素標籤層 － div、section、label、span
+屬性語意層 － id、for、aria、role、name
+行為邏輯層 － 事件、資料流、狀態
+
+> 互動功能：
+> - 點擊層級名稱可彈出範例程式碼視窗
+> - 右下角浮動面板：展開/收起/下載/分享
+
+</details>
+
+---
+
+第二章｜終極旗艦級拆解表
+
+<details>
+<summary>📊 點此展開 / 收起章節</summary>
+
+> 進階互動表格功能：
+> - 🔍 支援搜尋 / 篩選 / 排序
+> - 🖥️ 行內即時程式碼預覽
+> - 📋 一鍵複製程式碼
+> - ⏹️ 模擬執行於沙盒中
+
+功能名稱	頁面角色定位	語義結構設計	使用標籤	關鍵屬性	功能行為	即時操作
+工具主容器	整頁核心產品	main → article	<main><article>	id, aria-label	定位 SEO + 輔助焦點	▶ 預覽
+工具標頭	模組識別	article > header	<header><strong><span>	無需 class	建立產品語意辨識	▶ 預覽
+輸入參數控制	功能互動區	section	<section><label><input>	for, id, type	控制資料輸入	▶ 預覽
+選項開關	條件控制	section	<input type="checkbox">	checked, id	控制邏輯分支	▶ 預覽
+> 互動說明：
+> - 點擊 ▶ 預覽 → 開啟即時程式碼彈窗 + 沙盒模擬運作
+> - 右下角浮動面板提供下載 Markdown / HTML / PDF
+
+</details>
+
+---
+
+第三章｜專案級結構優勢解析
+
+<details>
+<summary>💡 點此展開 / 收起章節</summary>
+
+優勢：
+	⁃	HTML 即文件，結構清晰可讀
+	⁃	高度可重用，模組化易整合
+	⁃	AI 與 SEO 友好，助於文件生成與搜尋
+
+> 互動模組：
+> - 🖱️ 模擬點擊展示互動綁定效果
+> - 📋 快速複製 HTML 結構
+> - ⚡ 即時沙盒運行程式碼
+
+</details>
+
+---
+
+第四章｜簡易產品級範例 + 即時沙盒
+
+<details>
+<summary>📝 點此展開 / 收起程式碼範例</summary>
+
+<main>
+  <article>
+    <header>
+      <strong>Password Tool</strong><span> · Mobispace</span>
+    </header>
+
+    <section>
+      <label for="len">長度</label>
+      <input id="len" type="number" value="16">
+    </section>
+
+    <section>
