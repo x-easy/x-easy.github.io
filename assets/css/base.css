@@ -1,0 +1,30 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.topbar {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 12px;
+  background: var(--panel);
+}
+
+.icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: inherit;
+}
+
+.stack {
+  position: relative;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+}
