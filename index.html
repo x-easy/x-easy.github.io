@@ -1,343 +1,108 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MobiSpace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MobiSpace</title>
 
-  <style>
-  /* ===============================
-     全域變數（LINE-like）
-     =============================== */
-  :root {
-    --bg-main: #0f0f0f;
-    --bg-card: #1c1c1c;
-    --bg-soft: #232323;
-
-    --text-main: #ffffff;
-    --text-sub: #9a9a9a;
-
-    --c-active: #06c755;
-    --c-muted: #9aa0a6;
-
-    --ic-m: 24px;
-  }
-
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-    background: var(--bg-main);
-    color: var(--text-main);
-  }
-
-  /* ===============================
-     SVG ICON 基礎類
-     =============================== */
-  .ms-icon {
-    width: var(--ic-m);
-    height: var(--ic-m);
-    color: var(--c-muted);
-    display: inline-block;
-  }
-
-  .ms-icon.active {
-    color: var(--c-active);
-  }
-
-  /* ===============================
-     Header
-     =============================== */
-  header {
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .mini-player {
-    font-size: 13px;
-    color: var(--text-sub);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .header-actions {
-    display: flex;
-    gap: 18px;
-  }
-
-  .header-actions button {
-    background: none;
-    border: none;
-    color: var(--text-main);
-    font-size: 11px;
-    text-align: center;
-    cursor: pointer;
-  }
-
-  .header-actions svg {
-    display: block;
-    margin: 0 auto 4px;
-  }
-
-  /* ===============================
-     搜尋列
-     =============================== */
-  .search-bar {
-    margin: 0 16px 16px;
-    background: var(--bg-card);
-    border-radius: 16px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text-sub);
-  }
-
-  /* ===============================
-     精選卡片
-     =============================== */
-  .feature-slider {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 0 16px 16px;
-  }
-
-  .feature-card {
-    flex: 0 0 85%;
-    background: var(--bg-card);
-    border-radius: 16px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-sub);
-  }
-
-  /* ===============================
-     Service Slider（SVG 版）
-     =============================== */
-  .service-slider {
-    display: flex;
-    gap: 22px;
-    overflow-x: auto;
-    padding: 8px 16px 16px;
-  }
-
-  .service-item {
-    min-width: 56px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-sub);
-  }
-
-  .service-item svg {
-    margin-bottom: 6px;
-  }
-
-  /* ===============================
-     文章列表
-     =============================== */
-  .article-list {
-    padding: 0 16px 80px;
-  }
-
-  .article {
-    display: flex;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #222;
-  }
-
-  .article-thumb {
-    width: 56px;
-    height: 56px;
-    background: var(--bg-soft);
-    border-radius: 12px;
-  }
-
-  /* ===============================
-     Bottom Nav（SVG 版）
-     =============================== */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    background: #121212;
-    border-top: 1px solid #1f1f1f;
-    display: flex;
-  }
-
-  .bottom-nav button {
-    flex: 1;
-    background: none;
-    border: none;
-    color: var(--c-muted);
-    font-size: 11px;
-    text-align: center;
-    padding-top: 6px;
-  }
-
-  .bottom-nav button.active {
-    color: var(--c-active);
-  }
-
-  .bottom-nav svg {
-    display: block;
-    margin: 0 auto 4px;
-  }
-  </style>
+<link rel="stylesheet" href="./assets/css/app.css">
 </head>
 
 <body>
 
-<!-- =================================================
-     SVG SPRITE（全站唯一）
-     ================================================= -->
+<!-- ================= SVG ICON SPRITE ================= -->
 <div style="display:none">
 <svg xmlns="http://www.w3.org/2000/svg">
 
-  <symbol id="ic-home" viewBox="0 0 24 24">
-    <path d="M4 11.5L12 5l8 6.5" fill="none"
-      stroke="currentColor" stroke-width="2"
-      stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M6.5 10.8V19h11V10.8" fill="none"
-      stroke="currentColor" stroke-width="2"/>
+  <symbol id="ic-play" viewBox="0 0 24 24">
+    <polygon points="8,5 19,12 8,19" fill="currentColor"/>
   </symbol>
 
-  <symbol id="ic-doc" viewBox="0 0 24 24">
-    <path d="M6 4h9l3 3v13H6z"
-      fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linejoin="round"/>
+  <symbol id="ic-pause" viewBox="0 0 24 24">
+    <rect x="7" y="5" width="4" height="14" fill="currentColor"/>
+    <rect x="13" y="5" width="4" height="14" fill="currentColor"/>
   </symbol>
 
-  <symbol id="ic-bell" viewBox="0 0 24 24">
-    <path d="M18 16H6l1.5-2v-4a4.5 4.5 0 0 1 9 0v4z"
-      fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linejoin="round"/>
-  </symbol>
-
-  <symbol id="ic-music" viewBox="0 0 24 24">
-    <path d="M9 18a2 2 0 1 0 0-4
-             2 2 0 0 0 0 4zm6-2V6l-8 2v8"
-      fill="none" stroke="currentColor"
-      stroke-width="2" stroke-linecap="round"/>
-  </symbol>
-
-  <symbol id="ic-search" viewBox="0 0 24 24">
-    <circle cx="11" cy="11" r="6.5"
-      fill="none" stroke="currentColor"
-      stroke-width="2"/>
-    <path d="M16 16l4 4"
-      stroke="currentColor" stroke-width="2"
-      stroke-linecap="round"/>
-  </symbol>
-
-  <symbol id="ic-setting" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="3"
-      fill="none" stroke="currentColor"
-      stroke-width="2"/>
-    <path d="M4.5 12h2.5M17 12h2.5
-             M12 4.5v2.5M12 17v2.5"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"/>
+  <symbol id="ic-close" viewBox="0 0 24 24">
+    <path d="M6 6l12 12M18 6L6 18"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
   </symbol>
 
 </svg>
 </div>
 
-<!-- ================= Header ================= -->
-<header>
-  <div class="mini-player">
-    <svg class="ms-icon"><use href="#ic-music"/></svg>
-    感情 ‧ 阿YueYue
-  </div>
-
-  <div class="header-actions">
-    <button>
-      <svg class="ms-icon"><use href="#ic-doc"/></svg>
-      記事
-    </button>
-    <button>
-      <svg class="ms-icon"><use href="#ic-bell"/></svg>
-      提醒
-    </button>
-    <button>
-      <svg class="ms-icon"><use href="#ic-music"/></svg>
-      音樂
-    </button>
-    <button>
-      <svg class="ms-icon"><use href="#ic-setting"/></svg>
-      設定
+<!-- ================= HEADER / MINI PLAYER ================= -->
+<header class="header">
+  <div class="mini-player" id="miniPlayer">
+    <span>🎵 感情 ‧ 阿YueYue</span>
+    <button id="playBtn">
+      <svg class="icon"><use href="#ic-play"/></svg>
     </button>
   </div>
 </header>
 
-<!-- 搜尋 -->
-<div class="search-bar">
-  <svg class="ms-icon"><use href="#ic-search"/></svg>
-  搜尋
-</div>
+<!-- ================= SEARCH ================= -->
+<div class="search-bar">🔍 搜尋</div>
 
-<!-- 精選 -->
+<!-- ================= FEATURE ================= -->
 <div class="feature-slider">
-  <div class="feature-card">精選文章卡片 1</div>
-  <div class="feature-card">精選文章卡片 2</div>
+  <div class="feature-card">精選卡片</div>
 </div>
 
-<!-- Service -->
+<!-- ================= SERVICE HEADER ================= -->
+<div class="service-header">
+  <span></span>
+  <button id="openService">顯示全部</button>
+</div>
+
+<!-- ================= SERVICE SLIDER ================= -->
 <div class="service-slider">
-  <div class="service-item">
-    <svg class="ms-icon"><use href="#ic-doc"/></svg>
-    貼圖小舖
-  </div>
-  <div class="service-item">
-    <svg class="ms-icon"><use href="#ic-doc"/></svg>
-    主題小舖
-  </div>
-  <div class="service-item">
-    <svg class="ms-icon"><use href="#ic-music"/></svg>
-    LINE TV
+  <div class="service-item">貼圖小舖</div>
+  <div class="service-item">主題小舖</div>
+  <div class="service-item">LINE TV</div>
+  <div class="service-item">來電鈴聲</div>
+  <div class="service-item">LINE GO</div>
+  <div class="service-item">LINE GAME</div>
+  <div class="service-item">LINE 禮物</div>
+  <div class="service-item">官方帳號</div>
+</div>
+
+<!-- ================= FULL SERVICE PAGE ================= -->
+<div class="service-page" id="servicePage">
+  <header>
+    <span>服務</span>
+    <button id="closeService">
+      <svg class="icon"><use href="#ic-close"/></svg>
+    </button>
+  </header>
+
+  <div class="service-grid">
+    <div class="service-item">貼圖小舖</div>
+    <div class="service-item">主題小舖</div>
+    <div class="service-item">LINE TV</div>
+    <div class="service-item">來電鈴聲</div>
+    <div class="service-item">LINE GO</div>
+    <div class="service-item">LINE GAME</div>
+    <div class="service-item">LINE 禮物</div>
+    <div class="service-item">官方帳號</div>
   </div>
 </div>
 
-<!-- 文章 -->
-<div class="article-list">
-  <div class="article">
-    <div class="article-thumb"></div>
-    <div>
-      <div>全聯開出 3 張發票大獎</div>
-      <small style="color:#9a9a9a;">焦點新聞</small>
-    </div>
+<!-- ================= MUSIC MODAL ================= -->
+<div class="modal" id="musicModal">
+  <div class="modal-box">
+    <iframe id="ytPlayer"
+      src="https://www.youtube.com/embed/J0Gx6FwSvUQ?enablejsapi=1"
+      allow="autoplay"></iframe>
+    <button id="closeModal">關閉</button>
   </div>
 </div>
 
-<!-- Bottom Nav -->
-<nav class="bottom-nav">
-  <button class="active">
-    <svg class="ms-icon active"><use href="#ic-home"/></svg>
-    首頁
-  </button>
-  <button>
-    <svg class="ms-icon"><use href="#ic-doc"/></svg>
-    文章
-  </button>
-  <button>
-    <svg class="ms-icon"><use href="#ic-music"/></svg>
-    短影
-  </button>
-  <button>
-    <svg class="ms-icon"><use href="#ic-setting"/></svg>
-    設定
-  </button>
-</nav>
+<!-- ================= JS ================= -->
+<script src="./assets/js/app-init.js"></script>
+<script src="./assets/js/player.js"></script>
+<script src="./assets/js/service.js"></script>
+<script src="./assets/js/modal.js"></script>
 
 </body>
 </html>
