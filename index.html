@@ -1,108 +1,37 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MobiSpace</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MobiSpace</title>
 
-<link rel="stylesheet" href="./assets/css/app.css">
+  <!-- 全域主題變數（顏色 / 字型） -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+
+  <!-- App 殼架構（Header / Content / Bottom） -->
+  <link rel="stylesheet" href="layout/app-shell.css">
 </head>
 
 <body>
 
-<!-- ================= SVG ICON SPRITE ================= -->
-<div style="display:none">
-<svg xmlns="http://www.w3.org/2000/svg">
+  <!-- ===============================
+       App Root（整個 Web App 的容器）
+       =============================== -->
+  <div id="app-root">
 
-  <symbol id="ic-play" viewBox="0 0 24 24">
-    <polygon points="8,5 19,12 8,19" fill="currentColor"/>
-  </symbol>
+    <!-- Header：固定在最上 -->
+    <div id="app-header"></div>
 
-  <symbol id="ic-pause" viewBox="0 0 24 24">
-    <rect x="7" y="5" width="4" height="14" fill="currentColor"/>
-    <rect x="13" y="5" width="4" height="14" fill="currentColor"/>
-  </symbol>
+    <!-- 中央內容：唯一可捲動區 -->
+    <main id="app-content"></main>
 
-  <symbol id="ic-close" viewBox="0 0 24 24">
-    <path d="M6 6l12 12M18 6L6 18"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-  </symbol>
+    <!-- Bottom Nav：固定在最下 -->
+    <div id="app-bottom"></div>
 
-</svg>
-</div>
-
-<!-- ================= HEADER / MINI PLAYER ================= -->
-<header class="header">
-  <div class="mini-player" id="miniPlayer">
-    <span>🎵 感情 ‧ 阿YueYue</span>
-    <button id="playBtn">
-      <svg class="icon"><use href="#ic-play"/></svg>
-    </button>
   </div>
-</header>
 
-<!-- ================= SEARCH ================= -->
-<div class="search-bar">🔍 搜尋</div>
-
-<!-- ================= FEATURE ================= -->
-<div class="feature-slider">
-  <div class="feature-card">精選卡片</div>
-</div>
-
-<!-- ================= SERVICE HEADER ================= -->
-<div class="service-header">
-  <span></span>
-  <button id="openService">顯示全部</button>
-</div>
-
-<!-- ================= SERVICE SLIDER ================= -->
-<div class="service-slider">
-  <div class="service-item">貼圖小舖</div>
-  <div class="service-item">主題小舖</div>
-  <div class="service-item">LINE TV</div>
-  <div class="service-item">來電鈴聲</div>
-  <div class="service-item">LINE GO</div>
-  <div class="service-item">LINE GAME</div>
-  <div class="service-item">LINE 禮物</div>
-  <div class="service-item">官方帳號</div>
-</div>
-
-<!-- ================= FULL SERVICE PAGE ================= -->
-<div class="service-page" id="servicePage">
-  <header>
-    <span>服務</span>
-    <button id="closeService">
-      <svg class="icon"><use href="#ic-close"/></svg>
-    </button>
-  </header>
-
-  <div class="service-grid">
-    <div class="service-item">貼圖小舖</div>
-    <div class="service-item">主題小舖</div>
-    <div class="service-item">LINE TV</div>
-    <div class="service-item">來電鈴聲</div>
-    <div class="service-item">LINE GO</div>
-    <div class="service-item">LINE GAME</div>
-    <div class="service-item">LINE 禮物</div>
-    <div class="service-item">官方帳號</div>
-  </div>
-</div>
-
-<!-- ================= MUSIC MODAL ================= -->
-<div class="modal" id="musicModal">
-  <div class="modal-box">
-    <iframe id="ytPlayer"
-      src="https://www.youtube.com/embed/J0Gx6FwSvUQ?enablejsapi=1"
-      allow="autoplay"></iframe>
-    <button id="closeModal">關閉</button>
-  </div>
-</div>
-
-<!-- ================= JS ================= -->
-<script src="./assets/js/app-init.js"></script>
-<script src="./assets/js/player.js"></script>
-<script src="./assets/js/service.js"></script>
-<script src="./assets/js/modal.js"></script>
+  <!-- 全站唯一 JS 入口 -->
+  <script src="assets/js/app.js"></script>
 
 </body>
 </html>
