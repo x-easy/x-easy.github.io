@@ -1,294 +1,305 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Mobispace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>莫比空間 · MobiSpace</title>
 
-  <style>
-    /* =========================
-       全域基礎設定
-    ========================== */
-    * {
-      box-sizing: border-box;
-    }
+<style>
+/* ===============================
+   🎨 全域基礎樣式（深色系）
+================================ */
+:root{
+  --bg:#0b0b0b;
+  --panel:#141414;
+  --text:#eaeaea;
+  --muted:#888;
+  --accent:#1db954; /* 音樂綠 */
+}
 
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                   "PingFang TC", "Noto Sans TC", sans-serif;
-      background: #0f0f0f;
-      color: #eaeaea;
-    }
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
+/* ===============================
+   🔝 Header（紅框區）
+================================ */
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  background:linear-gradient(#111,#0b0b0b);
+}
 
-    /* =========================
-       Header（圖2 藍框樣式）
-    ========================== */
-    header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 14px 16px;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0.85),
-        rgba(0,0,0,0.55),
-        rgba(0,0,0,0)
-      );
-    }
+/* 右上功能群組 */
+.header-actions{
+  display:flex;
+  gap:18px;
+}
 
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+/* 單一功能按鈕 */
+.header-btn{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  font-size:12px;
+  color:#fff;
+  opacity:.85;
+  cursor:pointer;
+}
+.header-btn:hover{opacity:1}
 
-    .header-title {
-      font-size: 20px;
-      font-weight: 600;
-    }
+/* icon 用純 CSS 畫，避免外部依賴 */
+.icon{
+  width:22px;height:22px;
+  margin-bottom:4px;
+  border:2px solid currentColor;
+  border-radius:4px;
+}
 
-    .header-icons {
-      display: flex;
-      gap: 14px;
-    }
+/* 音樂清單專用 icon（人頭→音符） */
+.icon.music{
+  border-radius:50%;
+  position:relative;
+}
+.icon.music::after{
+  content:"♪";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
 
-    .header-icons span {
-      font-size: 20px;
-      opacity: 0.9;
-    }
+/* ===============================
+   📄 主內容（示意）
+================================ */
+main{
+  padding:16px;
+  min-height:60vh;
+  color:var(--muted);
+}
 
-    /* =========================
-       主內容區
-    ========================== */
-    main {
-      padding-top: 88px; /* header 空間 */
-      padding-bottom: 120px; /* 底部導覽空間 */
-    }
+/* ===============================
+   🎧 音樂清單 Modal
+================================ */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;                 /* 預設隱藏 */
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+}
 
-    .section {
-      padding: 16px;
-    }
+.modal.active{display:flex}
 
-    .card {
-      background: #2a2a2a;
-      border-radius: 18px;
-      padding: 24px;
-      text-align: center;
-      margin-bottom: 16px;
-    }
+/* Modal 主體 */
+.modal-panel{
+  width:92%;
+  max-width:420px;
+  background:var(--panel);
+  border-radius:12px;
+  padding:16px;
+}
 
-    .card.large {
-      height: 160px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      opacity: 0.7;
-    }
+/* 標題列 */
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
 
-    .list-item {
-      display: flex;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
+/* 關閉鍵 */
+.close{
+  cursor:pointer;
+  font-size:20px;
+}
 
-    .thumb {
-      width: 64px;
-      height: 64px;
-      background: #333;
-      border-radius: 12px;
-      flex-shrink: 0;
-    }
+/* 播放清單列表 */
+.playlist{
+  list-style:none;
+  padding:0;
+  margin:0 0 12px 0;
+}
+.playlist li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px;
+  border-bottom:1px solid #222;
+}
 
-    /* =========================
-       左上迷你音樂狀態
-    ========================== */
-    .mini-player-trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 999px;
-      font-size: 14px;
-      cursor: pointer;
-      margin-bottom: 12px;
-    }
+/* 移除按鈕 */
+.remove{
+  color:#f55;
+  cursor:pointer;
+}
 
-    .mini-player-trigger span {
-      color: #4cd964;
-    }
+/* 新增音樂 */
+.add-music{
+  display:flex;
+  gap:8px;
+}
+.add-music input{
+  flex:1;
+  padding:8px;
+  background:#000;
+  border:1px solid #333;
+  color:#fff;
+}
+.add-music button{
+  padding:8px 12px;
+  background:var(--accent);
+  border:none;
+  color:#000;
+  cursor:pointer;
+}
 
-    /* =========================
-       彈出播放器（圖3 藍框）
-    ========================== */
-    .player-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-    }
-
-    .player-overlay.active {
-      display: flex;
-    }
-
-    .player-card {
-      width: 92%;
-      max-width: 420px;
-      background: #1f1f1f;
-      border-radius: 20px;
-      padding: 16px;
-      margin-bottom: 20px;
-    }
-
-    .player-cover {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #333;
-      border-radius: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.8;
-    }
-
-    .player-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 12px;
-    }
-
-    .player-controls button {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 22px;
-    }
-
-    /* =========================
-       底部導覽
-    ========================== */
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: #1a1a1a;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      font-size: 13px;
-      z-index: 100;
-    }
-
-    nav div {
-      opacity: 0.7;
-    }
-
-    nav div.active {
-      opacity: 1;
-    }
-  </style>
+/* 播放器 */
+audio{
+  width:100%;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="header-row">
-      <div class="header-title">ホーム</div>
-      <div class="header-icons">
-        <span>🔖</span>
-        <span>🔔</span>
-        <span>👤</span>
-        <span>⚙️</span>
-      </div>
-    </div>
-  </header>
+<!-- ===============================
+     🔝 Header（紅框實作）
+================================ -->
+<header>
 
-  <!-- Main -->
-  <main>
+  <div>莫比空間</div>
 
-    <div class="section">
-      <!-- 迷你音樂 -->
-      <div class="mini-player-trigger" id="openPlayer">
-        <span>🎵</span>
-        懷情 - 阿YueYue
-      </div>
+  <div class="header-actions">
 
-      <!-- 精選卡片 -->
-      <div class="card large">
-        精選文章卡片
-      </div>
-
-      <!-- 文章列表 -->
-      <div class="list-item">
-        <div class="thumb"></div>
-        <div>
-          <div>全聯開出 3 張發票大獎</div>
-          <small style="opacity:.6">焦點新聞</small>
-        </div>
-      </div>
-
-      <div class="list-item">
-        <div class="thumb"></div>
-        <div>
-          <div>44 歲體脂創新低</div>
-          <small style="opacity:.6">討論熱度</small>
-        </div>
-      </div>
+    <div class="header-btn">
+      <div class="icon"></div>
+      <span>記事本</span>
     </div>
 
-  </main>
-
-  <!-- 彈出播放器 -->
-  <div class="player-overlay" id="player">
-    <div class="player-card">
-      <div class="player-cover">
-        音樂封面
-      </div>
-      <div class="player-controls">
-        <button>⏮</button>
-        <button>▶️</button>
-        <button id="closePlayer">✖</button>
-      </div>
+    <div class="header-btn">
+      <div class="icon"></div>
+      <span>提醒</span>
     </div>
+
+    <!-- 🔴 人頭 → 音樂清單功能 -->
+    <div class="header-btn" id="openPlaylist">
+      <div class="icon music"></div>
+      <span>音樂</span>
+    </div>
+
+    <div class="header-btn">
+      <div class="icon"></div>
+      <span>設定</span>
+    </div>
+
   </div>
+</header>
 
-  <!-- 底部導覽 -->
-  <nav>
-    <div class="active">首頁</div>
-    <div>文章</div>
-    <div>短影</div>
-    <div>設定</div>
-  </nav>
+<main>
+  這裡是主畫面內容區（暫略）
+</main>
 
-  <!-- JS -->
-  <script>
-    const openBtn = document.getElementById("openPlayer");
-    const closeBtn = document.getElementById("closePlayer");
-    const overlay = document.getElementById("player");
+<!-- ===============================
+     🎧 音樂清單 Modal
+================================ -->
+<div class="modal" id="playlistModal">
+  <div class="modal-panel">
 
-    openBtn.onclick = () => overlay.classList.add("active");
-    closeBtn.onclick = () => overlay.classList.remove("active");
-  </script>
+    <div class="modal-header">
+      <strong>播放清單</strong>
+      <span class="close" id="closePlaylist">✕</span>
+    </div>
+
+    <!-- 播放清單列表 -->
+    <ul class="playlist" id="playlist"></ul>
+
+    <!-- 新增音樂 -->
+    <div class="add-music">
+      <input id="musicUrl" placeholder="貼上音樂網址（mp3 / YouTube）">
+      <button id="addMusic">＋</button>
+    </div>
+
+    <!-- 音樂播放器 -->
+    <audio id="audio" controls></audio>
+
+  </div>
+</div>
+
+<script>
+/* ===============================
+   🧠 音樂清單邏輯（LocalStorage）
+================================ */
+
+// DOM 快取
+const modal = document.getElementById('playlistModal');
+const playlistEl = document.getElementById('playlist');
+const audio = document.getElementById('audio');
+const input = document.getElementById('musicUrl');
+
+// 讀取儲存的播放清單
+let playlist = JSON.parse(localStorage.getItem('playlist') || '[]');
+
+// 渲染播放清單
+function render(){
+  playlistEl.innerHTML = '';
+  playlist.forEach((url,i)=>{
+    const li = document.createElement('li');
+
+    // 點擊播放
+    const play = document.createElement('span');
+    play.textContent = `音樂 ${i+1}`;
+    play.style.cursor = 'pointer';
+    play.onclick = ()=> audio.src = url;
+
+    // 移除
+    const remove = document.createElement('span');
+    remove.textContent = '✕';
+    remove.className = 'remove';
+    remove.onclick = ()=>{
+      playlist.splice(i,1);
+      save();
+    };
+
+    li.append(play,remove);
+    playlistEl.appendChild(li);
+  });
+}
+
+// 儲存並重繪
+function save(){
+  localStorage.setItem('playlist',JSON.stringify(playlist));
+  render();
+}
+
+// 新增音樂
+document.getElementById('addMusic').onclick = ()=>{
+  if(!input.value.trim()) return;
+  playlist.push(input.value.trim());
+  input.value='';
+  save();
+};
+
+// 開關 Modal
+document.getElementById('openPlaylist').onclick = ()=>{
+  modal.classList.add('active');
+  render();
+};
+document.getElementById('closePlaylist').onclick = ()=>{
+  modal.classList.remove('active');
+};
+</script>
 
 </body>
 </html>
