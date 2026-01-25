@@ -11,17 +11,14 @@
    全域基礎設定（對齊 LINE 深色系）
    =============================== */
 :root {
-  --bg-main: #0f0f0f;           /* 主背景 */
-  --bg-card: #1c1c1c;           /* 卡片背景 */
-  --bg-soft: #232323;           /* 輕卡片 */
+  --bg-main: #0f0f0f;
+  --bg-card: #1c1c1c;
+  --bg-soft: #232323;
   --text-main: #ffffff;
   --text-sub: #9a9a9a;
-  --accent: #00c300;            /* LINE 綠 */
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -31,22 +28,30 @@ body {
 }
 
 /* ===============================
-   頁首 Header（紅框 + 紫框）
+   Header（紅框：播放器 + 工具列）
    =============================== */
 header {
-  padding: 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-header h1 {
-  font-size: 20px;
-  margin: 0;
-  font-weight: 600;
+/* 🎵 固定式簡易播放器（取代 Logo） */
+.mini-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* 右上功能按鈕群（文章 / 提醒 / 音樂 / 設定） */
+.mini-player iframe {
+  width: 160px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+}
+
+/* 右上工具按鈕 */
 .header-actions {
   display: flex;
   gap: 18px;
@@ -68,10 +73,10 @@ header h1 {
 }
 
 /* ===============================
-   搜尋列（維持你目前樣式）
+   搜尋列（維持）
    =============================== */
 .search-bar {
-  margin: 0 16px 16px;
+  margin: 0 16px 12px;
   background: var(--bg-card);
   border-radius: 16px;
   padding: 10px 14px;
@@ -80,20 +85,42 @@ header h1 {
   color: var(--text-sub);
 }
 
-.search-bar span {
-  margin-right: 8px;
+.search-bar span { margin-right: 8px; }
+
+/* ===============================
+   🟡 高仿 LINE「服務工具滑塊」
+   （圖2 黃色框尺寸）
+   =============================== */
+.service-slider-top {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 8px 16px 16px;
+}
+
+.service-top-item {
+  min-width: 64px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.service-top-icon {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 6px;
+  background: var(--bg-soft);
+  border-radius: 16px;
 }
 
 /* ===============================
-   🔶 橙色區塊（圖2 → 圖4）
-   LINE TODAY 焦點橫滑卡片
+   焦點橫滑卡片
    =============================== */
 .feature-slider {
   display: flex;
   gap: 12px;
   overflow-x: auto;
   padding: 0 16px 16px;
-  scroll-snap-type: x mandatory;
 }
 
 .feature-card {
@@ -104,39 +131,12 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  scroll-snap-align: start;
   color: var(--text-sub);
   font-size: 18px;
 }
 
 /* ===============================
-   🟡 黃色區塊（圖2 → 圖3）
-   LINE 服務 icon 滑動列
-   =============================== */
-.service-slider {
-  display: flex;
-  gap: 22px;
-  overflow-x: auto;
-  padding: 8px 16px 16px;
-}
-
-.service-item {
-  min-width: 56px;
-  text-align: center;
-  color: var(--text-sub);
-  font-size: 12px;
-}
-
-.service-icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 6px;
-  background: var(--bg-soft);
-  border-radius: 14px;
-}
-
-/* ===============================
-   🟢 文章列表（綠框，維持）
+   文章列表
    =============================== */
 .article-list {
   padding: 0 16px 80px;
@@ -156,10 +156,6 @@ header h1 {
   border-radius: 12px;
 }
 
-.article-text {
-  flex: 1;
-}
-
 .article-text h3 {
   margin: 0 0 4px;
   font-size: 15px;
@@ -172,8 +168,7 @@ header h1 {
 }
 
 /* ===============================
-   🔵 藍色區塊（圖2 → 圖5）
-   LINE 固定底部導覽列
+   底部導覽（不動）
    =============================== */
 .bottom-nav {
   position: fixed;
@@ -193,7 +188,6 @@ header h1 {
   border: none;
   color: var(--text-sub);
   font-size: 12px;
-  text-align: center;
 }
 
 .bottom-nav button span {
@@ -207,10 +201,17 @@ header h1 {
 <body>
 
 <!-- ===============================
-     Header（圖2 紅框 / 紫框）
+     Header
      =============================== -->
 <header>
-  <h1>MobiSpace</h1>
+
+  <!-- 🎵 簡易播放器（固定） -->
+  <div class="mini-player">
+    <iframe
+      src="https://www.youtube.com/embed/J0Gx6FwSvUQ?controls=1&modestbranding=1"
+      allow="autoplay">
+    </iframe>
+  </div>
 
   <div class="header-actions">
     <button><span>📄</span>記事</button>
@@ -220,39 +221,39 @@ header h1 {
   </div>
 </header>
 
-<!-- 搜尋列 -->
+<!-- 搜尋 -->
 <div class="search-bar">
   <span>🔍</span> 搜尋
 </div>
 
-<!-- 🔶 焦點橫滑卡片（圖4） -->
+<!-- 🟡 高仿服務工具列 -->
+<div class="service-slider-top">
+  <div class="service-top-item">
+    <div class="service-top-icon"></div>
+    貼圖小舖
+  </div>
+  <div class="service-top-item">
+    <div class="service-top-icon"></div>
+    主題小舖
+  </div>
+  <div class="service-top-item">
+    <div class="service-top-icon"></div>
+    LINE TV
+  </div>
+  <div class="service-top-item">
+    <div class="service-top-icon"></div>
+    來電鈴聲
+  </div>
+</div>
+
+<!-- 焦點卡片 -->
 <div class="feature-slider">
   <div class="feature-card">精選文章卡片 1</div>
   <div class="feature-card">精選文章卡片 2</div>
   <div class="feature-card">精選文章卡片 3</div>
 </div>
 
-<!-- 🟡 LINE 服務 icon 滑動列（圖3） -->
-<div class="service-slider">
-  <div class="service-item">
-    <div class="service-icon"></div>
-    貼圖小舖
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    主題小舖
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    LINE TV
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    來電鈴聲
-  </div>
-</div>
-
-<!-- 🟢 文章列表 -->
+<!-- 文章列表 -->
 <div class="article-list">
   <div class="article">
     <div class="article-thumb"></div>
@@ -271,7 +272,7 @@ header h1 {
   </div>
 </div>
 
-<!-- 🔵 固定底部導覽（圖5） -->
+<!-- 底部導覽 -->
 <nav class="bottom-nav">
   <button><span>🏠</span>首頁</button>
   <button><span>📰</span>文章</button>
