@@ -1,350 +1,283 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>MobiSpace</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ===============================
-       全域 CSS（單檔示範，之後可拆）
-       =============================== -->
-  <style>
-    /* ---------- 基本變數 ---------- */
-    :root {
-      --bg: #0b0b0b;
-      --panel: #1a1a1a;
-      --panel-soft: rgba(255,255,255,0.06);
-      --text: #eaeaea;
-      --muted: #9a9a9a;
-      --accent: #00e676;
-      --safe-bottom: env(safe-area-inset-bottom);
-    }
+<title>MobiSpace</title>
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      overflow-x: hidden;
-    }
+<style>
+/* ===============================
+   全域基礎設定（對齊 LINE 深色系）
+   =============================== */
+:root {
+  --bg-main: #0f0f0f;           /* 主背景 */
+  --bg-card: #1c1c1c;           /* 卡片背景 */
+  --bg-soft: #232323;           /* 輕卡片 */
+  --text-main: #ffffff;
+  --text-sub: #9a9a9a;
+  --accent: #00c300;            /* LINE 綠 */
+}
 
-    /* ===============================
-       3️⃣ Header｜Sticky
-       =============================== */
-    header {
-      position: sticky;        /* 固定在頂部 */
-      top: 0;
-      z-index: 100;
-      background: linear-gradient(#111, #0b0b0b);
-      padding: 14px 16px 10px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    .header-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
 
-    .logo {
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
+/* ===============================
+   頁首 Header（紅框 + 紫框）
+   =============================== */
+header {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    .header-icons {
-      display: flex;
-      gap: 14px;
-      opacity: 0.85;
-    }
+header h1 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: 600;
+}
 
-    .header-icons span {
-      width: 22px;
-      height: 22px;
-      border: 1px solid #555;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-    }
+/* 右上功能按鈕群（文章 / 提醒 / 音樂 / 設定） */
+.header-actions {
+  display: flex;
+  gap: 18px;
+}
 
-    /* ===============================
-       搜尋列
-       =============================== */
-    .search-bar {
-      margin-top: 10px;
-      background: var(--panel);
-      border-radius: 14px;
-      padding: 10px 14px;
-      color: var(--muted);
-    }
+.header-actions button {
+  background: none;
+  border: none;
+  color: var(--text-main);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+}
 
-    /* ===============================
-       1️⃣ 服務 icon 橫滑（慣性）
-       =============================== */
-    .service-strip {
-      margin-top: 16px;
-      padding-left: 16px;
-      display: flex;
-      gap: 18px;
-      overflow-x: auto;              /* 橫向滑動 */
-      scroll-snap-type: x mandatory; /* 停靠用 */
-      -webkit-overflow-scrolling: touch;
-    }
+.header-actions button span {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
 
-    .service-strip::-webkit-scrollbar { display: none; }
+/* ===============================
+   搜尋列（維持你目前樣式）
+   =============================== */
+.search-bar {
+  margin: 0 16px 16px;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  color: var(--text-sub);
+}
 
-    .service-item {
-      flex: 0 0 auto;
-      width: 64px;
-      text-align: center;
-      scroll-snap-align: start;
-      color: var(--muted);
-      font-size: 12px;
-    }
+.search-bar span {
+  margin-right: 8px;
+}
 
-    .service-item .icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: var(--panel-soft);
-      margin: 0 auto 6px;
-    }
+/* ===============================
+   🔶 橙色區塊（圖2 → 圖4）
+   LINE TODAY 焦點橫滑卡片
+   =============================== */
+.feature-slider {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 0 16px 16px;
+  scroll-snap-type: x mandatory;
+}
 
-    /* ===============================
-       5️⃣ 卡片區（Lazy Render）
-       =============================== */
-    main {
-      padding: 16px;
-      padding-bottom: 140px; /* 預留給底導 + 播放器 */
-    }
+.feature-card {
+  flex: 0 0 85%;
+  background: var(--bg-card);
+  border-radius: 16px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  color: var(--text-sub);
+  font-size: 18px;
+}
 
-    .card {
-      display: flex;
-      gap: 12px;
-      padding: 14px 0;
-      border-bottom: 1px solid #222;
-      opacity: 0;                   /* Lazy 前不可見 */
-      transform: translateY(20px);
-      transition: opacity .4s ease, transform .4s ease;
-    }
+/* ===============================
+   🟡 黃色區塊（圖2 → 圖3）
+   LINE 服務 icon 滑動列
+   =============================== */
+.service-slider {
+  display: flex;
+  gap: 22px;
+  overflow-x: auto;
+  padding: 8px 16px 16px;
+}
 
-    .card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
+.service-item {
+  min-width: 56px;
+  text-align: center;
+  color: var(--text-sub);
+  font-size: 12px;
+}
 
-    .thumb {
-      width: 56px;
-      height: 56px;
-      border-radius: 12px;
-      background: var(--panel-soft);
-      flex-shrink: 0;
-    }
+.service-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 6px;
+  background: var(--bg-soft);
+  border-radius: 14px;
+}
 
-    .card h4 {
-      margin: 0;
-      font-size: 15px;
-    }
+/* ===============================
+   🟢 文章列表（綠框，維持）
+   =============================== */
+.article-list {
+  padding: 0 16px 80px;
+}
 
-    .card p {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: var(--muted);
-    }
+.article {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #222;
+}
 
-    /* ===============================
-       2️⃣ 固定式迷你播放器
-       =============================== */
-    .mini-player {
-      position: fixed;
-      left: 12px;
-      top: 64px;                    /* 左上角 */
-      z-index: 90;
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-    }
+.article-thumb {
+  width: 56px;
+  height: 56px;
+  background: var(--bg-soft);
+  border-radius: 12px;
+}
 
-    .mini-player img {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: #333;
-    }
+.article-text {
+  flex: 1;
+}
 
-    .mini-player span {
-      font-size: 12px;
-      white-space: nowrap;
-    }
+.article-text h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
 
-    /* ===============================
-       2️⃣ 展開播放器（無 blur）
-       =============================== */
-    .player-modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.88); /* 純遮罩，不 blur */
-      z-index: 200;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+.article-text p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-sub);
+}
 
-    .player-box {
-      width: 90%;
-      max-width: 420px;
-      background: #000;
-      border-radius: 18px;
-      padding: 20px;
-    }
+/* ===============================
+   🔵 藍色區塊（圖2 → 圖5）
+   LINE 固定底部導覽列
+   =============================== */
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  background: #121212;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #1f1f1f;
+}
 
-    .progress {
-      height: 4px;
-      background: #333;
-      margin: 16px 0;
-      position: relative;
-    }
+.bottom-nav button {
+  background: none;
+  border: none;
+  color: var(--text-sub);
+  font-size: 12px;
+  text-align: center;
+}
 
-    .progress span {
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 30%;
-      background: var(--accent);
-    }
-
-    /* ===============================
-       4️⃣ 底部導覽（Active）
-       =============================== */
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding-bottom: var(--safe-bottom);
-      background: #111;
-      border-top: 1px solid #222;
-      display: flex;
-      justify-content: space-around;
-      z-index: 100;
-    }
-
-    nav button {
-      background: none;
-      border: none;
-      color: var(--muted);
-      padding: 10px 0 14px;
-      font-size: 12px;
-    }
-
-    nav button.active {
-      color: var(--accent);
-      transform: translateY(-2px);
-    }
-  </style>
+.bottom-nav button span {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+</style>
 </head>
 
 <body>
 
-  <!-- ===============================
-       Header
-       =============================== -->
-  <header>
-    <div class="header-row">
-      <div class="logo">MobiSpace</div>
-      <div class="header-icons">
-        <span>記</span><span>提</span><span>🎵</span><span>設</span>
-      </div>
+<!-- ===============================
+     Header（圖2 紅框 / 紫框）
+     =============================== -->
+<header>
+  <h1>MobiSpace</h1>
+
+  <div class="header-actions">
+    <button><span>📄</span>記事</button>
+    <button><span>🔔</span>提醒</button>
+    <button><span>🎵</span>音樂</button>
+    <button><span>⚙️</span>設定</button>
+  </div>
+</header>
+
+<!-- 搜尋列 -->
+<div class="search-bar">
+  <span>🔍</span> 搜尋
+</div>
+
+<!-- 🔶 焦點橫滑卡片（圖4） -->
+<div class="feature-slider">
+  <div class="feature-card">精選文章卡片 1</div>
+  <div class="feature-card">精選文章卡片 2</div>
+  <div class="feature-card">精選文章卡片 3</div>
+</div>
+
+<!-- 🟡 LINE 服務 icon 滑動列（圖3） -->
+<div class="service-slider">
+  <div class="service-item">
+    <div class="service-icon"></div>
+    貼圖小舖
+  </div>
+  <div class="service-item">
+    <div class="service-icon"></div>
+    主題小舖
+  </div>
+  <div class="service-item">
+    <div class="service-icon"></div>
+    LINE TV
+  </div>
+  <div class="service-item">
+    <div class="service-icon"></div>
+    來電鈴聲
+  </div>
+</div>
+
+<!-- 🟢 文章列表 -->
+<div class="article-list">
+  <div class="article">
+    <div class="article-thumb"></div>
+    <div class="article-text">
+      <h3>全聯開出 3 張發票大獎</h3>
+      <p>焦點新聞</p>
     </div>
-    <div class="search-bar">🔍 搜尋</div>
-  </header>
-
-  <!-- ===============================
-       1️⃣ 服務 icon 橫滑
-       =============================== -->
-  <section class="service-strip">
-    <div class="service-item"><div class="icon"></div>貼圖小舖</div>
-    <div class="service-item"><div class="icon"></div>主題小舖</div>
-    <div class="service-item"><div class="icon"></div>LINE TV</div>
-    <div class="service-item"><div class="icon"></div>來電鈴聲</div>
-  </section>
-
-  <!-- ===============================
-       主要內容（多頁切換區）
-       =============================== -->
-  <main id="page">
-    <!-- 模擬卡片列表 -->
-    <div class="card"><div class="thumb"></div><div><h4>全聯開出 3 張發票大獎</h4><p>焦點新聞</p></div></div>
-    <div class="card"><div class="thumb"></div><div><h4>44 歲體脂創新低</h4><p>討論熱度</p></div></div>
-    <div class="card"><div class="thumb"></div><div><h4>英農夫挖出千年寶藏</h4><p>國際</p></div></div>
-  </main>
-
-  <!-- ===============================
-       2️⃣ 固定式播放器
-       =============================== -->
-  <div class="mini-player" id="miniPlayer">
-    <img alt="" />
-    <span>🎵 感情 - 阿YueYue</span>
   </div>
 
-  <!-- ===============================
-       展開播放器
-       =============================== -->
-  <div class="player-modal" id="playerModal">
-    <div class="player-box">
-      <h3>感情 - 阿YueYue</h3>
-      <div class="progress"><span></span></div>
-      <button onclick="closePlayer()">關閉</button>
+  <div class="article">
+    <div class="article-thumb"></div>
+    <div class="article-text">
+      <h3>44 歲體脂創新低</h3>
+      <p>討論熱度</p>
     </div>
   </div>
+</div>
 
-  <!-- ===============================
-       底部導覽
-       =============================== -->
-  <nav>
-    <button class="active">首頁</button>
-    <button>文章</button>
-    <button>短影</button>
-    <button>設定</button>
-  </nav>
-
-  <!-- ===============================
-       JS 行為控制
-       =============================== -->
-  <script>
-    /* ===============================
-       5️⃣ Lazy Render 卡片
-       =============================== */
-    const cards = document.querySelectorAll('.card');
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add('visible');
-      });
-    }, { threshold: 0.2 });
-
-    cards.forEach(c => io.observe(c));
-
-    /* ===============================
-       2️⃣ 播放器開關
-       =============================== */
-    const mini = document.getElementById('miniPlayer');
-    const modal = document.getElementById('playerModal');
-
-    mini.onclick = () => modal.style.display = 'flex';
-    function closePlayer() { modal.style.display = 'none'; }
-
-    /* ===============================
-       7️⃣ localStorage 播放狀態
-       =============================== */
-    localStorage.setItem('lastTrack', '感情 - 阿YueYue');
-  </script>
+<!-- 🔵 固定底部導覽（圖5） -->
+<nav class="bottom-nav">
+  <button><span>🏠</span>首頁</button>
+  <button><span>📰</span>文章</button>
+  <button><span>🎬</span>短影</button>
+  <button><span>⚙️</span>設定</button>
+</nav>
 
 </body>
 </html>
