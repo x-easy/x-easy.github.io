@@ -2,163 +2,275 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MobiSpace</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MobiSpace｜Prototype</title>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+/* =====================================================
+   【全域基礎設定】
+   - 鎖定 App 感視窗寬度
+   - 深色主題
+===================================================== */
+* {
+  box-sizing: border-box; /* 確保 padding 不炸版 */
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #000;
-  color: #eee;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #0f0f0f;          /* LINE 深色背景 */
+  color: #eaeaea;
+  display: flex;
+  justify-content: center;      /* 置中 App */
 }
 
-/* ===== App Frame：圖2尺寸 ===== */
-#app {
-  max-width: 420px;
-  margin: 0 auto;
+/* App 主容器（模擬 LINE App 寬度） */
+.app {
+  width: 100%;
+  max-width: 420px;             /* iPhone Pro Max 安全值 */
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   background: #111;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* ===== Header（App密度） ===== */
-header {
-  height: 52px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  font-weight: 600;
-  border-bottom: 1px solid #222;
+/* =====================================================
+   【Header 區】
+===================================================== */
+.header {
+  padding: 16px;
 }
 
-/* ===== Content ===== */
-main {
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* ===== Section（圖1結構） ===== */
-.section {
-  padding: 14px;
-  border-bottom: 1px solid #222;
-}
-
-.section-title {
-  font-size: 13px;
-  color: #aaa;
-  margin-bottom: 8px;
-}
-
-/* ===== Music Bar ===== */
-.music-bar {
-  background: #2a2a2a;
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-size: 13px;
-}
-
-/* ===== Slider Placeholder ===== */
-.slider {
-  height: 140px;
-  background: #333;
+.search-box {
+  background: #1c1c1c;
   border-radius: 12px;
+  padding: 10px 14px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* =====================================================
+   【卡片輪播（圖1 樣式）】
+===================================================== */
+.carousel {
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;     /* 滑動吸附 */
+}
+
+.carousel-track::-webkit-scrollbar {
+  display: none;                     /* 隱藏 scrollbar */
+}
+
+.carousel-card {
+  min-width: 85%;
+  height: 160px;
+  background: #2a2a2a;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #888;
+  scroll-snap-align: start;
+  font-size: 18px;
+  color: #aaa;
+}
+
+/* =====================================================
+   【工具頁連結滑塊（圖2 樣式）】
+===================================================== */
+.tools {
+  margin-top: 24px;
+}
+
+.tools-title {
+  padding: 0 16px 8px;
   font-size: 14px;
+  color: #aaa;
 }
 
-/* ===== Tool Link ===== */
-.tool-link {
-  background: #444;
-  padding: 10px;
-  text-align: center;
-  border-radius: 10px;
-  font-size: 14px;
-}
-
-/* ===== Article List ===== */
-.article {
-  padding: 10px 0;
-  border-bottom: 1px solid #222;
-  font-size: 14px;
-}
-
-.article:last-child {
-  border-bottom: none;
-}
-
-/* ===== Bottom Nav（圖2尺寸） ===== */
-nav {
-  height: 56px;
+.tools-track {
   display: flex;
-  border-top: 1px solid #222;
-  background: #111;
+  gap: 20px;
+  padding: 0 16px;
+  overflow-x: auto;
 }
 
-nav button {
-  flex: 1;
-  border: none;
-  background: none;
-  color: #888;
+.tools-track::-webkit-scrollbar {
+  display: none;
+}
+
+.tool-item {
+  min-width: 64px;
+  text-align: center;
   font-size: 12px;
+  color: #ccc;
 }
 
-nav button.active {
-  color: #4cd964;
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #2b2b2b;
+  margin: 0 auto 6px;
+}
+
+/* =====================================================
+   【文章列表（圖1 樣式）】
+===================================================== */
+.article-list {
+  margin-top: 28px;
+  padding: 0 16px 80px; /* 留給底部 tab */
+}
+
+.article {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #222;
+}
+
+.article-thumb {
+  width: 88px;
+  height: 64px;
+  border-radius: 8px;
+  background: #333;
+  flex-shrink: 0;
+}
+
+.article-content {
+  flex: 1;
+}
+
+.article-title {
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.article-meta {
+  font-size: 12px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* =====================================================
+   【底部 Tab Bar（固定）】
+===================================================== */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 420px;
+  height: 64px;
+  background: #141414;
+  border-top: 1px solid #222;
+  display: flex;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.tab.active {
+  color: #fff;
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<div id="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="search-box">🔍 搜尋</div>
+  </div>
 
-<header>MobiSpace</header>
-
-<main>
-
-  <!-- 背景音樂 -->
-  <section class="section">
-    <div class="music-bar">
-      🎵 背景音樂播放器（可點擊展開）
+  <!-- 卡片輪播 -->
+  <section class="carousel">
+    <div class="carousel-track">
+      <div class="carousel-card">精選文章卡片 1</div>
+      <div class="carousel-card">精選文章卡片 2</div>
+      <div class="carousel-card">精選文章卡片 3</div>
     </div>
   </section>
 
-  <!-- 精選文章滑塊 -->
-  <section class="section">
-    <div class="section-title">精選文章卡片隨機輪播</div>
-    <div class="slider">Slider Placeholder</div>
+  <!-- 工具滑塊 -->
+  <section class="tools">
+    <div class="tools-title">服務</div>
+    <div class="tools-track">
+      <div class="tool-item">
+        <div class="tool-icon"></div>
+        貼圖小舖
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon"></div>
+        主題小舖
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon"></div>
+        LINE TV
+      </div>
+      <div class="tool-item">
+        <div class="tool-icon"></div>
+        來電鈴聲
+      </div>
+    </div>
   </section>
 
-  <!-- 工具頁連結 -->
-  <section class="section">
-    <div class="tool-link">工具頁連結滑塊</div>
+  <!-- 文章列表 -->
+  <section class="article-list">
+    <div class="article">
+      <div class="article-thumb"></div>
+      <div class="article-content">
+        <div class="article-title">全聯開出 3 張發票大獎</div>
+        <div class="article-meta">焦點新聞</div>
+      </div>
+    </div>
+
+    <div class="article">
+      <div class="article-thumb"></div>
+      <div class="article-content">
+        <div class="article-title">44 歲體脂創新低</div>
+        <div class="article-meta">討論熱度</div>
+      </div>
+    </div>
   </section>
-
-  <!-- 隨機文章列表 -->
-  <section class="section">
-    <div class="section-title">隨機文章列表</div>
-    <div class="article">文章標題一</div>
-    <div class="article">文章標題二</div>
-    <div class="article">文章標題三</div>
-  </section>
-
-</main>
-
-<nav>
-  <button class="active">首頁</button>
-  <button>文章</button>
-  <button>短影</button>
-  <button>設定</button>
-</nav>
 
 </div>
+
+<!-- 底部 Tab -->
+<nav class="tabbar">
+  <div class="tab active">首頁</div>
+  <div class="tab">文章</div>
+  <div class="tab">短影</div>
+  <div class="tab">設定</div>
+</nav>
+
+<script>
+/* =====================================================
+   【底部 Tab 切換邏輯（基礎版）】
+   - 先只做 active 樣式
+===================================================== */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+</script>
 
 </body>
 </html>
