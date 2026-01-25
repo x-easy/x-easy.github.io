@@ -1,276 +1,294 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MobiSpace｜Prototype</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mobispace</title>
 
-<style>
-/* =====================================================
-   【全域基礎設定】
-   - 鎖定 App 感視窗寬度
-   - 深色主題
-===================================================== */
-* {
-  box-sizing: border-box; /* 確保 padding 不炸版 */
-  margin: 0;
-  padding: 0;
-}
+  <style>
+    /* =========================
+       全域基礎設定
+    ========================== */
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0f0f0f;          /* LINE 深色背景 */
-  color: #eaeaea;
-  display: flex;
-  justify-content: center;      /* 置中 App */
-}
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   "PingFang TC", "Noto Sans TC", sans-serif;
+      background: #0f0f0f;
+      color: #eaeaea;
+    }
 
-/* App 主容器（模擬 LINE App 寬度） */
-.app {
-  width: 100%;
-  max-width: 420px;             /* iPhone Pro Max 安全值 */
-  min-height: 100vh;
-  background: #111;
-  position: relative;
-  overflow-x: hidden;
-}
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
 
-/* =====================================================
-   【Header 區】
-===================================================== */
-.header {
-  padding: 16px;
-}
+    /* =========================
+       Header（圖2 藍框樣式）
+    ========================== */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 14px 16px;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.85),
+        rgba(0,0,0,0.55),
+        rgba(0,0,0,0)
+      );
+    }
 
-.search-box {
-  background: #1c1c1c;
-  border-radius: 12px;
-  padding: 10px 14px;
-  color: #888;
-  font-size: 14px;
-}
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-/* =====================================================
-   【卡片輪播（圖1 樣式）】
-===================================================== */
-.carousel {
-  margin-top: 16px;
-  overflow: hidden;
-}
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
 
-.carousel-track {
-  display: flex;
-  gap: 12px;
-  padding: 0 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;     /* 滑動吸附 */
-}
+    .header-icons {
+      display: flex;
+      gap: 14px;
+    }
 
-.carousel-track::-webkit-scrollbar {
-  display: none;                     /* 隱藏 scrollbar */
-}
+    .header-icons span {
+      font-size: 20px;
+      opacity: 0.9;
+    }
 
-.carousel-card {
-  min-width: 85%;
-  height: 160px;
-  background: #2a2a2a;
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-align: start;
-  font-size: 18px;
-  color: #aaa;
-}
+    /* =========================
+       主內容區
+    ========================== */
+    main {
+      padding-top: 88px; /* header 空間 */
+      padding-bottom: 120px; /* 底部導覽空間 */
+    }
 
-/* =====================================================
-   【工具頁連結滑塊（圖2 樣式）】
-===================================================== */
-.tools {
-  margin-top: 24px;
-}
+    .section {
+      padding: 16px;
+    }
 
-.tools-title {
-  padding: 0 16px 8px;
-  font-size: 14px;
-  color: #aaa;
-}
+    .card {
+      background: #2a2a2a;
+      border-radius: 18px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
 
-.tools-track {
-  display: flex;
-  gap: 20px;
-  padding: 0 16px;
-  overflow-x: auto;
-}
+    .card.large {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      opacity: 0.7;
+    }
 
-.tools-track::-webkit-scrollbar {
-  display: none;
-}
+    .list-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
 
-.tool-item {
-  min-width: 64px;
-  text-align: center;
-  font-size: 12px;
-  color: #ccc;
-}
+    .thumb {
+      width: 64px;
+      height: 64px;
+      background: #333;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
 
-.tool-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: #2b2b2b;
-  margin: 0 auto 6px;
-}
+    /* =========================
+       左上迷你音樂狀態
+    ========================== */
+    .mini-player-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
 
-/* =====================================================
-   【文章列表（圖1 樣式）】
-===================================================== */
-.article-list {
-  margin-top: 28px;
-  padding: 0 16px 80px; /* 留給底部 tab */
-}
+    .mini-player-trigger span {
+      color: #4cd964;
+    }
 
-.article {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #222;
-}
+    /* =========================
+       彈出播放器（圖3 藍框）
+    ========================== */
+    .player-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
 
-.article-thumb {
-  width: 88px;
-  height: 64px;
-  border-radius: 8px;
-  background: #333;
-  flex-shrink: 0;
-}
+    .player-overlay.active {
+      display: flex;
+    }
 
-.article-content {
-  flex: 1;
-}
+    .player-card {
+      width: 92%;
+      max-width: 420px;
+      background: #1f1f1f;
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
 
-.article-title {
-  font-size: 15px;
-  line-height: 1.3;
-}
+    .player-cover {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #333;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.8;
+    }
 
-.article-meta {
-  font-size: 12px;
-  color: #777;
-  margin-top: 4px;
-}
+    .player-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
 
-/* =====================================================
-   【底部 Tab Bar（固定）】
-===================================================== */
-.tabbar {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  max-width: 420px;
-  height: 64px;
-  background: #141414;
-  border-top: 1px solid #222;
-  display: flex;
-}
+    .player-controls button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 22px;
+    }
 
-.tab {
-  flex: 1;
-  text-align: center;
-  font-size: 11px;
-  color: #777;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+    /* =========================
+       底部導覽
+    ========================== */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: #1a1a1a;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 13px;
+      z-index: 100;
+    }
 
-.tab.active {
-  color: #fff;
-}
-</style>
+    nav div {
+      opacity: 0.7;
+    }
+
+    nav div.active {
+      opacity: 1;
+    }
+  </style>
 </head>
 
 <body>
-<div class="app">
 
   <!-- Header -->
-  <div class="header">
-    <div class="search-box">🔍 搜尋</div>
+  <header>
+    <div class="header-row">
+      <div class="header-title">ホーム</div>
+      <div class="header-icons">
+        <span>🔖</span>
+        <span>🔔</span>
+        <span>👤</span>
+        <span>⚙️</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+
+    <div class="section">
+      <!-- 迷你音樂 -->
+      <div class="mini-player-trigger" id="openPlayer">
+        <span>🎵</span>
+        懷情 - 阿YueYue
+      </div>
+
+      <!-- 精選卡片 -->
+      <div class="card large">
+        精選文章卡片
+      </div>
+
+      <!-- 文章列表 -->
+      <div class="list-item">
+        <div class="thumb"></div>
+        <div>
+          <div>全聯開出 3 張發票大獎</div>
+          <small style="opacity:.6">焦點新聞</small>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="thumb"></div>
+        <div>
+          <div>44 歲體脂創新低</div>
+          <small style="opacity:.6">討論熱度</small>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 彈出播放器 -->
+  <div class="player-overlay" id="player">
+    <div class="player-card">
+      <div class="player-cover">
+        音樂封面
+      </div>
+      <div class="player-controls">
+        <button>⏮</button>
+        <button>▶️</button>
+        <button id="closePlayer">✖</button>
+      </div>
+    </div>
   </div>
 
-  <!-- 卡片輪播 -->
-  <section class="carousel">
-    <div class="carousel-track">
-      <div class="carousel-card">精選文章卡片 1</div>
-      <div class="carousel-card">精選文章卡片 2</div>
-      <div class="carousel-card">精選文章卡片 3</div>
-    </div>
-  </section>
+  <!-- 底部導覽 -->
+  <nav>
+    <div class="active">首頁</div>
+    <div>文章</div>
+    <div>短影</div>
+    <div>設定</div>
+  </nav>
 
-  <!-- 工具滑塊 -->
-  <section class="tools">
-    <div class="tools-title">服務</div>
-    <div class="tools-track">
-      <div class="tool-item">
-        <div class="tool-icon"></div>
-        貼圖小舖
-      </div>
-      <div class="tool-item">
-        <div class="tool-icon"></div>
-        主題小舖
-      </div>
-      <div class="tool-item">
-        <div class="tool-icon"></div>
-        LINE TV
-      </div>
-      <div class="tool-item">
-        <div class="tool-icon"></div>
-        來電鈴聲
-      </div>
-    </div>
-  </section>
+  <!-- JS -->
+  <script>
+    const openBtn = document.getElementById("openPlayer");
+    const closeBtn = document.getElementById("closePlayer");
+    const overlay = document.getElementById("player");
 
-  <!-- 文章列表 -->
-  <section class="article-list">
-    <div class="article">
-      <div class="article-thumb"></div>
-      <div class="article-content">
-        <div class="article-title">全聯開出 3 張發票大獎</div>
-        <div class="article-meta">焦點新聞</div>
-      </div>
-    </div>
-
-    <div class="article">
-      <div class="article-thumb"></div>
-      <div class="article-content">
-        <div class="article-title">44 歲體脂創新低</div>
-        <div class="article-meta">討論熱度</div>
-      </div>
-    </div>
-  </section>
-
-</div>
-
-<!-- 底部 Tab -->
-<nav class="tabbar">
-  <div class="tab active">首頁</div>
-  <div class="tab">文章</div>
-  <div class="tab">短影</div>
-  <div class="tab">設定</div>
-</nav>
-
-<script>
-/* =====================================================
-   【底部 Tab 切換邏輯（基礎版）】
-   - 先只做 active 樣式
-===================================================== */
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-  });
-});
-</script>
+    openBtn.onclick = () => overlay.classList.add("active");
+    closeBtn.onclick = () => overlay.classList.remove("active");
+  </script>
 
 </body>
 </html>
