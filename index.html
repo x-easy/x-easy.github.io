@@ -6,238 +6,345 @@
   <title>MobiSpace</title>
 
   <!-- ===============================
-       CSS：UI 外觀（無 blur）
+       全域 CSS（單檔示範，之後可拆）
        =============================== -->
   <style>
+    /* ---------- 基本變數 ---------- */
     :root {
-      --bg:#0b0b0b;
-      --panel:#1a1a1a;
-      --panel-soft:rgba(255,255,255,.06);
-      --text:#eaeaea;
-      --muted:#9a9a9a;
-      --accent:#00e676;
-      --safe-bottom:env(safe-area-inset-bottom);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      --bg: #0b0b0b;
+      --panel: #1a1a1a;
+      --panel-soft: rgba(255,255,255,0.06);
+      --text: #eaeaea;
+      --muted: #9a9a9a;
+      --accent: #00e676;
+      --safe-bottom: env(safe-area-inset-bottom);
     }
 
-    /* Header */
-    header{
-      position:sticky;
-      top:0;
-      z-index:100;
-      background:linear-gradient(#111,#0b0b0b);
-      padding:14px 16px 10px;
-    }
-    .header-row{display:flex;justify-content:space-between;align-items:center}
-    .logo{font-weight:700}
-    .header-icons{display:flex;gap:12px;opacity:.8}
-    .header-icons span{
-      width:22px;height:22px;
-      border:1px solid #555;
-      border-radius:6px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:12px;
-    }
-    .search-bar{
-      margin-top:10px;
-      background:var(--panel);
-      border-radius:14px;
-      padding:10px 14px;
-      color:var(--muted);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
     }
 
-    /* 服務列 */
-    .service-strip{
-      margin-top:16px;
-      padding-left:16px;
-      display:flex;
-      gap:18px;
-      overflow-x:auto;
-      -webkit-overflow-scrolling:touch;
-    }
-    .service-strip::-webkit-scrollbar{display:none}
-    .service-item{width:64px;font-size:12px;color:var(--muted);text-align:center}
-    .service-item .icon{
-      width:44px;height:44px;
-      margin:0 auto 6px;
-      background:var(--panel-soft);
-      border-radius:12px;
+    /* ===============================
+       3️⃣ Header｜Sticky
+       =============================== */
+    header {
+      position: sticky;        /* 固定在頂部 */
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(#111, #0b0b0b);
+      padding: 14px 16px 10px;
     }
 
-    main{padding:16px;padding-bottom:140px}
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-    /* 卡片 */
-    .card{
-      display:flex;gap:12px;
-      padding:14px 0;
-      border-bottom:1px solid #222;
-      opacity:0;transform:translateY(20px);
-      transition:.4s;
+    .logo {
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
-    .card.visible{opacity:1;transform:none}
-    .thumb{width:56px;height:56px;border-radius:12px;background:var(--panel-soft)}
-    .card h4{margin:0;font-size:15px}
-    .card p{margin:6px 0 0;font-size:13px;color:var(--muted)}
 
-    /* Mini Player */
-    .mini-player{
-      position:fixed;
-      left:12px;
-      top:64px;
-      z-index:90;
-      background:#1e1e1e;
-      border-radius:12px;
-      padding:8px 10px;
-      display:flex;
-      gap:10px;
-      align-items:center;
-      cursor:pointer;
+    .header-icons {
+      display: flex;
+      gap: 14px;
+      opacity: 0.85;
     }
-    .mini-player img{width:36px;height:36px;border-radius:8px;background:#333}
-    .mini-player span{font-size:12px;white-space:nowrap}
 
-    /* Player Modal（純遮罩） */
-    .player-modal{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.88);
-      z-index:200;
-      display:none;
-      justify-content:center;
-      align-items:center;
+    .header-icons span {
+      width: 22px;
+      height: 22px;
+      border: 1px solid #555;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
     }
-    .player-box{
-      width:90%;max-width:420px;
-      background:#000;
-      border-radius:18px;
-      padding:20px;
-    }
-    .progress{height:4px;background:#333;margin:16px 0;position:relative}
-    .progress span{height:100%;width:0;background:var(--accent);display:block}
 
-    /* Bottom Nav */
-    nav{
-      position:fixed;
-      bottom:0;left:0;right:0;
-      background:#111;
-      border-top:1px solid #222;
-      display:flex;
-      justify-content:space-around;
-      padding-bottom:var(--safe-bottom);
+    /* ===============================
+       搜尋列
+       =============================== */
+    .search-bar {
+      margin-top: 10px;
+      background: var(--panel);
+      border-radius: 14px;
+      padding: 10px 14px;
+      color: var(--muted);
     }
-    nav button{
-      background:none;border:none;
-      color:var(--muted);
-      padding:10px 0 14px;
+
+    /* ===============================
+       1️⃣ 服務 icon 橫滑（慣性）
+       =============================== */
+    .service-strip {
+      margin-top: 16px;
+      padding-left: 16px;
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;              /* 橫向滑動 */
+      scroll-snap-type: x mandatory; /* 停靠用 */
+      -webkit-overflow-scrolling: touch;
     }
-    nav button.active{color:var(--accent)}
+
+    .service-strip::-webkit-scrollbar { display: none; }
+
+    .service-item {
+      flex: 0 0 auto;
+      width: 64px;
+      text-align: center;
+      scroll-snap-align: start;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .service-item .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--panel-soft);
+      margin: 0 auto 6px;
+    }
+
+    /* ===============================
+       5️⃣ 卡片區（Lazy Render）
+       =============================== */
+    main {
+      padding: 16px;
+      padding-bottom: 140px; /* 預留給底導 + 播放器 */
+    }
+
+    .card {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid #222;
+      opacity: 0;                   /* Lazy 前不可見 */
+      transform: translateY(20px);
+      transition: opacity .4s ease, transform .4s ease;
+    }
+
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: var(--panel-soft);
+      flex-shrink: 0;
+    }
+
+    .card h4 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .card p {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* ===============================
+       2️⃣ 固定式迷你播放器
+       =============================== */
+    .mini-player {
+      position: fixed;
+      left: 12px;
+      top: 64px;                    /* 左上角 */
+      z-index: 90;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .mini-player img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #333;
+    }
+
+    .mini-player span {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    /* ===============================
+       2️⃣ 展開播放器（無 blur）
+       =============================== */
+    .player-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88); /* 純遮罩，不 blur */
+      z-index: 200;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .player-box {
+      width: 90%;
+      max-width: 420px;
+      background: #000;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .progress {
+      height: 4px;
+      background: #333;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    .progress span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 30%;
+      background: var(--accent);
+    }
+
+    /* ===============================
+       4️⃣ 底部導覽（Active）
+       =============================== */
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding-bottom: var(--safe-bottom);
+      background: #111;
+      border-top: 1px solid #222;
+      display: flex;
+      justify-content: space-around;
+      z-index: 100;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      padding: 10px 0 14px;
+      font-size: 12px;
+    }
+
+    nav button.active {
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 
 <body>
 
-<header>
-  <div class="header-row">
-    <div class="logo">MobiSpace</div>
-    <div class="header-icons"><span>記</span><span>提</span><span>🎵</span><span>設</span></div>
+  <!-- ===============================
+       Header
+       =============================== -->
+  <header>
+    <div class="header-row">
+      <div class="logo">MobiSpace</div>
+      <div class="header-icons">
+        <span>記</span><span>提</span><span>🎵</span><span>設</span>
+      </div>
+    </div>
+    <div class="search-bar">🔍 搜尋</div>
+  </header>
+
+  <!-- ===============================
+       1️⃣ 服務 icon 橫滑
+       =============================== -->
+  <section class="service-strip">
+    <div class="service-item"><div class="icon"></div>貼圖小舖</div>
+    <div class="service-item"><div class="icon"></div>主題小舖</div>
+    <div class="service-item"><div class="icon"></div>LINE TV</div>
+    <div class="service-item"><div class="icon"></div>來電鈴聲</div>
+  </section>
+
+  <!-- ===============================
+       主要內容（多頁切換區）
+       =============================== -->
+  <main id="page">
+    <!-- 模擬卡片列表 -->
+    <div class="card"><div class="thumb"></div><div><h4>全聯開出 3 張發票大獎</h4><p>焦點新聞</p></div></div>
+    <div class="card"><div class="thumb"></div><div><h4>44 歲體脂創新低</h4><p>討論熱度</p></div></div>
+    <div class="card"><div class="thumb"></div><div><h4>英農夫挖出千年寶藏</h4><p>國際</p></div></div>
+  </main>
+
+  <!-- ===============================
+       2️⃣ 固定式播放器
+       =============================== -->
+  <div class="mini-player" id="miniPlayer">
+    <img alt="" />
+    <span>🎵 感情 - 阿YueYue</span>
   </div>
-  <div class="search-bar">🔍 搜尋</div>
-</header>
 
-<section class="service-strip">
-  <div class="service-item"><div class="icon"></div>貼圖</div>
-  <div class="service-item"><div class="icon"></div>音樂</div>
-  <div class="service-item"><div class="icon"></div>影片</div>
-</section>
-
-<main>
-  <div class="card"><div class="thumb"></div><div><h4>YouTube 試播</h4><p>J0Gx6FwSvUQ</p></div></div>
-</main>
-
-<!-- Mini Player -->
-<div class="mini-player" id="miniPlayer">
-  <img alt="">
-  <span>🎵 YouTube 音源測試</span>
-</div>
-
-<!-- Player Modal -->
-<div class="player-modal" id="playerModal">
-  <div class="player-box">
-    <h3>YouTube 播放中</h3>
-    <div class="progress"><span id="progressBar"></span></div>
-    <button onclick="togglePlay()">播放 / 暫停</button>
-    <button onclick="closePlayer()">關閉</button>
+  <!-- ===============================
+       展開播放器
+       =============================== -->
+  <div class="player-modal" id="playerModal">
+    <div class="player-box">
+      <h3>感情 - 阿YueYue</h3>
+      <div class="progress"><span></span></div>
+      <button onclick="closePlayer()">關閉</button>
+    </div>
   </div>
-</div>
 
-<!-- 🔑 YouTube Player（隱藏，只當音源） -->
-<div id="yt-player" style="width:0;height:0;overflow:hidden"></div>
+  <!-- ===============================
+       底部導覽
+       =============================== -->
+  <nav>
+    <button class="active">首頁</button>
+    <button>文章</button>
+    <button>短影</button>
+    <button>設定</button>
+  </nav>
 
-<!-- ===============================
-     JS：行為邏輯
-     =============================== -->
-<script>
-  /* Lazy 卡片 */
-  new IntersectionObserver(es=>{
-    es.forEach(e=>e.isIntersecting&&e.target.classList.add('visible'))
-  },{threshold:.2}).observe(document.querySelector('.card'))
+  <!-- ===============================
+       JS 行為控制
+       =============================== -->
+  <script>
+    /* ===============================
+       5️⃣ Lazy Render 卡片
+       =============================== */
+    const cards = document.querySelectorAll('.card');
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.2 });
 
-  /* Modal 控制 */
-  const modal=document.getElementById('playerModal')
-  miniPlayer.onclick=()=>modal.style.display='flex'
-  function closePlayer(){modal.style.display='none'}
+    cards.forEach(c => io.observe(c));
 
-  /* ===== YouTube IFrame API ===== */
-  let player,isPlaying=false
+    /* ===============================
+       2️⃣ 播放器開關
+       =============================== */
+    const mini = document.getElementById('miniPlayer');
+    const modal = document.getElementById('playerModal');
 
-  function onYouTubeIframeAPIReady(){
-    player=new YT.Player('yt-player',{
-      videoId:'J0Gx6FwSvUQ',   // 🔑 你的影片
-      playerVars:{
-        autoplay:0,
-        controls:0,
-        rel:0,
-        modestbranding:1
-      },
-      events:{
-        onReady:()=>console.log('YT Ready'),
-      }
-    })
-  }
+    mini.onclick = () => modal.style.display = 'flex';
+    function closePlayer() { modal.style.display = 'none'; }
 
-  function togglePlay(){
-    if(!player)return
-    if(isPlaying){
-      player.pauseVideo()
-      isPlaying=false
-    }else{
-      player.playVideo()
-      isPlaying=true
-    }
-  }
-
-  /* 進度條同步（簡化版） */
-  setInterval(()=>{
-    if(player&&player.getDuration){
-      const d=player.getDuration()
-      const c=player.getCurrentTime()
-      if(d>0){
-        document.getElementById('progressBar').style.width=(c/d*100)+'%'
-      }
-    }
-  },500)
-
-  /* 載入 API */
-  const tag=document.createElement('script')
-  tag.src="https://www.youtube.com/iframe_api"
-  document.body.appendChild(tag)
-</script>
+    /* ===============================
+       7️⃣ localStorage 播放狀態
+       =============================== */
+    localStorage.setItem('lastTrack', '感情 - 阿YueYue');
+  </script>
 
 </body>
 </html>
