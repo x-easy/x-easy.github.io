@@ -1,0 +1,104 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont;
+  background: #0f0f0f;
+  color: #fff;
+}
+
+.header {
+  padding: 12px;
+}
+
+.mini-player {
+  background: #1c1c1c;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.search-bar {
+  margin: 12px;
+  padding: 10px;
+  background: #1c1c1c;
+  border-radius: 14px;
+}
+
+.feature-slider {
+  padding: 12px;
+}
+
+.feature-card {
+  height: 140px;
+  background: #232323;
+  border-radius: 16px;
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+}
+
+.service-slider {
+  display: flex;
+  gap: 20px;
+  padding: 12px;
+  overflow-x: auto;
+}
+
+.service-item {
+  min-width: 56px;
+  text-align: center;
+}
+
+.service-page {
+  position: fixed;
+  inset: 0;
+  background: #0f0f0f;
+  transform: translateY(100%);
+  transition: .3s;
+  z-index: 1000;
+}
+
+.service-page.active {
+  transform: translateY(0);
+}
+
+.service-page header {
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  z-index: 2000;
+}
+
+.modal.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  width: 90%;
+  aspect-ratio: 16/9;
+}
