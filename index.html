@@ -1,283 +1,243 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MobiSpace</title>
 
-<title>MobiSpace</title>
+  <!-- ===============================
+       CSS：UI 外觀（無 blur）
+       =============================== -->
+  <style>
+    :root {
+      --bg:#0b0b0b;
+      --panel:#1a1a1a;
+      --panel-soft:rgba(255,255,255,.06);
+      --text:#eaeaea;
+      --muted:#9a9a9a;
+      --accent:#00e676;
+      --safe-bottom:env(safe-area-inset-bottom);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
 
-<style>
-/* ===============================
-   全域基礎設定（對齊 LINE 深色系）
-   =============================== */
-:root {
-  --bg-main: #0f0f0f;           /* 主背景 */
-  --bg-card: #1c1c1c;           /* 卡片背景 */
-  --bg-soft: #232323;           /* 輕卡片 */
-  --text-main: #ffffff;
-  --text-sub: #9a9a9a;
-  --accent: #00c300;            /* LINE 綠 */
-}
+    /* Header */
+    header{
+      position:sticky;
+      top:0;
+      z-index:100;
+      background:linear-gradient(#111,#0b0b0b);
+      padding:14px 16px 10px;
+    }
+    .header-row{display:flex;justify-content:space-between;align-items:center}
+    .logo{font-weight:700}
+    .header-icons{display:flex;gap:12px;opacity:.8}
+    .header-icons span{
+      width:22px;height:22px;
+      border:1px solid #555;
+      border-radius:6px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;
+    }
+    .search-bar{
+      margin-top:10px;
+      background:var(--panel);
+      border-radius:14px;
+      padding:10px 14px;
+      color:var(--muted);
+    }
 
-* {
-  box-sizing: border-box;
-}
+    /* 服務列 */
+    .service-strip{
+      margin-top:16px;
+      padding-left:16px;
+      display:flex;
+      gap:18px;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    .service-strip::-webkit-scrollbar{display:none}
+    .service-item{width:64px;font-size:12px;color:var(--muted);text-align:center}
+    .service-item .icon{
+      width:44px;height:44px;
+      margin:0 auto 6px;
+      background:var(--panel-soft);
+      border-radius:12px;
+    }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
-  background: var(--bg-main);
-  color: var(--text-main);
-}
+    main{padding:16px;padding-bottom:140px}
 
-/* ===============================
-   頁首 Header（紅框 + 紫框）
-   =============================== */
-header {
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+    /* 卡片 */
+    .card{
+      display:flex;gap:12px;
+      padding:14px 0;
+      border-bottom:1px solid #222;
+      opacity:0;transform:translateY(20px);
+      transition:.4s;
+    }
+    .card.visible{opacity:1;transform:none}
+    .thumb{width:56px;height:56px;border-radius:12px;background:var(--panel-soft)}
+    .card h4{margin:0;font-size:15px}
+    .card p{margin:6px 0 0;font-size:13px;color:var(--muted)}
 
-header h1 {
-  font-size: 20px;
-  margin: 0;
-  font-weight: 600;
-}
+    /* Mini Player */
+    .mini-player{
+      position:fixed;
+      left:12px;
+      top:64px;
+      z-index:90;
+      background:#1e1e1e;
+      border-radius:12px;
+      padding:8px 10px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      cursor:pointer;
+    }
+    .mini-player img{width:36px;height:36px;border-radius:8px;background:#333}
+    .mini-player span{font-size:12px;white-space:nowrap}
 
-/* 右上功能按鈕群（文章 / 提醒 / 音樂 / 設定） */
-.header-actions {
-  display: flex;
-  gap: 18px;
-}
+    /* Player Modal（純遮罩） */
+    .player-modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.88);
+      z-index:200;
+      display:none;
+      justify-content:center;
+      align-items:center;
+    }
+    .player-box{
+      width:90%;max-width:420px;
+      background:#000;
+      border-radius:18px;
+      padding:20px;
+    }
+    .progress{height:4px;background:#333;margin:16px 0;position:relative}
+    .progress span{height:100%;width:0;background:var(--accent);display:block}
 
-.header-actions button {
-  background: none;
-  border: none;
-  color: var(--text-main);
-  font-size: 12px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.header-actions button span {
-  display: block;
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-/* ===============================
-   搜尋列（維持你目前樣式）
-   =============================== */
-.search-bar {
-  margin: 0 16px 16px;
-  background: var(--bg-card);
-  border-radius: 16px;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  color: var(--text-sub);
-}
-
-.search-bar span {
-  margin-right: 8px;
-}
-
-/* ===============================
-   🔶 橙色區塊（圖2 → 圖4）
-   LINE TODAY 焦點橫滑卡片
-   =============================== */
-.feature-slider {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 0 16px 16px;
-  scroll-snap-type: x mandatory;
-}
-
-.feature-card {
-  flex: 0 0 85%;
-  background: var(--bg-card);
-  border-radius: 16px;
-  height: 160px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  scroll-snap-align: start;
-  color: var(--text-sub);
-  font-size: 18px;
-}
-
-/* ===============================
-   🟡 黃色區塊（圖2 → 圖3）
-   LINE 服務 icon 滑動列
-   =============================== */
-.service-slider {
-  display: flex;
-  gap: 22px;
-  overflow-x: auto;
-  padding: 8px 16px 16px;
-}
-
-.service-item {
-  min-width: 56px;
-  text-align: center;
-  color: var(--text-sub);
-  font-size: 12px;
-}
-
-.service-icon {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 6px;
-  background: var(--bg-soft);
-  border-radius: 14px;
-}
-
-/* ===============================
-   🟢 文章列表（綠框，維持）
-   =============================== */
-.article-list {
-  padding: 0 16px 80px;
-}
-
-.article {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #222;
-}
-
-.article-thumb {
-  width: 56px;
-  height: 56px;
-  background: var(--bg-soft);
-  border-radius: 12px;
-}
-
-.article-text {
-  flex: 1;
-}
-
-.article-text h3 {
-  margin: 0 0 4px;
-  font-size: 15px;
-}
-
-.article-text p {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-sub);
-}
-
-/* ===============================
-   🔵 藍色區塊（圖2 → 圖5）
-   LINE 固定底部導覽列
-   =============================== */
-.bottom-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 64px;
-  background: #121212;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid #1f1f1f;
-}
-
-.bottom-nav button {
-  background: none;
-  border: none;
-  color: var(--text-sub);
-  font-size: 12px;
-  text-align: center;
-}
-
-.bottom-nav button span {
-  display: block;
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-</style>
+    /* Bottom Nav */
+    nav{
+      position:fixed;
+      bottom:0;left:0;right:0;
+      background:#111;
+      border-top:1px solid #222;
+      display:flex;
+      justify-content:space-around;
+      padding-bottom:var(--safe-bottom);
+    }
+    nav button{
+      background:none;border:none;
+      color:var(--muted);
+      padding:10px 0 14px;
+    }
+    nav button.active{color:var(--accent)}
+  </style>
 </head>
 
 <body>
 
-<!-- ===============================
-     Header（圖2 紅框 / 紫框）
-     =============================== -->
 <header>
-  <h1>MobiSpace</h1>
-
-  <div class="header-actions">
-    <button><span>📄</span>記事</button>
-    <button><span>🔔</span>提醒</button>
-    <button><span>🎵</span>音樂</button>
-    <button><span>⚙️</span>設定</button>
+  <div class="header-row">
+    <div class="logo">MobiSpace</div>
+    <div class="header-icons"><span>記</span><span>提</span><span>🎵</span><span>設</span></div>
   </div>
+  <div class="search-bar">🔍 搜尋</div>
 </header>
 
-<!-- 搜尋列 -->
-<div class="search-bar">
-  <span>🔍</span> 搜尋
+<section class="service-strip">
+  <div class="service-item"><div class="icon"></div>貼圖</div>
+  <div class="service-item"><div class="icon"></div>音樂</div>
+  <div class="service-item"><div class="icon"></div>影片</div>
+</section>
+
+<main>
+  <div class="card"><div class="thumb"></div><div><h4>YouTube 試播</h4><p>J0Gx6FwSvUQ</p></div></div>
+</main>
+
+<!-- Mini Player -->
+<div class="mini-player" id="miniPlayer">
+  <img alt="">
+  <span>🎵 YouTube 音源測試</span>
 </div>
 
-<!-- 🔶 焦點橫滑卡片（圖4） -->
-<div class="feature-slider">
-  <div class="feature-card">精選文章卡片 1</div>
-  <div class="feature-card">精選文章卡片 2</div>
-  <div class="feature-card">精選文章卡片 3</div>
-</div>
-
-<!-- 🟡 LINE 服務 icon 滑動列（圖3） -->
-<div class="service-slider">
-  <div class="service-item">
-    <div class="service-icon"></div>
-    貼圖小舖
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    主題小舖
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    LINE TV
-  </div>
-  <div class="service-item">
-    <div class="service-icon"></div>
-    來電鈴聲
+<!-- Player Modal -->
+<div class="player-modal" id="playerModal">
+  <div class="player-box">
+    <h3>YouTube 播放中</h3>
+    <div class="progress"><span id="progressBar"></span></div>
+    <button onclick="togglePlay()">播放 / 暫停</button>
+    <button onclick="closePlayer()">關閉</button>
   </div>
 </div>
 
-<!-- 🟢 文章列表 -->
-<div class="article-list">
-  <div class="article">
-    <div class="article-thumb"></div>
-    <div class="article-text">
-      <h3>全聯開出 3 張發票大獎</h3>
-      <p>焦點新聞</p>
-    </div>
-  </div>
+<!-- 🔑 YouTube Player（隱藏，只當音源） -->
+<div id="yt-player" style="width:0;height:0;overflow:hidden"></div>
 
-  <div class="article">
-    <div class="article-thumb"></div>
-    <div class="article-text">
-      <h3>44 歲體脂創新低</h3>
-      <p>討論熱度</p>
-    </div>
-  </div>
-</div>
+<!-- ===============================
+     JS：行為邏輯
+     =============================== -->
+<script>
+  /* Lazy 卡片 */
+  new IntersectionObserver(es=>{
+    es.forEach(e=>e.isIntersecting&&e.target.classList.add('visible'))
+  },{threshold:.2}).observe(document.querySelector('.card'))
 
-<!-- 🔵 固定底部導覽（圖5） -->
-<nav class="bottom-nav">
-  <button><span>🏠</span>首頁</button>
-  <button><span>📰</span>文章</button>
-  <button><span>🎬</span>短影</button>
-  <button><span>⚙️</span>設定</button>
-</nav>
+  /* Modal 控制 */
+  const modal=document.getElementById('playerModal')
+  miniPlayer.onclick=()=>modal.style.display='flex'
+  function closePlayer(){modal.style.display='none'}
+
+  /* ===== YouTube IFrame API ===== */
+  let player,isPlaying=false
+
+  function onYouTubeIframeAPIReady(){
+    player=new YT.Player('yt-player',{
+      videoId:'J0Gx6FwSvUQ',   // 🔑 你的影片
+      playerVars:{
+        autoplay:0,
+        controls:0,
+        rel:0,
+        modestbranding:1
+      },
+      events:{
+        onReady:()=>console.log('YT Ready'),
+      }
+    })
+  }
+
+  function togglePlay(){
+    if(!player)return
+    if(isPlaying){
+      player.pauseVideo()
+      isPlaying=false
+    }else{
+      player.playVideo()
+      isPlaying=true
+    }
+  }
+
+  /* 進度條同步（簡化版） */
+  setInterval(()=>{
+    if(player&&player.getDuration){
+      const d=player.getDuration()
+      const c=player.getCurrentTime()
+      if(d>0){
+        document.getElementById('progressBar').style.width=(c/d*100)+'%'
+      }
+    }
+  },500)
+
+  /* 載入 API */
+  const tag=document.createElement('script')
+  tag.src="https://www.youtube.com/iframe_api"
+  document.body.appendChild(tag)
+</script>
 
 </body>
 </html>
