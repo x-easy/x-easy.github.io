@@ -1,245 +1,137 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MobiSpace</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>MobiSpace</title>
 
-  <!-- =========================
-       全站基礎樣式（APP 殼）
-       ========================= -->
-  <style>
-    :root{
-      --header-h:48px;
-      --nav-h:56px;
-      --primary:#00c853;
-      --muted:#888;
-      --bg:#fff;
-    }
+<style>
+/* ===== Reset ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+}
 
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color:transparent;
-    }
+/* ===== App Frame（LINE 核心） ===== */
+#app {
+  max-width: 420px;          /* ★ LINE 關鍵尺寸 */
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+}
 
-    body{
-      margin:0;
-      height:100dvh;
-      overflow:hidden;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:#111;
-    }
+/* ===== Header ===== */
+header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 18px;
+  font-weight: 600;
+  border-bottom: 1px solid #222;
+}
 
-    /* ===== Header（像 LINE） ===== */
-    header{
-      height:var(--header-h);
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:0 12px;
-      border-bottom:1px solid #eee;
-      background:#fff;
-    }
+/* ===== Content ===== */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
 
-    header button{
-      border:none;
-      background:none;
-      font-size:18px;
-      padding:4px 6px;
-    }
+/* ===== Card / List ===== */
+.card {
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
 
-    header h1{
-      font-size:16px;
-      margin:0;
-      font-weight:600;
-    }
+.list .item {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0;
+  border-bottom: 1px solid #222;
+}
 
-    /* ===== Stack（核心容器） ===== */
-    main#stack{
-      position:relative;
-      height:calc(100dvh - var(--header-h) - var(--nav-h));
-      overflow:hidden;
-      background:#fff;
-    }
+.list .item:last-child {
+  border-bottom: none;
+}
 
-    /* ===== Page（每一頁） ===== */
-    .page{
-      position:absolute;
-      inset:0;
-      background:#fff;
-      transform:translateX(100%);
-      transition:transform .28s ease;
-      overflow-y:auto;
-      padding:16px;
-    }
+.item strong {
+  font-size: 15px;
+  margin-bottom: 4px;
+}
 
-    .page.active{
-      transform:translateX(0);
-      z-index:2;
-    }
+.item small {
+  font-size: 12px;
+  color: #aaa;
+}
 
-    .page.prev{
-      transform:translateX(-30%);
-      z-index:1;
-    }
+/* ===== Bottom Nav ===== */
+nav {
+  height: 56px;
+  display: flex;
+  border-top: 1px solid #222;
+  background: #111;
+}
 
-    /* ===== Bottom Nav ===== */
-    nav{
-      height:var(--nav-h);
-      display:flex;
-      border-top:1px solid #eee;
-      background:#fff;
-    }
+nav button {
+  flex: 1;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 12px;
+}
 
-    nav button{
-      flex:1;
-      border:none;
-      background:none;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    nav button.active{
-      color:var(--primary);
-      font-weight:600;
-    }
-
-    /* ===== 基本 UI 元件 ===== */
-    .list{
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .item{
-      padding:16px;
-      border-radius:14px;
-      background:#f5f5f5;
-    }
-
-    .item strong{
-      display:block;
-      font-size:15px;
-    }
-
-    .item small{
-      font-size:12px;
-      color:#666;
-    }
-  </style>
+nav button.active {
+  color: #4cd964;
+}
+</style>
 </head>
 
 <body>
 
-<!-- =========================
-     Header
-     ========================= -->
-<header>
-  <button id="backBtn" onclick="popPage()" hidden>←</button>
-  <h1>MobiSpace</h1>
-</header>
+<div id="app">
 
-<!-- =========================
-     Stack（一定要有一頁）
-     ========================= -->
-<main id="stack">
-  <!-- Boot Page：保命頁，JS 掛也不白 -->
-  <section class="page active" data-page="boot">
-    <div class="item">
-      <strong>初始化中…</strong>
-      <small>系統啟動</small>
+  <header>
+    MobiSpace
+  </header>
+
+  <main id="view">
+    <!-- 首頁內容 -->
+    <div class="card">
+      <strong>初始化完成</strong>
+      <small>LINE App 尺寸模式已啟用</small>
     </div>
-  </section>
-</main>
 
-<!-- =========================
-     Bottom Navigation
-     ========================= -->
-<nav>
-  <button onclick="goRoot()">首頁</button>
-  <button onclick="pushPage('article')">文章</button>
-  <button onclick="pushPage('tools')">工具</button>
-  <button onclick="pushPage('settings')">設定</button>
-</nav>
+    <div class="card list">
+      <div class="item">
+        <strong>精選文章</strong>
+        <small>隨機推薦內容</small>
+      </div>
+      <div class="item">
+        <strong>工具箱</strong>
+        <small>指令 / 功能</small>
+      </div>
+      <div class="item">
+        <strong>設定</strong>
+        <small>外觀 / 系統</small>
+      </div>
+    </div>
+  </main>
 
-<!-- =========================
-     JavaScript（唯一控制權）
-     ========================= -->
-<script>
-  const stack = document.getElementById('stack');
-  const backBtn = document.getElementById('backBtn');
+  <nav>
+    <button class="active">首頁</button>
+    <button>文章</button>
+    <button>工具</button>
+    <button>設定</button>
+  </nav>
 
-  /* ===== Header 狀態 ===== */
-  function updateHeader(){
-    backBtn.hidden = stack.querySelectorAll('.page').length <= 1;
-  }
-
-  /* ===== 載入並推入頁面 ===== */
-  async function pushPage(name){
-    const pages = stack.querySelectorAll('.page');
-    const current = pages[pages.length - 1];
-
-    try{
-      const res = await fetch(`pages/${name}.html`);
-      if(!res.ok) throw new Error('load failed');
-
-      const html = await res.text();
-      const temp = document.createElement('div');
-      temp.innerHTML = html.trim();
-
-      const page = temp.firstElementChild;
-      if(!page || !page.classList.contains('page')){
-        throw new Error('invalid page structure');
-      }
-
-      stack.appendChild(page);
-
-      requestAnimationFrame(()=>{
-        current.classList.add('prev');
-        page.classList.add('active');
-        updateHeader();
-      });
-
-    }catch(err){
-      alert(`頁面載入失敗：${name}`);
-      console.error(err);
-    }
-  }
-
-  /* ===== 返回上一頁 ===== */
-  function popPage(){
-    const pages = stack.querySelectorAll('.page');
-    if(pages.length <= 1) return;
-
-    const cur = pages[pages.length - 1];
-    const prev = pages[pages.length - 2];
-
-    cur.classList.remove('active');
-    prev.classList.remove('prev');
-
-    setTimeout(()=>{
-      cur.remove();
-      updateHeader();
-    }, 300);
-  }
-
-  /* ===== 回到首頁 ===== */
-  function goRoot(){
-    const pages = stack.querySelectorAll('.page');
-    pages.forEach((p, i)=>{
-      if(i > 0) p.remove();
-      p.classList.remove('prev');
-      p.classList.add('active');
-    });
-    updateHeader();
-  }
-
-  /* ===== 初始化：載入首頁內容 ===== */
-  document.addEventListener('DOMContentLoaded', ()=>{
-    pushPage('home');
-  });
-</script>
+</div>
 
 </body>
 </html>
