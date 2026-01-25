@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MobiSpace</title>
 
 <style>
-/* ===== Reset ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #0f0f0f;
-  color: #fff;
+  background: #000;
+  color: #eee;
 }
 
-/* ===== App Frame（LINE 核心） ===== */
+/* ===== App Frame：圖2尺寸 ===== */
 #app {
-  max-width: 420px;          /* ★ LINE 關鍵尺寸 */
+  max-width: 420px;
   margin: 0 auto;
   min-height: 100vh;
   display: flex;
@@ -24,12 +24,12 @@ body {
   background: #111;
 }
 
-/* ===== Header ===== */
+/* ===== Header（App密度） ===== */
 header {
-  height: 56px;
+  height: 52px;
+  padding: 0 14px;
   display: flex;
   align-items: center;
-  padding: 0 14px;
   font-size: 18px;
   font-weight: 600;
   border-bottom: 1px solid #222;
@@ -39,39 +39,61 @@ header {
 main {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
 }
 
-/* ===== Card / List ===== */
-.card {
-  background: #1a1a1a;
-  border-radius: 14px;
+/* ===== Section（圖1結構） ===== */
+.section {
   padding: 14px;
-  margin-bottom: 12px;
-}
-
-.list .item {
-  display: flex;
-  flex-direction: column;
-  padding: 12px 0;
   border-bottom: 1px solid #222;
 }
 
-.list .item:last-child {
+.section-title {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+/* ===== Music Bar ===== */
+.music-bar {
+  background: #2a2a2a;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+/* ===== Slider Placeholder ===== */
+.slider {
+  height: 140px;
+  background: #333;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ===== Tool Link ===== */
+.tool-link {
+  background: #444;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+/* ===== Article List ===== */
+.article {
+  padding: 10px 0;
+  border-bottom: 1px solid #222;
+  font-size: 14px;
+}
+
+.article:last-child {
   border-bottom: none;
 }
 
-.item strong {
-  font-size: 15px;
-  margin-bottom: 4px;
-}
-
-.item small {
-  font-size: 12px;
-  color: #aaa;
-}
-
-/* ===== Bottom Nav ===== */
+/* ===== Bottom Nav（圖2尺寸） ===== */
 nav {
   height: 56px;
   display: flex;
@@ -81,8 +103,8 @@ nav {
 
 nav button {
   flex: 1;
-  background: none;
   border: none;
+  background: none;
   color: #888;
   font-size: 12px;
 }
@@ -97,39 +119,44 @@ nav button.active {
 
 <div id="app">
 
-  <header>
-    MobiSpace
-  </header>
+<header>MobiSpace</header>
 
-  <main id="view">
-    <!-- 首頁內容 -->
-    <div class="card">
-      <strong>初始化完成</strong>
-      <small>LINE App 尺寸模式已啟用</small>
+<main>
+
+  <!-- 背景音樂 -->
+  <section class="section">
+    <div class="music-bar">
+      🎵 背景音樂播放器（可點擊展開）
     </div>
+  </section>
 
-    <div class="card list">
-      <div class="item">
-        <strong>精選文章</strong>
-        <small>隨機推薦內容</small>
-      </div>
-      <div class="item">
-        <strong>工具箱</strong>
-        <small>指令 / 功能</small>
-      </div>
-      <div class="item">
-        <strong>設定</strong>
-        <small>外觀 / 系統</small>
-      </div>
-    </div>
-  </main>
+  <!-- 精選文章滑塊 -->
+  <section class="section">
+    <div class="section-title">精選文章卡片隨機輪播</div>
+    <div class="slider">Slider Placeholder</div>
+  </section>
 
-  <nav>
-    <button class="active">首頁</button>
-    <button>文章</button>
-    <button>工具</button>
-    <button>設定</button>
-  </nav>
+  <!-- 工具頁連結 -->
+  <section class="section">
+    <div class="tool-link">工具頁連結滑塊</div>
+  </section>
+
+  <!-- 隨機文章列表 -->
+  <section class="section">
+    <div class="section-title">隨機文章列表</div>
+    <div class="article">文章標題一</div>
+    <div class="article">文章標題二</div>
+    <div class="article">文章標題三</div>
+  </section>
+
+</main>
+
+<nav>
+  <button class="active">首頁</button>
+  <button>文章</button>
+  <button>短影</button>
+  <button>設定</button>
+</nav>
 
 </div>
 
