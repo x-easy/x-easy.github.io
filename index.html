@@ -5,52 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MobiSpace</title>
 
-  <!-- 結構層 -->
-  <link rel="stylesheet" href="./layout.css" />
-  <!-- 元件層 -->
-  <link rel="stylesheet" href="./components.css" />
+  <!-- 全域主題變數（顏色 / 字型） -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+
+  <!-- App 殼架構（Header / Content / Bottom） -->
+  <link rel="stylesheet" href="layout/app-shell.css">
 </head>
 
 <body>
 
-  <!-- ===== Header ===== -->
-  <header class="app-header">
-    <div class="logo">MobiSpace</div>
-    <div class="actions">
-      <button>記事</button>
-      <button>提醒</button>
-      <button>音樂</button>
-      <button>設定</button>
-    </div>
-  </header>
+  <!-- ===============================
+       App Root（整個 Web App 的容器）
+       =============================== -->
+  <div id="app-root">
 
-  <!-- ===== Main ===== -->
-  <main class="app-main">
-    <div class="search-bar">🔍 搜尋</div>
+    <!-- Header：固定在最上 -->
+    <div id="app-header"></div>
 
-    <section class="card">精選文章卡片 1</section>
+    <!-- 中央內容：唯一可捲動區 -->
+    <main id="app-content"></main>
 
-    <section class="service-row">
-      <div>貼圖小舖</div>
-      <div>主題小舖</div>
-      <div>LINE TV</div>
-      <div>來電鈴聲</div>
-    </section>
+    <!-- Bottom Nav：固定在最下 -->
+    <div id="app-bottom"></div>
 
-    <section class="article">
-      <div>全聯開出 3 張發票大獎</div>
-      <small>焦點新聞</small>
-    </section>
-  </main>
+  </div>
 
-  <!-- ===== Bottom Nav ===== -->
-  <nav class="bottom-nav">
-    <button>首頁</button>
-    <button>文章</button>
-    <button>短影</button>
-    <button>設定</button>
-  </nav>
+  <!-- 全站唯一 JS 入口 -->
+  <script src="assets/js/app.js"></script>
 
-  <script src="./app.js"></script>
 </body>
 </html>
