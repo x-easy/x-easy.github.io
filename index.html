@@ -5,85 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MobiSpace</title>
 
-  <!-- 主樣式（唯一入口） -->
-  <link rel="stylesheet" href="assets/css/app.css" />
+  <!-- 主樣式 -->
+  <link rel="stylesheet" href="./assets/css/app.css" />
 </head>
 
 <body>
-
   <!-- ===============================
-       Header：固定式簡易播放器容器
+       Header｜頁首頂部區塊
+       功能：顯示品牌、快捷功能
        =============================== -->
-  <header class="header">
-    <!-- ⚠️ 只是一個殼，行為由 JS 控制 -->
-    <div class="mini-player" id="miniPlayer">
-      <div class="mini-player__info">
-        <div class="mini-player__thumb"></div>
-        <div class="mini-player__text">
-          <div class="title">未播放</div>
-          <div class="artist">點擊展開播放器</div>
-        </div>
-      </div>
-      <div class="mini-player__action">▶︎</div>
+  <header class="app-header">
+    <div class="header-left">
+      <!-- 品牌名稱 -->
+      <span class="brand">MobiSpace</span>
+    </div>
+
+    <div class="header-right">
+      <!-- 快捷功能按鈕（僅顯示，不綁功能） -->
+      <button class="icon-btn">📄</button>
+      <button class="icon-btn">🔔</button>
+      <button class="icon-btn">🎵</button>
+      <button class="icon-btn">⚙️</button>
     </div>
   </header>
 
   <!-- ===============================
-       服務 icon 橫滑列（藍框）
+       Main Content
        =============================== -->
-  <section class="service-section">
-    <div class="service-header">
-      <span>服務</span>
-      <button id="openServiceModal">顯示全部</button>
-    </div>
+  <main class="app-main">
 
-    <div class="service-slider">
-      <!-- 8 個 icon（畫面只顯示 6 個，可滑） -->
-      <div class="service-item">🎵</div>
-      <div class="service-item">📰</div>
-      <div class="service-item">🎬</div>
-      <div class="service-item">📻</div>
-      <div class="service-item">📚</div>
-      <div class="service-item">🎮</div>
-      <div class="service-item">🧰</div>
-      <div class="service-item">⭐</div>
-    </div>
-  </section>
+    <!-- ===============================
+         精選卡片輪播區
+         功能：橫向滑動卡片
+         =============================== -->
+    <section class="card-carousel">
+      <h2 class="section-title">精選卡片</h2>
 
-  <!-- ===============================
-       文章列表（暫留）
-       =============================== -->
-  <main class="content">
-    <div class="article">
-      <div class="thumb"></div>
-      <div class="text">
-        <h3>文章標題</h3>
-        <p>文章摘要</p>
+      <div class="carousel-track">
+        <!-- 卡片 1 -->
+        <article class="card">
+          <div class="card-placeholder"></div>
+          <span class="card-title">精選文章卡片 1</span>
+        </article>
+
+        <!-- 卡片 2 -->
+        <article class="card">
+          <div class="card-placeholder"></div>
+          <span class="card-title">精選文章卡片 2</span>
+        </article>
+
+        <!-- 卡片 3 -->
+        <article class="card">
+          <div class="card-placeholder"></div>
+          <span class="card-title">精選文章卡片 3</span>
+        </article>
       </div>
-    </div>
+    </section>
+
   </main>
 
-  <!-- ===============================
-       固定底部導覽
-       =============================== -->
-  <nav class="bottom-nav">
-    <button class="active">🏠<span>首頁</span></button>
-    <button>📰<span>文章</span></button>
-    <button>🎬<span>影音</span></button>
-    <button>⚙️<span>設定</span></button>
-  </nav>
-
-  <!-- ===============================
-       Service Modal（預設關閉）
-       =============================== -->
-  <div class="modal" id="serviceModal">
-    <div class="modal-content">
-      <h2>全部服務</h2>
-      <p>之後再補內容</p>
-    </div>
-  </div>
-
-  <!-- JS（唯一入口，放 body 最底） -->
-  <script src="assets/js/app.js"></script>
+  <!-- 主 JS -->
+  <script src="./assets/js/app.js"></script>
 </body>
 </html>
