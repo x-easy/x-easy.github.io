@@ -1,0 +1,32 @@
+.search-bar {
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 12px;
+}
+
+.card {
+  background: #1c1c1c;
+  height: 120px;
+  margin: 12px;
+  border-radius: 12px;
+}
+
+.service-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+}
+
+.service-row div {
+  flex: 1;
+  background: #222;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.article {
+  padding: 12px;
+  border-top: 1px solid #222;
+}
