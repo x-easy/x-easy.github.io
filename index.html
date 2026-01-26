@@ -5,33 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MobiSpace</title>
 
-  <!-- 全域主題變數（顏色 / 字型） -->
-  <link rel="stylesheet" href="assets/css/theme.css">
-
-  <!-- App 殼架構（Header / Content / Bottom） -->
-  <link rel="stylesheet" href="layout/app-shell.css">
+  <!-- 主樣式（唯一入口） -->
+  <link rel="stylesheet" href="assets/css/app.css" />
 </head>
 
 <body>
 
   <!-- ===============================
-       App Root（整個 Web App 的容器）
+       Header：固定式簡易播放器容器
        =============================== -->
-  <div id="app-root">
+  <header class="header">
+    <!-- ⚠️ 只是一個殼，行為由 JS 控制 -->
+    <div class="mini-player" id="miniPlayer">
+      <div class="mini-player__info">
+        <div class="mini-player__thumb"></div>
+        <div class="mini-player__text">
+          <div class="title">未播放</div>
+          <div class="artist">點擊展開播放器</div>
+        </div>
+      </div>
+      <div class="mini-player__action">▶︎</div>
+    </div>
+  </header>
 
-    <!-- Header：固定在最上 -->
-    <div id="app-header"></div>
+  <!-- ===============================
+       服務 icon 橫滑列（藍框）
+       =============================== -->
+  <section class="service-section">
+    <div class="service-header">
+      <span>服務</span>
+      <button id="openServiceModal">顯示全部</button>
+    </div>
 
-    <!-- 中央內容：唯一可捲動區 -->
-    <main id="app-content"></main>
+    <div class="service-slider">
+      <!-- 8 個 icon（畫面只顯示 6 個，可滑） -->
+      <div class="service-item">🎵</div>
+      <div class="service-item">📰</div>
+      <div class="service-item">🎬</div>
+      <div class="service-item">📻</div>
+      <div class="service-item">📚</div>
+      <div class="service-item">🎮</div>
+      <div class="service-item">🧰</div>
+      <div class="service-item">⭐</div>
+    </div>
+  </section>
 
-    <!-- Bottom Nav：固定在最下 -->
-    <div id="app-bottom"></div>
+  <!-- ===============================
+       文章列表（暫留）
+       =============================== -->
+  <main class="content">
+    <div class="article">
+      <div class="thumb"></div>
+      <div class="text">
+        <h3>文章標題</h3>
+        <p>文章摘要</p>
+      </div>
+    </div>
+  </main>
 
+  <!-- ===============================
+       固定底部導覽
+       =============================== -->
+  <nav class="bottom-nav">
+    <button class="active">🏠<span>首頁</span></button>
+    <button>📰<span>文章</span></button>
+    <button>🎬<span>影音</span></button>
+    <button>⚙️<span>設定</span></button>
+  </nav>
+
+  <!-- ===============================
+       Service Modal（預設關閉）
+       =============================== -->
+  <div class="modal" id="serviceModal">
+    <div class="modal-content">
+      <h2>全部服務</h2>
+      <p>之後再補內容</p>
+    </div>
   </div>
 
-  <!-- 全站唯一 JS 入口 -->
+  <!-- JS（唯一入口，放 body 最底） -->
   <script src="assets/js/app.js"></script>
-
 </body>
 </html>
