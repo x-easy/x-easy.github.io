@@ -1,44 +1,10 @@
 /* ===============================
-   全站狀態（唯一來源）
-   =============================== */
-const state = {
-  serviceModalOpen: false
-};
-
-/* ===============================
-   DOM 快取（只抓一次）
-   =============================== */
-const serviceModal = document.getElementById("serviceModal");
-const openServiceModalBtn = document.getElementById("openServiceModal");
-const miniPlayer = document.getElementById("miniPlayer");
-
-/* ===============================
-   行為控制
+   app.js
+   功能：目前只做初始化，不綁任何行為
+   目的：確保結構穩定、不誤觸其他模組
    =============================== */
 
-// 服務 modal 開關
-openServiceModalBtn.addEventListener("click", () => {
-  state.serviceModalOpen = true;
-  serviceModal.classList.add("show");
+document.addEventListener("DOMContentLoaded", () => {
+  // 目前不執行任何邏輯
+  // 保留給之後逐一掛功能用
 });
-
-// 點背景關閉 modal
-serviceModal.addEventListener("click", (e) => {
-  if (e.target === serviceModal) {
-    state.serviceModalOpen = false;
-    serviceModal.classList.remove("show");
-  }
-});
-
-// 點擊 mini player（之後接播放器）
-miniPlayer.addEventListener("click", () => {
-  alert("播放器展開（下一步再做）");
-});
-
-/* ===============================
-   初始化（防止空白）
-   =============================== */
-(function init() {
-  // 保證 modal 初始為關閉
-  serviceModal.classList.remove("show");
-})();
