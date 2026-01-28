@@ -1,170 +1,240 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>X-EASY | 技術與生活的交匯點</title>
+    <meta name="description" content="歡迎來到 X-Easy 的個人入口首頁。這裡紀錄了程式開發、技術筆記與數位生活的點滴。">
+    <meta name="keywords" content="X-Easy, Github IO, 部落格, 技術筆記, 前端開發, 音樂">
+    <meta property="og:title" content="X-EASY | 技術與生活的交匯點">
+    <meta property="og:description" content="點擊進入 X-Easy 的個人部落格，探索更多精彩內容。">
+    <meta property="og:url" content="https://x-easy.github.io/">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#000000">
 
-<title id="seo-title">mobispace</title>
-<meta id="seo-desc" name="description" content="mobispace WebApp 平台">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<meta property="og:title" content="mobispace">
-<meta property="og:description" content="搜尋 × 內容 × 模組化平台">
-<meta property="og:type" content="website">
+    <style>
+        /* ============================
+           全域變數與重置
+           ============================ */
+        :root {
+            --bg-color: #050505;
+            --text-main: #ffffff;
+            --text-sub: #a1a1aa;
+            --accent-color: #06c755; /* 延續之前的綠色主調 */
+            --accent-glow: rgba(6, 199, 85, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
 
-<script id="seo-jsonld" type="application/ld+json"></script>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<!-- =======================
- PWA 全套 Manifest (含 icons)
-======================= -->
-<link rel="manifest" href="data:application/json,{
-  &quot;name&quot;:&quot;mobispace&quot;,
-  &quot;short_name&quot;:&quot;mobispace&quot;,
-  &quot;start_url&quot;:&quot;/&quot;,
-  &quot;display&quot;:&quot;standalone&quot;,
-  &quot;background_color&quot;:&quot;#000000&quot;,
-  &quot;theme_color&quot;:&quot;#000000&quot;,
-  &quot;icons&quot;:[
-    {&quot;src&quot;:&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA...&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},
-    {&quot;src&quot;:&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA...&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}
-  ]
-}">
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; /* 禁止捲動 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-<meta name="theme-color" content="#000000">
+        /* ============================
+           背景動畫 (極光效果)
+           ============================ */
+        .ambient-light {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.15), transparent 25%), 
+                radial-gradient(circle at 85% 30%, rgba(6, 199, 85, 0.15), transparent 25%);
+            filter: blur(60px);
+            animation: gradientMove 15s ease-in-out infinite alternate;
+        }
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+        @keyframes gradientMove {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.2); opacity: 1; }
+        }
 
-<style>
-body{background:#000;color:#eee;font-family:system-ui;padding-bottom:80px}
-header,nav{position:fixed;left:0;width:100%;background:#050505}
-header{top:0;padding:12px}
-nav{bottom:0;display:flex;justify-content:space-around;padding:12px}
-#app{padding:80px 12px}
-.item{border-bottom:1px solid #111;padding:16px}
-a{color:#0f0;text-decoration:none}
-button{background:#111;color:#eee;border:0;padding:10px 14px;border-radius:10px}
-</style>
+        /* 網格背景紋理 */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* ============================
+           主要內容卡片 (玻璃擬態)
+           ============================ */
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 3rem 2rem;
+            max-width: 500px;
+            width: 90%;
+            
+            /* Glassmorphism */
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #333, #111);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--glass-border);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .avatar i {
+            font-size: 32px;
+            color: var(--text-main);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.05em;
+            background: linear-gradient(to right, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-sub);
+            font-size: 1rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+
+        /* ============================
+           互動按鈕 (核心功能)
+           ============================ */
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #000; /* 按鈕文字黑 */
+            background-color: var(--accent-color);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 rgba(6, 199, 85, 0);
+        }
+
+        /* 按鈕 hover 動畫 */
+        .cta-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 25px -5px var(--accent-glow);
+            background-color: #05d65a; /* 稍微亮一點 */
+        }
+
+        .cta-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .cta-button i {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover i {
+            transform: translateX(4px);
+        }
+
+        /* ============================
+           Footer
+           ============================ */
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            color: #555;
+        }
+
+        /* ============================
+           進場動畫
+           ============================ */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
 </head>
-
 <body>
 
-<header>mobispace WebApp</header>
+    <div class="ambient-light"></div>
+    <div class="grid-overlay"></div>
 
-<div id="app"></div>
+    <main class="container">
+        
+        <div class="avatar">
+            <i class="fa-solid fa-code"></i>
+        </div>
 
-<nav>
-<button onclick="route('/')">首頁</button>
-<button onclick="route('/articles')">文章</button>
-<button onclick="generateSitemap()">產生 Sitemap</button>
-</nav>
+        <h1>X-EASY</h1>
+        <p class="subtitle">
+            歡迎來到我的個人空間。<br>
+            這裡匯聚了關於程式技術、開發心得與生活隨筆。
+        </p>
 
-<script>
-/* ===============================
-  路由系統 (History API)
-================================ */
-function route(path){
-  history.pushState({}, "", path);
-  render();
-}
-window.onpopstate = render;
+        <a href="https://x-easy.github.io/blog/" class="cta-button">
+            <span>進入部落格</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-/* ===============================
-  CMS 文章索引 (真實檔案列表)
-  → 對應 /posts/*
-================================ */
-const postIndex = [
-  {slug:"hello", file:"/posts/hello.md", title:"Hello World"},
-  {slug:"guide", file:"/posts/guide.html", title:"使用指南"},
-  {slug:"data", file:"/posts/data.json", title:"JSON 範例"}
-];
+        <div class="footer">
+            &copy; 2024 X-Easy. All rights reserved.
+        </div>
+    </main>
 
-/* ===============================
-  Render 核心
-================================ */
-async function render(){
-  const path = location.pathname;
-  const app = document.getElementById("app");
-
-  if(path === "/"){
-    app.innerHTML = `<h2>首頁</h2>`;
-  }
-
-  else if(path === "/articles"){
-    app.innerHTML = postIndex.map(p=>
-      `<div class="item"><a href="/post/${p.slug}" onclick="event.preventDefault();route('/post/${p.slug}')">${p.title}</a></div>`
-    ).join("");
-  }
-
-  else if(path.startsWith("/post/")){
-    const slug = path.split("/post/")[1];
-    const post = postIndex.find(p=>p.slug===slug);
-    if(!post){ app.innerHTML="404"; return; }
-
-    const res = await fetch(post.file);
-    let content = await res.text();
-
-    if(post.file.endsWith(".md")) content = marked.parse(content);
-    if(post.file.endsWith(".json")) content = `<pre>${content}</pre>`;
-
-    app.innerHTML = `<div class="item">${content}</div>`;
-
-    updateSEO(post.title, content.replace(/<[^>]+>/g,"").slice(0,120));
-  }
-}
-render();
-
-/* ===============================
- SEO 動態更新
-================================ */
-function updateSEO(title,desc){
-  document.getElementById("seo-title").textContent = title;
-  document.getElementById("seo-desc").content = desc;
-
-  document.getElementById("seo-jsonld").textContent = JSON.stringify({
-    "@context":"https://schema.org",
-    "@type":"Article",
-    "headline":title,
-    "description":desc,
-    "url":location.href
-  });
-}
-
-/* ===============================
- Sitemap.xml 生成器
-================================ */
-function generateSitemap(){
-  const urls = [
-    "/",
-    "/articles",
-    ...postIndex.map(p=>`/post/${p.slug}`)
-  ];
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    urls.map(u=>`<url><loc>${location.origin}${u}</loc></url>`).join("\n") +
-    "\n</urlset>";
-
-  const blob = new Blob([xml],{type:"application/xml"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "sitemap.xml";
-  a.click();
-}
-
-/* ===============================
- PWA Service Worker
-================================ */
-if('serviceWorker' in navigator){
-  const sw = new Blob([`
-    self.addEventListener('install',e=>{
-      e.waitUntil(caches.open('v1').then(c=>c.addAll(['/'])));
-    });
-    self.addEventListener('fetch',e=>{
-      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
-    });
-  `],{type:'text/javascript'});
-  navigator.serviceWorker.register(URL.createObjectURL(sw));
-}
-</script>
-
+    <script>
+        // 簡單的 console 招呼語
+        console.log(
+            "%c Welcome to X-Easy's Space ",
+            "background: #06c755; color: #000; padding: 10px; border-radius: 5px; font-weight: bold;"
+        );
+    </script>
 </body>
 </html>
