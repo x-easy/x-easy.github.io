@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>旗艦版音樂入口網 | 首頁</title> <meta name="description" content="全方位的音樂與內容聚合平台，提供極致的 WebApp 體驗。">
+    <title>旗艦版音樂入口網 | 首頁</title>
+    <meta name="description" content="全方位的音樂與內容聚合平台，提供極致的 WebApp 體驗。">
     <meta name="keywords" content="音樂, SPA, PWA, 搜尋引擎, 音樂播放器">
     <meta name="author" content="Music WebApp Team">
     <link rel="canonical" href="https://your-domain.com/">
@@ -52,6 +53,7 @@
             --accent-color: #06c755; /* Line Green */
             --nav-bg: #111111;
             --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --setting-item-bg: #222222;
         }
 
         /* 明亮模式 (Light Mode) */
@@ -66,6 +68,7 @@
             --accent-color: #00b900; /* Line Green Light */
             --nav-bg: #ffffff;
             --shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --setting-item-bg: #ffffff;
         }
 
         /* 基礎重置 */
@@ -123,13 +126,15 @@
             color: var(--text-main);
         }
 
-        .header-icons { display: flex; gap: 12px; }
+        /* Header Icon Group Update */
+        .header-icons { display: flex; gap: 15px; }
         .icon-btn {
             background: none; border: none;
             color: var(--text-main);
             font-size: 10px;
             display: flex; flex-direction: column; align-items: center;
             cursor: pointer;
+            text-decoration: none; /* For <a> tags */
         }
         .icon-btn i {
             font-size: 18px; margin-bottom: 2px;
@@ -230,6 +235,45 @@
         .list-title { font-size: 15px; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); }
         .list-meta { font-size: 12px; color: var(--text-sub); }
 
+        /* 設定頁面樣式 (New) */
+        .settings-container { padding: 0; }
+        .settings-group { margin-bottom: 20px; }
+        .settings-header {
+            padding: 15px;
+            font-size: 14px;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: var(--setting-item-bg);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .setting-label { display: flex; align-items: center; gap: 10px; }
+        .toggle-switch {
+            width: 40px; height: 20px;
+            background-color: #555;
+            border-radius: 10px;
+            position: relative;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .toggle-switch.active { background-color: var(--accent-color); }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px; left: 2px;
+            transition: 0.3s;
+        }
+        .toggle-switch.active::after { transform: translateX(20px); }
+
         /* 底部導航 */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
@@ -265,14 +309,18 @@
             </div>
 
             <div class="header-icons">
-                <button class="icon-btn" id="themeToggle" aria-label="切換主題">
-                    <i class="fa-solid fa-moon"></i>
-                    <span>主題</span>
+                <button class="icon-btn" onclick="alert('開啟音樂播放器頁面')" aria-label="音樂">
+                    <i class="fa-solid fa-compact-disc"></i>
+                    <span>音樂</span>
                 </button>
-                <button class="icon-btn" aria-label="會員">
-                    <i class="fa-regular fa-user"></i>
-                    <span>會員</span>
+                <button class="icon-btn" onclick="alert('查看 KEEP 收藏')" aria-label="KEEP">
+                    <i class="fa-regular fa-bookmark"></i>
+                    <span>KEEP</span>
                 </button>
+                <a href="/settings" class="icon-btn" data-link aria-label="設定">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>設定</span>
+                </a>
             </div>
         </header>
 
@@ -310,7 +358,7 @@
     <script>
         /**
          * =============================================
-         * 系統資料庫 (模擬後端 API JSON)
+         * 系統資料庫
          * =============================================
          */
         const db = {
@@ -337,33 +385,23 @@
             ]
         };
 
-        /**
-         * =============================================
-         * 1. Fuse.js 搜尋引擎設定
-         * =============================================
-         */
-        const fuseOptions = {
-            keys: ['title', 'category'],
-            threshold: 0.3, // 模糊匹配閾值
-        };
+        const fuseOptions = { keys: ['title', 'category'], threshold: 0.3 };
         const fuse = new Fuse(db.articles, fuseOptions);
 
         /**
          * =============================================
-         * 2. SPA 路由系統 (True SPA Architecture)
+         * SPA 路由系統
          * =============================================
          */
         const mainView = document.getElementById('main-view');
 
-        // 路由定義
         const routes = {
             '/': renderHome,
             '/explore': renderExplore,
             '/library': () => '<h1>資料庫 (開發中)</h1>',
-            '/settings': () => '<h1>設定 (開發中)</h1>'
+            '/settings': renderSettings // 連結到新的設定頁面渲染函數
         };
 
-        // 導航處理
         const navigateTo = url => {
             history.pushState(null, null, url);
             router();
@@ -372,47 +410,43 @@
         async function router() {
             const path = window.location.pathname;
             const view = routes[path] || routes['/'];
-            
-            // 獨立 SEO 設定
             updateSEO(path);
-
-            // 渲染視圖
             mainView.innerHTML = await view();
             
-            // 重新綁定首頁特有的 JS 邏輯
+            // 首頁與設定頁的特殊邏輯初始化
             if(path === '/') initHomeScripts();
+            if(path === '/settings') initSettingsScripts();
+            
+            // 更新底部導航狀態
+            updateNavState(path);
         }
 
-        // SEO 更新函數
         function updateSEO(path) {
-            const titles = {
-                '/': '首頁 - 發現好音樂',
-                '/explore': '探索 - 熱門話題',
-                '/library': '資料庫 - 我的收藏',
-                '/settings': '設定 - 個人化'
-            };
+            const titles = { '/': '首頁', '/explore': '探索', '/library': '資料庫', '/settings': '設定' };
             document.title = `旗艦版音樂入口網 | ${titles[path] || 'WebApp'}`;
+        }
+
+        function updateNavState(path) {
+            document.querySelectorAll('.nav-item').forEach(el => {
+                if(el.getAttribute('href') === path) el.classList.add('active');
+                else el.classList.remove('active');
+            });
         }
 
         /**
          * =============================================
-         * 3. 視圖渲染器 (View Renderers)
+         * 視圖渲染器 (View Renderers)
          * =============================================
          */
         
-        // 生成首頁 HTML
         function renderHome() {
-            // 生成輪播
             const carouselHtml = db.carousel.map(item => `
                 <div class="hero-card">
                     <img src="${item.img}" alt="${item.title}" loading="lazy">
-                    <div class="hero-overlay">
-                        <h3>${item.title}</h3>
-                    </div>
+                    <div class="hero-overlay"><h3>${item.title}</h3></div>
                 </div>
             `).join('');
 
-            // 生成快捷按鈕 (JSON 動態生成)
             const shortcutsHtml = db.shortcuts.map(btn => `
                 <a href="${btn.route}" class="shortcut-item" onclick="event.preventDefault(); alert('功能: ${btn.name}')">
                     <div class="shortcut-icon"><i class="fa-solid ${btn.icon}"></i></div>
@@ -420,20 +454,11 @@
                 </a>
             `).join('');
 
-            // 生成文章列表
             const articlesHtml = renderArticleList(db.articles);
 
             return `
-                <section class="hero-carousel">
-                    <div class="carousel-track" id="heroTrack">
-                        ${carouselHtml}
-                    </div>
-                </section>
-                
-                <section class="shortcut-grid">
-                    ${shortcutsHtml}
-                </section>
-
+                <section class="hero-carousel"><div class="carousel-track" id="heroTrack">${carouselHtml}</div></section>
+                <section class="shortcut-grid">${shortcutsHtml}</section>
                 <section class="list-section" id="contentList">
                     <h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>
                     ${articlesHtml}
@@ -445,10 +470,50 @@
             return `<div style="padding:20px;"><h2>探索頁面</h2><p>這裡是動態載入的探索內容。</p></div>`;
         }
 
-        // 輔助：生成文章列表 HTML
+        // --- 新增：設定頁面渲染器 (包含光暗模式開關) ---
+        function renderSettings() {
+            // 判斷當前主題狀態，決定開關是否為 active
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const isActive = currentTheme === 'light' ? 'active' : '';
+
+            return `
+                <div class="settings-container">
+                    <div class="settings-group">
+                        <div class="settings-header">基本設定</div>
+                        <div class="setting-row">
+                            <div class="setting-label"><i class="fa-regular fa-user"></i> 個人檔案</div>
+                            <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: #666;"></i>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label"><i class="fa-solid fa-bell"></i> 通知設定</div>
+                            <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: #666;"></i>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-header">外觀與顯示</div>
+                        <div class="setting-row" id="themeToggleRow" style="cursor: pointer;">
+                            <div class="setting-label">
+                                <i class="fa-solid fa-moon"></i> 
+                                <span>明亮模式</span>
+                            </div>
+                            <div class="toggle-switch ${isActive}" id="settingsThemeSwitch"></div>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="settings-header">關於</div>
+                        <div class="setting-row">
+                            <div class="setting-label">版本資訊</div>
+                            <span style="font-size: 12px; color: #666;">v2.0.0</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         function renderArticleList(data) {
             if(data.length === 0) return '<p style="text-align:center; padding:20px; color:var(--text-sub)">沒有找到相關結果</p>';
-            
             return data.map(item => `
                 <article class="list-card">
                     <div class="list-thumb"><img src="${item.img}" alt="${item.title}" loading="lazy"></div>
@@ -462,95 +527,76 @@
 
         /**
          * =============================================
-         * 4. 邏輯初始化 (Home Logic)
+         * 邏輯初始化
          * =============================================
          */
         function initHomeScripts() {
-            // --- Hero Carousel 自動輪播邏輯 ---
             const track = document.getElementById('heroTrack');
             if(track) {
                 let scrollAmount = 0;
-                const cardWidth = track.offsetWidth; 
-                
                 const autoScroll = setInterval(() => {
-                    scrollAmount += cardWidth;
-                    if (scrollAmount >= track.scrollWidth) {
-                        scrollAmount = 0; // 回到開頭
-                    }
+                    scrollAmount += track.offsetWidth;
+                    if (scrollAmount >= track.scrollWidth) scrollAmount = 0;
                     track.scrollTo({ left: scrollAmount, behavior: 'smooth' });
-                }, 4000); // 4秒輪播一次
-
-                // 觸摸時暫停輪播 (提升 UX)
+                }, 4000);
                 track.addEventListener('touchstart', () => clearInterval(autoScroll));
+            }
+        }
+
+        // --- 新增：設定頁面邏輯 (處理主題切換) ---
+        function initSettingsScripts() {
+            const toggleRow = document.getElementById('themeToggleRow');
+            const switchBtn = document.getElementById('settingsThemeSwitch');
+            
+            if(toggleRow && switchBtn) {
+                toggleRow.addEventListener('click', () => {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    
+                    if (currentTheme === 'light') {
+                        // 切換回深色
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        switchBtn.classList.remove('active');
+                        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111111');
+                    } else {
+                        // 切換回明亮
+                        document.documentElement.setAttribute('data-theme', 'light');
+                        switchBtn.classList.add('active');
+                        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
+                    }
+                });
             }
         }
 
         /**
          * =============================================
-         * 5. 全域事件監聽 (Global Events)
+         * 全域事件監聽
          * =============================================
          */
-        
-        // 頁面載入與路由
         window.addEventListener('popstate', router);
         document.addEventListener('DOMContentLoaded', () => {
             router();
-            
-            // 處理 SPA 連結點擊
             document.body.addEventListener('click', e => {
                 if (e.target.closest('[data-link]')) {
                     e.preventDefault();
-                    const link = e.target.closest('[data-link]');
-                    
-                    // 更新 Nav UI
-                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                    link.classList.add('active');
-                    
-                    navigateTo(link.getAttribute('href'));
+                    navigateTo(e.target.closest('[data-link]').getAttribute('href'));
                 }
             });
         });
 
-        // 搜尋功能監聽
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', (e) => {
             const term = e.target.value;
             const contentList = document.getElementById('contentList');
-            
-            if (!contentList) return; // 不在首頁不執行
+            if (!contentList) return;
 
             if (term.trim() === '') {
-                // 恢復原狀
                 contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>` + renderArticleList(db.articles);
             } else {
-                // 執行 Fuse.js 搜尋
                 const results = fuse.search(term);
-                const items = results.map(r => r.item);
-                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">搜尋結果</h3>` + renderArticleList(items);
+                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">搜尋結果</h3>` + renderArticleList(results.map(r => r.item));
             }
         });
 
-        // 光/暗模式切換 (100% 仿 Line)
-        const themeBtn = document.getElementById('themeToggle');
-        themeBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const icon = themeBtn.querySelector('i');
-            
-            if (currentTheme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                // 改變狀態列顏色 (Mobile Safari)
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111111');
-            } else {
-                document.documentElement.setAttribute('data-theme', 'light');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
-            }
-        });
-
-        // 播放器互動
         const miniPlayer = document.getElementById('miniPlayer');
         let isPlaying = false;
         miniPlayer.addEventListener('click', () => {
@@ -564,7 +610,6 @@
                 document.getElementById('playerText').innerText = "已暫停";
             }
         });
-
     </script>
 </body>
 </html>
