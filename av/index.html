@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RSS 聚合閱讀器</title>
+
+<style>
+:root {
+  --bg:#fff; --text:#111; --card:#f2f2f2; --accent:#0066cc;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#121212;--text:#eee;--card:#1e1e1e;--accent:#4da3ff;}
+}
+body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text);}
+header{padding:1rem;text-align:center;font-weight:bold;font-size:1.3rem;}
+main{max-width:900px;margin:auto;padding:1rem;}
+input,select{padding:.6rem;border-radius:8px;border:1px solid #888;background:var(--card);color:var(--text);width:100%;}
+.controls{display:grid;gap:.5rem;margin-bottom:1rem;}
+.item{background:var(--card);padding:1rem;border-radius:12px;margin-bottom:.8rem;}
+.item a{color:var(--accent);font-weight:bold;text-decoration:none;}
+.source{opacity:.6;font-size:.8rem;}
+#status{text-align:center;opacity:.6;margin:1rem;}
+</style>
+</head>
+
+<body>
+<header>📡 私人 RSS 聚合器</header>
+
+<main>
+  <div class="controls">
+    <input id="search" placeholder="搜尋 / 關鍵字過濾（空白分隔）">
+    <select id="sourceFilter">
+      <option value="all">所有來源</option>
+      <option value="18AV">18AV</option>
+      <option value="Hanime1">Hanime1</option>
+      <option value="Ero-Video">Ero-Video</option>
+    </select>
+  </div>
+
+  <div id="status">載入中...</div>
+  <div id="feed"></div>
+</main>
+
+<script>
+// =============================
+// PWA 自動建立 (manifest + SW)
+// =============================
+const manifest = {
+  name: "RSS Reader",
+  short_name: "RSS",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#000000",
+  theme_color: "#000000",
+  icons: []
+};
+const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
+const manifestURL = URL.createObjectURL(blob);
+const link = document.createElement("link");
+link.rel = "manifest"; link.href = manifestURL;
+document.head.appendChild(link);
+
+if ("serviceWorker" in navigator) {
+  const swCode = `
+    self.addEventListener('install', e=>{
+      e.waitUntil(caches.open('rss-cache').then(c=>c.addAll(['./'])));
+    });
+    self.addEventListener('fetch', e=>{
+      e.respondWith(
+        caches.match(e.request).then(r=>r||fetch(e.request))
+      );
+    });
+  `;
+  const swBlob = new Blob([swCode], {type:"text/javascript"});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob));
+}
+
+// =============================
+// RSS 核心邏輯
+// =============================
+const feeds = [
+  {name:"18AV", url:"https://rss.app/feeds/eS2iB3hy0gfoMeSW.xml"},
+  {name:"Hanime1", url:"https://rss.app/feeds/FuIYGgvZZ4yvY9js.xml"},
+  {name:"Ero-Video", url:"https://rss.app/feeds/lrJwczmeZYPaSWFl.xml"}
+];
+
+const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
+const container = document.getElementById("feed");
+const status = document.getElementById("status");
+const search = document.getElementById("search");
+const filter = document.getElementById("sourceFilter");
+
+let allItems = JSON.parse(localStorage.getItem("rss-cache")||"[]");
+if(allItems.length){ status.remove(); render(allItems); }
+
+Promise.all(feeds.map(f=>
+  fetch(proxy+encodeURIComponent(f.url))
+    .then(r=>r.json())
+    .then(d=>d.items.map(i=>({
+      title:i.title,
+      link:i.link,
+      date:new Date(i.pubDate||Date.now()),
+      source:f.name
+    })))
+)).then(res=>{
+  allItems = res.flat().sort((a,b)=>b.date-a.date);
+  localStorage.setItem("rss-cache", JSON.stringify(allItems));
+  status.remove();
+  render(allItems);
+});
+
+function render(data){
+  container.innerHTML="";
+  data.forEach(i=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
+      <a href="${i.link}" target="_blank">${i.title}</a>
+      <div class="source">${i.source}｜${i.date.toLocaleString()}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function applyFilter(){
+  const kw = search.value.toLowerCase().split(/\s+/).filter(Boolean);
+  const src = filter.value;
+  const filtered = allItems.filter(i=>{
+    const okSrc = src==="all"||i.source===src;
+    const okKw = kw.every(k=>i.title.toLowerCase().includes(k));
+    return okSrc && okKw;
+  });
+  render(filtered);
+}
+
+search.oninput = applyFilter;
+filter.onchange = applyFilter;
+</script>
+</body>
+</html>
