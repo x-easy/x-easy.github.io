@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>旗艦版音樂入口網 | 首頁</title> <meta name="description" content="全方位的音樂與內容聚合平台，提供極致的 WebApp 體驗。">
+    <meta name="keywords" content="音樂, SPA, PWA, 搜尋引擎, 音樂播放器">
+    <meta name="author" content="Music WebApp Team">
+    <link rel="canonical" href="https://your-domain.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="旗艦版音樂入口網">
+    <meta property="og:description" content="全方位的音樂與內容聚合平台。">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&q=80">
+    <meta property="og:url" content="https://your-domain.com/">
+
+    <meta name="theme-color" content="#111111">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3756/3756770.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "旗艦版音樂入口網",
+      "url": "https://your-domain.com/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://your-domain.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <style>
+        /* * 光/暗模式變數定義 (100% 高仿 Line App 配色)
+         */
+        :root {
+            /* 預設暗黑模式 (Dark Mode) */
+            --bg-body: #000000;
+            --bg-container: #111111;
+            --bg-card: #222222;
+            --bg-input: #333333;
+            --text-main: #ffffff;
+            --text-sub: #aaaaaa;
+            --border-color: #333333;
+            --accent-color: #06c755; /* Line Green */
+            --nav-bg: #111111;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        /* 明亮模式 (Light Mode) */
+        [data-theme="light"] {
+            --bg-body: #f0f0f0;
+            --bg-container: #ffffff;
+            --bg-card: #f8f9fa; /* 極淺灰 */
+            --bg-input: #f2f2f2;
+            --text-main: #111111;
+            --text-sub: #666666;
+            --border-color: #e5e5e5;
+            --accent-color: #00b900; /* Line Green Light */
+            --nav-bg: #ffffff;
+            --shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* 基礎重置 */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* APP 容器 */
+        #app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: var(--bg-container);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px; /* Nav height */
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        /* HEADER */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--bg-container);
+            transition: background-color 0.3s;
+        }
+
+        .line-music-player {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-input);
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            flex: 1;
+            margin-right: 15px;
+            height: 38px;
+            cursor: pointer;
+        }
+
+        .music-title-scroll {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 120px;
+            color: var(--text-main);
+        }
+
+        .header-icons { display: flex; gap: 12px; }
+        .icon-btn {
+            background: none; border: none;
+            color: var(--text-main);
+            font-size: 10px;
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer;
+        }
+        .icon-btn i {
+            font-size: 18px; margin-bottom: 2px;
+            padding: 5px;
+            border: 1px solid var(--text-main);
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .icon-btn:hover i { color: var(--accent-color); border-color: var(--accent-color); }
+
+        /* 搜尋區塊 */
+        .search-section { padding: 5px 15px 10px; }
+        .search-box {
+            background-color: var(--bg-input);
+            border-radius: 10px;
+            padding: 8px 15px;
+            display: flex; align-items: center;
+            color: var(--text-sub);
+        }
+        .search-box input {
+            background: transparent; border: none;
+            color: var(--text-main);
+            width: 100%; margin-left: 10px;
+            font-size: 14px; outline: none;
+        }
+
+        /* 內容切換區 (SPA View) */
+        #main-view {
+            min-height: 60vh;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* HERO CAROUSEL */
+        .hero-carousel { padding: 10px 0; overflow: hidden; position: relative; }
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth; /* 平滑滾動 */
+            scrollbar-width: none;
+        }
+        .carousel-track::-webkit-scrollbar { display: none; }
+        
+        .hero-card {
+            min-width: 92%; /* 左右露出一點點提示可滑動 */
+            margin-left: 4%;
+            margin-right: 4%;
+            height: 180px;
+            border-radius: 12px;
+            scroll-snap-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .hero-card img { width: 100%; height: 100%; object-fit: cover; }
+        .hero-overlay {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 20px 15px 10px;
+            color: white;
+        }
+
+        /* 動態快捷按鈕區 */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px 15px;
+        }
+        .shortcut-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-main); text-decoration: none; font-size: 11px;
+        }
+        .shortcut-icon {
+            width: 45px; height: 45px;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 6px;
+            font-size: 20px;
+            color: var(--accent-color);
+            box-shadow: var(--shadow);
+        }
+
+        /* 文章列表 */
+        .list-section { padding: 0 15px; }
+        .list-card {
+            display: flex; gap: 15px; padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .list-thumb {
+            width: 90px; height: 90px;
+            border-radius: 10px; overflow: hidden; flex-shrink: 0;
+        }
+        .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .list-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .list-title { font-size: 15px; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); }
+        .list-meta { font-size: 12px; color: var(--text-sub); }
+
+        /* 底部導航 */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            max-width: 480px; margin: 0 auto;
+            height: 60px;
+            background-color: var(--nav-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 999;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-sub); text-decoration: none;
+            width: 25%; font-size: 10px;
+        }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item.active { color: var(--text-main); }
+        .nav-item.active i { color: var(--text-main); }
+
+        /* 動畫 */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        
+        <header class="app-header">
+            <div class="line-music-player" id="miniPlayer">
+                <i class="fa-solid fa-music" style="color: var(--accent-color); margin-right: 8px;"></i>
+                <div class="music-title-scroll" id="playerText">點擊播放推薦音樂...</div>
+                <i class="fa-solid fa-play" style="font-size: 12px; margin-left: auto; color: var(--text-sub);"></i>
+            </div>
+
+            <div class="header-icons">
+                <button class="icon-btn" id="themeToggle" aria-label="切換主題">
+                    <i class="fa-solid fa-moon"></i>
+                    <span>主題</span>
+                </button>
+                <button class="icon-btn" aria-label="會員">
+                    <i class="fa-regular fa-user"></i>
+                    <span>會員</span>
+                </button>
+            </div>
+        </header>
+
+        <section class="search-section">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="搜尋歌曲、文章、短片...">
+            </div>
+        </section>
+
+        <main id="main-view">
+            </main>
+
+        <nav class="bottom-nav">
+            <a href="/" class="nav-item active" data-link>
+                <i class="fa-solid fa-house"></i>
+                <span>首頁</span>
+            </a>
+            <a href="/explore" class="nav-item" data-link>
+                <i class="fa-solid fa-compass"></i>
+                <span>探索</span>
+            </a>
+            <a href="/library" class="nav-item" data-link>
+                <i class="fa-solid fa-layer-group"></i>
+                <span>資料庫</span>
+            </a>
+            <a href="/settings" class="nav-item" data-link>
+                <i class="fa-solid fa-gear"></i>
+                <span>設定</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <script>
+        /**
+         * =============================================
+         * 系統資料庫 (模擬後端 API JSON)
+         * =============================================
+         */
+        const db = {
+            carousel: [
+                { id: 1, title: "沉浸式 3D 音效體驗", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80" },
+                { id: 2, title: "2024 獨立音樂排行榜", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=800&q=80" },
+                { id: 3, title: "深夜 Lo-Fi 讀書清單", img: "https://images.unsplash.com/photo-1514525253440-b393452e3383?w=800&q=80" }
+            ],
+            shortcuts: [
+                { name: "排行榜", icon: "fa-chart-simple", route: "/rank" },
+                { name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
+                { name: "Podcast", icon: "fa-microphone", route: "/podcast" },
+                { name: "我的最愛", icon: "fa-heart", route: "/fav" },
+                { name: "演唱會", icon: "fa-ticket", route: "/ticket" },
+                { name: "周邊商城", icon: "fa-bag-shopping", route: "/shop" },
+                { name: "社群", icon: "fa-users", route: "/community" },
+                { name: "更多", icon: "fa-ellipsis", route: "/more" }
+            ],
+            articles: [
+                { id: 1, title: "如何選擇你的第一把吉他？", category: "教學", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" },
+                { id: 2, title: "Spotify 與 Apple Music 音質大比拼", category: "科技", date: "5小時前", img: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=200" },
+                { id: 3, title: "PWA 網頁應用程式的未來", category: "開發", date: "1天前", img: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=200" },
+                { id: 4, title: "周杰倫歷年專輯回顧", category: "樂評", date: "2天前", img: "https://images.unsplash.com/photo-1459749411177-0473ef71607b?w=200" }
+            ]
+        };
+
+        /**
+         * =============================================
+         * 1. Fuse.js 搜尋引擎設定
+         * =============================================
+         */
+        const fuseOptions = {
+            keys: ['title', 'category'],
+            threshold: 0.3, // 模糊匹配閾值
+        };
+        const fuse = new Fuse(db.articles, fuseOptions);
+
+        /**
+         * =============================================
+         * 2. SPA 路由系統 (True SPA Architecture)
+         * =============================================
+         */
+        const mainView = document.getElementById('main-view');
+
+        // 路由定義
+        const routes = {
+            '/': renderHome,
+            '/explore': renderExplore,
+            '/library': () => '<h1>資料庫 (開發中)</h1>',
+            '/settings': () => '<h1>設定 (開發中)</h1>'
+        };
+
+        // 導航處理
+        const navigateTo = url => {
+            history.pushState(null, null, url);
+            router();
+        };
+
+        async function router() {
+            const path = window.location.pathname;
+            const view = routes[path] || routes['/'];
+            
+            // 獨立 SEO 設定
+            updateSEO(path);
+
+            // 渲染視圖
+            mainView.innerHTML = await view();
+            
+            // 重新綁定首頁特有的 JS 邏輯
+            if(path === '/') initHomeScripts();
+        }
+
+        // SEO 更新函數
+        function updateSEO(path) {
+            const titles = {
+                '/': '首頁 - 發現好音樂',
+                '/explore': '探索 - 熱門話題',
+                '/library': '資料庫 - 我的收藏',
+                '/settings': '設定 - 個人化'
+            };
+            document.title = `旗艦版音樂入口網 | ${titles[path] || 'WebApp'}`;
+        }
+
+        /**
+         * =============================================
+         * 3. 視圖渲染器 (View Renderers)
+         * =============================================
+         */
+        
+        // 生成首頁 HTML
+        function renderHome() {
+            // 生成輪播
+            const carouselHtml = db.carousel.map(item => `
+                <div class="hero-card">
+                    <img src="${item.img}" alt="${item.title}" loading="lazy">
+                    <div class="hero-overlay">
+                        <h3>${item.title}</h3>
+                    </div>
+                </div>
+            `).join('');
+
+            // 生成快捷按鈕 (JSON 動態生成)
+            const shortcutsHtml = db.shortcuts.map(btn => `
+                <a href="${btn.route}" class="shortcut-item" onclick="event.preventDefault(); alert('功能: ${btn.name}')">
+                    <div class="shortcut-icon"><i class="fa-solid ${btn.icon}"></i></div>
+                    <span>${btn.name}</span>
+                </a>
+            `).join('');
+
+            // 生成文章列表
+            const articlesHtml = renderArticleList(db.articles);
+
+            return `
+                <section class="hero-carousel">
+                    <div class="carousel-track" id="heroTrack">
+                        ${carouselHtml}
+                    </div>
+                </section>
+                
+                <section class="shortcut-grid">
+                    ${shortcutsHtml}
+                </section>
+
+                <section class="list-section" id="contentList">
+                    <h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>
+                    ${articlesHtml}
+                </section>
+            `;
+        }
+
+        function renderExplore() {
+            return `<div style="padding:20px;"><h2>探索頁面</h2><p>這裡是動態載入的探索內容。</p></div>`;
+        }
+
+        // 輔助：生成文章列表 HTML
+        function renderArticleList(data) {
+            if(data.length === 0) return '<p style="text-align:center; padding:20px; color:var(--text-sub)">沒有找到相關結果</p>';
+            
+            return data.map(item => `
+                <article class="list-card">
+                    <div class="list-thumb"><img src="${item.img}" alt="${item.title}" loading="lazy"></div>
+                    <div class="list-content">
+                        <h3 class="list-title">${item.title}</h3>
+                        <span class="list-meta">${item.date} • ${item.category}</span>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        /**
+         * =============================================
+         * 4. 邏輯初始化 (Home Logic)
+         * =============================================
+         */
+        function initHomeScripts() {
+            // --- Hero Carousel 自動輪播邏輯 ---
+            const track = document.getElementById('heroTrack');
+            if(track) {
+                let scrollAmount = 0;
+                const cardWidth = track.offsetWidth; 
+                
+                const autoScroll = setInterval(() => {
+                    scrollAmount += cardWidth;
+                    if (scrollAmount >= track.scrollWidth) {
+                        scrollAmount = 0; // 回到開頭
+                    }
+                    track.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+                }, 4000); // 4秒輪播一次
+
+                // 觸摸時暫停輪播 (提升 UX)
+                track.addEventListener('touchstart', () => clearInterval(autoScroll));
+            }
+        }
+
+        /**
+         * =============================================
+         * 5. 全域事件監聽 (Global Events)
+         * =============================================
+         */
+        
+        // 頁面載入與路由
+        window.addEventListener('popstate', router);
+        document.addEventListener('DOMContentLoaded', () => {
+            router();
+            
+            // 處理 SPA 連結點擊
+            document.body.addEventListener('click', e => {
+                if (e.target.closest('[data-link]')) {
+                    e.preventDefault();
+                    const link = e.target.closest('[data-link]');
+                    
+                    // 更新 Nav UI
+                    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    navigateTo(link.getAttribute('href'));
+                }
+            });
+        });
+
+        // 搜尋功能監聽
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value;
+            const contentList = document.getElementById('contentList');
+            
+            if (!contentList) return; // 不在首頁不執行
+
+            if (term.trim() === '') {
+                // 恢復原狀
+                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>` + renderArticleList(db.articles);
+            } else {
+                // 執行 Fuse.js 搜尋
+                const results = fuse.search(term);
+                const items = results.map(r => r.item);
+                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">搜尋結果</h3>` + renderArticleList(items);
+            }
+        });
+
+        // 光/暗模式切換 (100% 仿 Line)
+        const themeBtn = document.getElementById('themeToggle');
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const icon = themeBtn.querySelector('i');
+            
+            if (currentTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                // 改變狀態列顏色 (Mobile Safari)
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111111');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
+            }
+        });
+
+        // 播放器互動
+        const miniPlayer = document.getElementById('miniPlayer');
+        let isPlaying = false;
+        miniPlayer.addEventListener('click', () => {
+            const icon = miniPlayer.querySelector('.fa-play, .fa-pause');
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                icon.className = 'fa-solid fa-pause';
+                document.getElementById('playerText').innerText = "正在播放: 模擬音頻串流...";
+            } else {
+                icon.className = 'fa-solid fa-play';
+                document.getElementById('playerText').innerText = "已暫停";
+            }
+        });
+
+    </script>
+</body>
+</html>
