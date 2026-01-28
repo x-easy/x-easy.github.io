@@ -4,44 +4,32 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- ================= SEO / 語意核心 ================= -->
 <title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
 <meta name="description" content="莫比空間 Mobispace 私密筆記 × 發布引擎">
 <meta name="robots" content="index,follow">
 
-<!-- ================= 動態網站名稱輪播 ================= -->
-<script>
-const titles = [
-  "莫比文件",
-  "空間編輯器",
-  "Ⲙⳝ編輯器",
-  "Ⲙ𝔬ⲃ¡ kⲉⲉ𝔭",
-  "ⳝ𝔭ⲁ𝔠ⲉ N𝔬tⲉ",
-  "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
-];
-let tIndex = Math.floor(Math.random()*titles.length);
-setInterval(()=>{ document.title = titles[tIndex++ % titles.length]; }, 4000);
-</script>
+<!-- ===== Open Graph 預設值（發布時會被動態取代） ===== -->
+<meta property="og:title" content="莫比文件" />
+<meta property="og:description" content="由 Mobispace 發布的筆記內容" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="" />
+<meta property="og:image" content="https://x-easy.github.io/og-default.png" />
 
-<!-- ================= CDN libs ================= -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <style>
 body { margin:0; background:#000; color:#eee; font-family:"Noto Sans TC", system-ui; }
 #mobispace-editor { max-width:1100px; margin:auto; padding:20px; }
 .editor-main { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 @media(max-width:768px){ .editor-main { grid-template-columns:1fr; } }
-textarea,#preview,#monaco { background:#111;color:#fff;border:1px solid #333;border-radius:10px;padding:12px;min-height:280px; }
+textarea,#preview,input { background:#111;color:#fff;border:1px solid #333;border-radius:10px;padding:12px; }
+textarea,#preview { min-height:280px; }
 .toolbar { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
 select,input,button { background:#111;color:#fff;border:1px solid #333;border-radius:6px;padding:6px; }
 #tabBar { display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px; }
 .tab { background:#333;border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer; }
 .tab.active { background:#4caf50; }
-footer { margin-top:40px;text-align:center;font-size:13px;color:#666; }
-footer a { color:#888;text-decoration:none; }
-footer a:hover { text-decoration:underline; }
 </style>
 </head>
 
@@ -50,30 +38,31 @@ footer a:hover { text-decoration:underline; }
 
 <h2 style="text-align:center">莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h2>
 
-<!-- ================= 工具列 ================= -->
+<!-- ===== 工具列 ===== -->
 <div class="toolbar">
-  <select id="modeSelect">
-    <option value="normal">一般模式</option>
-    <option value="monaco">IDE 模式</option>
-  </select>
+
+  <!-- ✏️ 每筆筆記的標題（直接納入資料模型） -->
+  <input id="titleInput" placeholder="筆記標題（用於管理 / SEO / OG）" />
+
+  <!-- 📥 匯入檔案（支援 md/txt/html/xml/zip/任意純文字） -->
+  <input type="file" id="importFile" multiple />
 
   <select id="formatSelect">
     <option value="md">下載 .md</option>
     <option value="txt">下載 .txt</option>
     <option value="html">下載 .html</option>
+    <option value="xml">下載 .xml</option>
+    <option value="zip">下載 .zip</option>
+  </select>
+
+  <select id="scopeSelect">
+    <option value="single">單頁</option>
+    <option value="all">全部頁面</option>
   </select>
 
   <input id="filenameInput" placeholder="檔名" />
-
-  <select id="actionSelect">
-    <option value="">操作</option>
-    <option value="add">新增筆記</option>
-    <option value="delete">刪除筆記</option>
-    <option value="publish">一鍵發布文章頁</option>
-  </select>
-
-  <!-- ⬇️ 僅保留一般下載 -->
   <button onclick="download()">⬇️ 執行下載</button>
+  <button onclick="publishHTML()">🌐 SEO Publish</button>
 </div>
 
 <div class="editor-main">
@@ -81,54 +70,48 @@ footer a:hover { text-decoration:underline; }
   <div id="preview">Preview</div>
 </div>
 
-<div id="monaco" style="display:none;"></div>
 <div id="tabBar"></div>
-
-<p id="status" style="text-align:center;font-size:13px;color:#777;">Mobispace Engine Ready</p>
-
-<footer>
-  <a href="https://x-easy.github.io" target="_blank">
-    莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025
-  </a>
-</footer>
-
-</section>
 
 <script>
 /* ================= IndexedDB 資料層 ================= */
 const DB="mobispaceDB", STORE="notes";
 let db, current=1, tabs=[1];
 
-indexedDB.open(DB,1).onupgradeneeded=e=>{
+indexedDB.open(DB,2).onupgradeneeded=e=>{
   e.target.result.createObjectStore(STORE,{keyPath:"id"});
 };
-indexedDB.open(DB,1).onsuccess=e=>{
+
+indexedDB.open(DB,2).onsuccess=e=>{
   db=e.target.result;
   load(1); renderTabs();
 };
 
-const ta=textArea, prev=preview;
+const ta=textArea, prev=preview, titleEl=titleInput;
 
-/* ================= Markdown 即時渲染 ================= */
-ta.oninput=()=>{
-  prev.innerHTML = marked.parse(ta.value);
-  save();
+/* 每次輸入即同步儲存內容與標題 */
+ta.oninput = titleEl.oninput = ()=>{
+  prev.innerHTML = marked.parse(ta.value); // Markdown → HTML 預覽
+  save(); // 同步保存資料
 };
 
+/* 儲存資料：id + title + content */
 function save(){
   db.transaction(STORE,"readwrite").objectStore(STORE)
-    .put({id:current,content:ta.value});
+    .put({id:current,title:titleEl.value||`Note ${current}`,content:ta.value});
 }
 
+/* 載入指定筆記 */
 function load(id){
   db.transaction(STORE).objectStore(STORE)
     .get(id).onsuccess=e=>{
-      ta.value=e.target.result?.content||"";
+      const note=e.target.result;
+      titleEl.value=note?.title||`Note ${id}`;
+      ta.value=note?.content||"";
       prev.innerHTML = marked.parse(ta.value);
     };
 }
 
-/* ================= Tabs ================= */
+/* Tabs UI */
 function renderTabs(){
   tabBar.innerHTML="";
   tabs.forEach(id=>{
@@ -140,34 +123,96 @@ function renderTabs(){
   });
 }
 
-actionSelect.onchange=()=>{
-  const v=actionSelect.value; actionSelect.value="";
-  if(v==="add"){ tabs.push(tabs.length+1); renderTabs(); }
-  if(v==="delete" && confirm("刪除目前頁？")){
-    tabs=tabs.filter(t=>t!==current);
-    current=tabs[0]||1;
-    renderTabs(); load(current);
+/* 匯入檔案邏輯 */
+importFile.onchange=async ()=>{
+  for(const file of importFile.files){
+    const text = await file.text(); // 所有文字格式 fallback 皆可讀取
+    const id = tabs.length+1;
+    tabs.push(id);
+    db.transaction(STORE,"readwrite").objectStore(STORE)
+      .put({id,title:file.name,content:text});
   }
-  if(v==="publish") publishHTML();
+  renderTabs();
 };
 
-/* ================= 發布器 ================= */
+/* 收集全部筆記 */
+async function collectAllNotes(){
+  return new Promise(res=>{
+    const out=[];
+    const tx=db.transaction(STORE);
+    tx.objectStore(STORE).openCursor().onsuccess=e=>{
+      const c=e.target.result;
+      if(c){ out.push(c.value); c.continue(); }
+      else res(out.sort((a,b)=>a.id-b.id));
+    };
+  });
+}
+
+/* ZIP 匯出 */
+async function exportZIP(notes){
+  const zip=new JSZip();
+  notes.forEach(n=>{
+    zip.file(`${n.title||"note-"+n.id}.md`,n.content);
+  });
+  const blob=await zip.generateAsync({type:"blob"});
+  trigger(blob,`${filenameInput.value||"notes"}.zip`);
+}
+
+/* XML 匯出 */
+async function exportXML(notes){
+  let xml=`<?xml version="1.0" encoding="UTF-8"?><notes>`;
+  notes.forEach(n=>{
+    xml+=`<note id="${n.id}" title="${n.title}"><![CDATA[${n.content}]]></note>`;
+  });
+  xml+=`</notes>`;
+  trigger(new Blob([xml],{type:"application/xml"}),`${filenameInput.value||"notes"}.xml`);
+}
+
+/* 主下載控制器 */
+async function download(){
+  const scope=scopeSelect.value;
+  const format=formatSelect.value;
+  const notes = scope==="single"
+    ? [{id:current,title:titleEl.value,content:ta.value}]
+    : await collectAllNotes();
+
+  if(format==="zip") return exportZIP(notes);
+  if(format==="xml") return exportXML(notes);
+
+  if(notes.length>1){
+    const zip=new JSZip();
+    notes.forEach(n=>zip.file(`${n.title}.${format}`,n.content));
+    const blob=await zip.generateAsync({type:"blob"});
+    return trigger(blob,`${filenameInput.value||"notes"}.zip`);
+  }
+
+  trigger(new Blob([notes[0].content]),`${filenameInput.value||notes[0].title}.${format}`);
+}
+
+/* SEO Publish（含 OG tags） */
 function publishHTML(){
+  const title = titleEl.value||"莫比文件";
+  const desc = ta.value.slice(0,120).replace(/\n/g," ");
   const html = `
-<!DOCTYPE html><html><head><meta charset="UTF-8">
-<title>${filenameInput.value||"莫比文件"}</title></head>
-<body><article>${marked.parse(ta.value)}</article></body></html>`;
-  trigger(new Blob([html]),`${filenameInput.value||"article"}.html`);
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${desc}">
+<meta property="og:type" content="article">
+<meta property="og:image" content="https://x-easy.github.io/og-default.png">
+</head>
+<body>
+<article>${marked.parse(ta.value)}</article>
+</body>
+</html>`;
+  trigger(new Blob([html]),`${filenameInput.value||title}.html`);
 }
 
-/* ================= 一般下載 ================= */
-function download(){
-  const content = ta.value;
-  const ext = formatSelect.value;
-  trigger(new Blob([content]),`${filenameInput.value||"note"}.${ext}`);
-}
-
-/* ================= 通用下載觸發 ================= */
+/* 通用下載器 */
 function trigger(blob,filename){
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
