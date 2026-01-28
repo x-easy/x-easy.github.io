@@ -6,12 +6,11 @@
 
 <!-- ================= SEO / 語意核心 ================= -->
 <title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
-<meta name="description" content="莫比空間 Mobispace 私密筆記 × 加密編輯 × 發布引擎">
+<meta name="description" content="莫比空間 Mobispace 私密筆記 × 發布引擎 × 加密下載">
 <meta name="robots" content="index,follow">
 
 <!-- ================= 動態網站名稱輪播 ================= -->
 <script>
-/* 使用者指定的多組品牌名稱池（刷新或輪播顯示） */
 const titles = [
   "莫比文件",
   "空間編輯器",
@@ -21,9 +20,7 @@ const titles = [
   "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
 ];
 let tIndex = Math.floor(Math.random()*titles.length);
-setInterval(()=>{
-  document.title = titles[tIndex++ % titles.length];
-}, 4000); // 每4秒切換一次品牌名稱
+setInterval(()=>{ document.title = titles[tIndex++ % titles.length]; }, 4000);
 </script>
 
 <!-- ================= CDN libs ================= -->
@@ -32,88 +29,19 @@ setInterval(()=>{
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <style>
-/* ================= 基礎視覺骨架 ================= */
-body {
-  margin:0;
-  background:#000;
-  color:#eee;
-  font-family:"Noto Sans TC", system-ui;
-}
-
-/* 主編輯器容器（語意上為主要功能區塊） */
-#mobispace-editor {
-  max-width: 1100px;
-  margin:auto;
-  padding:20px;
-}
-
-/* 雙欄編輯架構，RWD 自動降級為單欄 */
-.editor-main {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-@media(max-width:768px){
-  .editor-main { grid-template-columns:1fr; }
-}
-
-/* 輸入與預覽統一風格 */
-textarea, #preview, #monaco {
-  background:#111;
-  color:#fff;
-  border:1px solid #333;
-  border-radius:10px;
-  padding:12px;
-  min-height:280px;
-}
-
-/* 工具列：下拉邏輯中樞 */
-.toolbar {
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin:12px 0;
-}
-select, input, button {
-  background:#111;
-  color:#fff;
-  border:1px solid #333;
-  border-radius:6px;
-  padding:6px;
-}
-
-/* 分頁 Tab 區 */
-#tabBar {
-  display:flex;
-  gap:6px;
-  flex-wrap:wrap;
-  justify-content:center;
-  margin-top:12px;
-}
-.tab {
-  background:#333;
-  border:none;
-  border-radius:6px;
-  padding:6px 10px;
-  color:#fff;
-  cursor:pointer;
-}
+body { margin:0; background:#000; color:#eee; font-family:"Noto Sans TC", system-ui; }
+#mobispace-editor { max-width:1100px; margin:auto; padding:20px; }
+.editor-main { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:768px){ .editor-main { grid-template-columns:1fr; } }
+textarea,#preview,#monaco { background:#111;color:#fff;border:1px solid #333;border-radius:10px;padding:12px;min-height:280px; }
+.toolbar { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+select,input,button { background:#111;color:#fff;border:1px solid #333;border-radius:6px;padding:6px; }
+#tabBar { display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px; }
+.tab { background:#333;border:none;border-radius:6px;padding:6px 10px;color:#fff;cursor:pointer; }
 .tab.active { background:#4caf50; }
-
-/* 頁尾聲明 */
-footer {
-  margin-top:40px;
-  text-align:center;
-  font-size:13px;
-  color:#666;
-}
-footer a {
-  color:#888;
-  text-decoration:none;
-}
-footer a:hover {
-  text-decoration:underline;
-}
+footer { margin-top:40px;text-align:center;font-size:13px;color:#666; }
+footer a { color:#888;text-decoration:none; }
+footer a:hover { text-decoration:underline; }
 </style>
 </head>
 
@@ -122,9 +50,8 @@ footer a:hover {
 
 <h2 style="text-align:center">莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h2>
 
-<!-- ================= 工具列控制核心 ================= -->
+<!-- ================= 工具列 ================= -->
 <div class="toolbar">
-
   <select id="modeSelect">
     <option value="normal">一般模式</option>
     <option value="monaco">IDE 模式</option>
@@ -134,7 +61,6 @@ footer a:hover {
     <option value="md">下載 .md</option>
     <option value="txt">下載 .txt</option>
     <option value="html">下載 .html</option>
-    <option value="zip">下載 .zip</option>
   </select>
 
   <input id="filenameInput" placeholder="檔名" />
@@ -143,16 +69,16 @@ footer a:hover {
     <option value="">操作</option>
     <option value="add">新增筆記</option>
     <option value="delete">刪除筆記</option>
-    <option value="download">下載</option>
     <option value="publish">一鍵發布文章頁</option>
   </select>
 
-  <input id="passInput" placeholder="加密密碼" type="password" />
-  <button onclick="encryptNote()">加密</button>
-  <button onclick="decryptNote()">解密</button>
+  <!-- 🔐 加密下載按鈕（新功能核心） -->
+  <button onclick="downloadEncrypted()">🔐 加密下載</button>
+
+  <!-- ⬇️ 一般下載按鈕 -->
+  <button onclick="download()">⬇️ 執行下載</button>
 </div>
 
-<!-- ================= 編輯核心 ================= -->
 <div class="editor-main">
   <textarea id="textArea" placeholder="輸入 Markdown..."></textarea>
   <div id="preview">Preview</div>
@@ -163,7 +89,6 @@ footer a:hover {
 
 <p id="status" style="text-align:center;font-size:13px;color:#777;">Mobispace Engine Ready</p>
 
-<!-- ================= 頁尾品牌聲明 ================= -->
 <footer>
   <a href="https://x-easy.github.io" target="_blank">
     莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025
@@ -173,35 +98,31 @@ footer a:hover {
 </section>
 
 <script>
-/* ================= 資料庫層 ================= */
+/* ================= IndexedDB 資料層 ================= */
 const DB="mobispaceDB", STORE="notes";
 let db, current=1, tabs=[1];
 
 indexedDB.open(DB,1).onupgradeneeded=e=>{
-  e.target.result.createObjectStore(STORE,{keyPath:"id"});
+  e.target.result.createObjectStore(STORE,{keyPath:"id"}); // 建立 notes 表
 };
 indexedDB.open(DB,1).onsuccess=e=>{
   db=e.target.result;
-  load(1);
-  renderTabs();
+  load(1); renderTabs();
 };
 
-/* ================= DOM 快捷綁定 ================= */
 const ta=textArea, prev=preview;
 
-/* ================= Markdown 渲染 ================= */
+/* ================= Markdown 即時渲染 ================= */
 ta.oninput=()=>{
-  prev.innerHTML = marked.parse(ta.value); // 即時轉譯 Markdown → HTML
-  save(); // 每次輸入即同步保存
+  prev.innerHTML = marked.parse(ta.value); // Markdown → HTML
+  save(); // 每次輸入即寫入 IndexedDB
 };
 
-/* ================= 儲存 ================= */
 function save(){
   db.transaction(STORE,"readwrite").objectStore(STORE)
     .put({id:current,content:ta.value});
 }
 
-/* ================= 載入 ================= */
 function load(id){
   db.transaction(STORE).objectStore(STORE)
     .get(id).onsuccess=e=>{
@@ -210,7 +131,7 @@ function load(id){
     };
 }
 
-/* ================= Tabs 渲染 ================= */
+/* ================= Tabs ================= */
 function renderTabs(){
   tabBar.innerHTML="";
   tabs.forEach(id=>{
@@ -222,82 +143,69 @@ function renderTabs(){
   });
 }
 
-/* ================= 控制中心 ================= */
 actionSelect.onchange=()=>{
-  const v=actionSelect.value;
-  actionSelect.value="";
+  const v=actionSelect.value; actionSelect.value="";
   if(v==="add"){ tabs.push(tabs.length+1); renderTabs(); }
-  if(v==="delete"){
-    if(confirm("刪除目前頁？")){
-      tabs=tabs.filter(t=>t!==current);
-      current=tabs[0]||1;
-      renderTabs(); load(current);
-    }
+  if(v==="delete" && confirm("刪除目前頁？")){
+    tabs=tabs.filter(t=>t!==current);
+    current=tabs[0]||1;
+    renderTabs(); load(current);
   }
-  if(v==="download") download();
   if(v==="publish") publishHTML();
 };
 
 /* ================= 發布器 ================= */
 function publishHTML(){
   const html = `
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<title>${filenameInput.value||"莫比文件"}</title>
-<meta name="description" content="由 Mobispace 發布">
-</head>
-<body>
-<article>
-${marked.parse(ta.value)}
-</article>
-</body>
-</html>`;
-  trigger(new Blob([html]), `${filenameInput.value||"article"}.html`);
+<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${filenameInput.value||"莫比文件"}</title></head>
+<body><article>${marked.parse(ta.value)}</article></body></html>`;
+  trigger(new Blob([html]),`${filenameInput.value||"article"}.html`);
 }
 
-/* ================= AES 加密核心 ================= */
-async function getKey(pass){
-  const enc=new TextEncoder();
-  const key=await crypto.subtle.importKey(
+/* ================= 一般下載 ================= */
+function download(){
+  const content = ta.value;
+  const ext = formatSelect.value;
+  trigger(new Blob([content]),`${filenameInput.value||"note"}.${ext}`);
+}
+
+/* ================= 加密下載核心 ================= */
+async function downloadEncrypted(){
+  const password = crypto.getRandomValues(new Uint8Array(16))
+    .reduce((s,b)=>s+("0"+b.toString(16)).slice(-2),""); // 高強度隨機密碼
+
+  const enc = new TextEncoder().encode(ta.value);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+
+  const key = await crypto.subtle.importKey(
     "raw",
-    enc.encode(pass),
+    new TextEncoder().encode(password),
     {name:"PBKDF2"},
     false,
     ["deriveKey"]
   );
-  return crypto.subtle.deriveKey(
-    {name:"PBKDF2",salt:enc.encode("mobispace"),iterations:100000,hash:"SHA-256"},
-    key,
-    {name:"AES-GCM",length:256},
-    false,
-    ["encrypt","decrypt"]
+
+  const aes = await crypto.subtle.deriveKey(
+    {name:"PBKDF2",salt:new TextEncoder().encode("mobispace"),iterations:100000,hash:"SHA-256"},
+    key,{name:"AES-GCM",length:256},false,["encrypt"]
   );
+
+  const cipher = await crypto.subtle.encrypt({name:"AES-GCM",iv},aes,enc);
+
+  const payload = JSON.stringify({
+    iv:Array.from(iv),
+    data:Array.from(new Uint8Array(cipher))
+  });
+
+  // 同時下載兩個檔案
+  trigger(new Blob([payload]),`${filenameInput.value||"note"}.enc.txt`);
+  trigger(new Blob([`Password: ${password}`]),`${filenameInput.value||"note"}_password.txt`);
+
+  alert("已下載加密檔 + 密碼檔，請分開保存。");
 }
 
-async function encryptNote(){
-  const key=await getKey(passInput.value);
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const enc=new TextEncoder().encode(ta.value);
-  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc);
-  ta.value=btoa(JSON.stringify({iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))}));
-  ta.oninput();
-}
-
-async function decryptNote(){
-  const obj=JSON.parse(atob(ta.value));
-  const key=await getKey(passInput.value);
-  const plain=await crypto.subtle.decrypt(
-    {name:"AES-GCM",iv:new Uint8Array(obj.iv)},
-    key,
-    new Uint8Array(obj.data)
-  );
-  ta.value=new TextDecoder().decode(plain);
-  ta.oninput();
-}
-
-/* ================= 下載 ================= */
+/* ================= 通用下載觸發 ================= */
 function trigger(blob,filename){
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
