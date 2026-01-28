@@ -39,10 +39,8 @@
     </script>
 
     <style>
-        /* * 光/暗模式變數定義 (100% 高仿 Line App 配色)
-         */
+        /* * 光/暗模式變數定義 */
         :root {
-            /* 預設暗黑模式 (Dark Mode) */
             --bg-body: #000000;
             --bg-container: #111111;
             --bg-card: #222222;
@@ -50,28 +48,26 @@
             --text-main: #ffffff;
             --text-sub: #aaaaaa;
             --border-color: #333333;
-            --accent-color: #06c755; /* Line Green */
+            --accent-color: #06c755;
             --nav-bg: #111111;
             --shadow: 0 4px 6px rgba(0,0,0,0.3);
             --setting-item-bg: #222222;
         }
 
-        /* 明亮模式 (Light Mode) */
         [data-theme="light"] {
             --bg-body: #f0f0f0;
             --bg-container: #ffffff;
-            --bg-card: #f8f9fa; /* 極淺灰 */
+            --bg-card: #f8f9fa;
             --bg-input: #f2f2f2;
             --text-main: #111111;
             --text-sub: #666666;
             --border-color: #e5e5e5;
-            --accent-color: #00b900; /* Line Green Light */
+            --accent-color: #00b900;
             --nav-bg: #ffffff;
             --shadow: 0 2px 8px rgba(0,0,0,0.05);
             --setting-item-bg: #ffffff;
         }
 
-        /* 基礎重置 */
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -80,14 +76,13 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* APP 容器 */
         #app-container {
             max-width: 480px;
             margin: 0 auto;
             background-color: var(--bg-container);
             min-height: 100vh;
             position: relative;
-            padding-bottom: 70px; /* Nav height */
+            padding-bottom: 70px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             transition: background-color 0.3s;
         }
@@ -112,29 +107,32 @@
             padding: 4px 12px;
             border-radius: 20px;
             border: 1px solid var(--border-color);
-            flex: 1;
-            margin-right: 15px;
+            flex: 1; /* 讓播放器佔據剩餘空間 */
+            margin-right: 10px; /* 稍微縮小間距以容納4個按鈕 */
             height: 38px;
             cursor: pointer;
+            min-width: 0; /* 防止 flex item 溢出 */
         }
 
         .music-title-scroll {
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
-            width: 120px;
+            text-overflow: ellipsis; /* 窄螢幕時顯示... */
             color: var(--text-main);
+            flex: 1;
         }
 
-        /* Header Icon Group Update */
-        .header-icons { display: flex; gap: 15px; }
+        .header-icons { display: flex; gap: 10px; flex-shrink: 0; }
+        
         .icon-btn {
             background: none; border: none;
             color: var(--text-main);
             font-size: 10px;
             display: flex; flex-direction: column; align-items: center;
             cursor: pointer;
-            text-decoration: none; /* For <a> tags */
+            text-decoration: none;
+            min-width: 30px; /* 確保按鈕有最小點擊區域 */
         }
         .icon-btn i {
             font-size: 18px; margin-bottom: 2px;
@@ -145,155 +143,139 @@
         }
         .icon-btn:hover i { color: var(--accent-color); border-color: var(--accent-color); }
 
-        /* 搜尋區塊 */
+        /* Modal (公告彈窗) 樣式 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            display: none; /* 預設隱藏 */
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        
+        .modal-content {
+            background-color: var(--bg-card);
+            width: 85%; max-width: 320px;
+            padding: 25px 20px;
+            border-radius: 16px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+
+        .modal-close {
+            position: absolute;
+            top: 15px; left: 15px; /* 左上角關閉 */
+            font-size: 20px;
+            color: var(--text-sub);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .modal-btn-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background-color: var(--accent-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(6, 199, 85, 0.3);
+            transition: transform 0.2s;
+        }
+        .modal-btn-link:active { transform: scale(0.95); }
+
+        /* 其他原有樣式 */
         .search-section { padding: 5px 15px 10px; }
         .search-box {
-            background-color: var(--bg-input);
-            border-radius: 10px;
-            padding: 8px 15px;
-            display: flex; align-items: center;
+            background-color: var(--bg-input); border-radius: 10px;
+            padding: 8px 15px; display: flex; align-items: center;
             color: var(--text-sub);
         }
         .search-box input {
-            background: transparent; border: none;
-            color: var(--text-main);
-            width: 100%; margin-left: 10px;
-            font-size: 14px; outline: none;
+            background: transparent; border: none; color: var(--text-main);
+            width: 100%; margin-left: 10px; font-size: 14px; outline: none;
         }
-
-        /* 內容切換區 (SPA View) */
-        #main-view {
-            min-height: 60vh;
-            animation: fadeIn 0.3s ease;
-        }
-
-        /* HERO CAROUSEL */
+        #main-view { min-height: 60vh; animation: fadeIn 0.3s ease; }
+        
         .hero-carousel { padding: 10px 0; overflow: hidden; position: relative; }
         .carousel-track {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scroll-behavior: smooth; /* 平滑滾動 */
-            scrollbar-width: none;
+            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+            scroll-behavior: smooth; scrollbar-width: none;
         }
         .carousel-track::-webkit-scrollbar { display: none; }
-        
         .hero-card {
-            min-width: 92%; /* 左右露出一點點提示可滑動 */
-            margin-left: 4%;
-            margin-right: 4%;
-            height: 180px;
-            border-radius: 12px;
-            scroll-snap-align: center;
-            position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
+            min-width: 92%; margin-left: 4%; margin-right: 4%; height: 180px;
+            border-radius: 12px; scroll-snap-align: center; position: relative;
+            overflow: hidden; flex-shrink: 0;
         }
         .hero-card img { width: 100%; height: 100%; object-fit: cover; }
         .hero-overlay {
             position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            padding: 20px 15px 10px;
-            color: white;
+            padding: 20px 15px 10px; color: white;
         }
 
-        /* 動態快捷按鈕區 */
-        .shortcut-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            padding: 20px 15px;
-        }
-        .shortcut-item {
-            display: flex; flex-direction: column; align-items: center;
-            color: var(--text-main); text-decoration: none; font-size: 11px;
-        }
+        .shortcut-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px 15px; }
+        .shortcut-item { display: flex; flex-direction: column; align-items: center; color: var(--text-main); text-decoration: none; font-size: 11px; }
         .shortcut-icon {
-            width: 45px; height: 45px;
-            background-color: var(--bg-card);
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 6px;
-            font-size: 20px;
-            color: var(--accent-color);
+            width: 45px; height: 45px; background-color: var(--bg-card);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 6px; font-size: 20px; color: var(--accent-color);
             box-shadow: var(--shadow);
         }
 
-        /* 文章列表 */
         .list-section { padding: 0 15px; }
         .list-card {
-            display: flex; gap: 15px; padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
+            display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;
         }
-        .list-thumb {
-            width: 90px; height: 90px;
-            border-radius: 10px; overflow: hidden; flex-shrink: 0;
-        }
+        .list-thumb { width: 90px; height: 90px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
         .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .list-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .list-title { font-size: 15px; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); }
         .list-meta { font-size: 12px; color: var(--text-sub); }
 
-        /* 設定頁面樣式 (New) */
         .settings-container { padding: 0; }
         .settings-group { margin-bottom: 20px; }
-        .settings-header {
-            padding: 15px;
-            font-size: 14px;
-            color: var(--text-sub);
-            font-weight: bold;
-        }
+        .settings-header { padding: 15px; font-size: 14px; color: var(--text-sub); font-weight: bold; }
         .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background-color: var(--setting-item-bg);
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; background-color: var(--setting-item-bg);
+            border-bottom: 1px solid var(--border-color); color: var(--text-main);
         }
         .setting-label { display: flex; align-items: center; gap: 10px; }
         .toggle-switch {
-            width: 40px; height: 20px;
-            background-color: #555;
-            border-radius: 10px;
-            position: relative;
-            transition: 0.3s;
-            cursor: pointer;
+            width: 40px; height: 20px; background-color: #555;
+            border-radius: 10px; position: relative; transition: 0.3s; cursor: pointer;
         }
         .toggle-switch.active { background-color: var(--accent-color); }
         .toggle-switch::after {
-            content: '';
-            position: absolute;
-            width: 16px; height: 16px;
-            background-color: white;
-            border-radius: 50%;
-            top: 2px; left: 2px;
-            transition: 0.3s;
+            content: ''; position: absolute; width: 16px; height: 16px;
+            background-color: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s;
         }
         .toggle-switch.active::after { transform: translateX(20px); }
 
-        /* 底部導航 */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            max-width: 480px; margin: 0 auto;
-            height: 60px;
-            background-color: var(--nav-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex; justify-content: space-around; align-items: center;
-            z-index: 999;
+            max-width: 480px; margin: 0 auto; height: 60px;
+            background-color: var(--nav-bg); border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-around; align-items: center; z-index: 999;
         }
         .nav-item {
             display: flex; flex-direction: column; align-items: center;
-            color: var(--text-sub); text-decoration: none;
-            width: 25%; font-size: 10px;
+            color: var(--text-sub); text-decoration: none; width: 25%; font-size: 10px;
         }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active i { color: var(--text-main); }
 
-        /* 動畫 */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -305,10 +287,14 @@
             <div class="line-music-player" id="miniPlayer">
                 <i class="fa-solid fa-music" style="color: var(--accent-color); margin-right: 8px;"></i>
                 <div class="music-title-scroll" id="playerText">點擊播放推薦音樂...</div>
-                <i class="fa-solid fa-play" style="font-size: 12px; margin-left: auto; color: var(--text-sub);"></i>
+                <i class="fa-solid fa-play" style="font-size: 12px; margin-left: 8px; color: var(--text-sub);"></i>
             </div>
 
             <div class="header-icons">
+                <button class="icon-btn" onclick="toggleModal(true)" aria-label="公告">
+                    <i class="fa-solid fa-scroll"></i>
+                    <span>公告</span>
+                </button>
                 <button class="icon-btn" onclick="alert('開啟音樂播放器頁面')" aria-label="音樂">
                     <i class="fa-solid fa-compact-disc"></i>
                     <span>音樂</span>
@@ -352,6 +338,28 @@
                 <span>設定</span>
             </a>
         </nav>
+
+        <div id="announcementModal" class="modal-overlay">
+            <div class="modal-content">
+                <i class="fa-solid fa-times modal-close" onclick="toggleModal(false)"></i>
+                
+                <div style="margin-bottom: 20px;">
+                    <i class="fa-solid fa-bullhorn" style="font-size: 40px; color: var(--accent-color); margin-bottom: 10px;"></i>
+                    <h3 style="color: var(--text-main); margin-bottom: 5px;">最新公告</h3>
+                    <p style="color: var(--text-sub); font-size: 13px;">查看最新的系統更新與維護資訊</p>
+                </div>
+
+                <div style="text-align: left; background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; color: var(--text-sub);">
+                    <p>• v2.0.0 系統架構升級為 SPA</p>
+                    <p>• 新增光/暗模式切換</p>
+                    <p>• 優化搜尋引擎效能</p>
+                </div>
+
+                <a href="https://x-easy.github.io/" class="modal-btn-link">
+                    返回公告頁
+                </a>
+            </div>
+        </div>
 
     </div>
 
@@ -399,7 +407,7 @@
             '/': renderHome,
             '/explore': renderExplore,
             '/library': () => '<h1>資料庫 (開發中)</h1>',
-            '/settings': renderSettings // 連結到新的設定頁面渲染函數
+            '/settings': renderSettings
         };
 
         const navigateTo = url => {
@@ -413,11 +421,9 @@
             updateSEO(path);
             mainView.innerHTML = await view();
             
-            // 首頁與設定頁的特殊邏輯初始化
             if(path === '/') initHomeScripts();
             if(path === '/settings') initSettingsScripts();
             
-            // 更新底部導航狀態
             updateNavState(path);
         }
 
@@ -435,10 +441,27 @@
 
         /**
          * =============================================
-         * 視圖渲染器 (View Renderers)
+         * 彈窗控制邏輯 (New)
          * =============================================
          */
-        
+        function toggleModal(show) {
+            const modal = document.getElementById('announcementModal');
+            if(show) {
+                modal.style.display = 'flex';
+                // 使用 setTimeout 觸發 transition 動畫
+                setTimeout(() => modal.classList.add('show'), 10);
+            } else {
+                modal.classList.remove('show');
+                // 等待動畫結束後再隱藏
+                setTimeout(() => modal.style.display = 'none', 300);
+            }
+        }
+
+        /**
+         * =============================================
+         * 視圖渲染器
+         * =============================================
+         */
         function renderHome() {
             const carouselHtml = db.carousel.map(item => `
                 <div class="hero-card">
@@ -470,9 +493,7 @@
             return `<div style="padding:20px;"><h2>探索頁面</h2><p>這裡是動態載入的探索內容。</p></div>`;
         }
 
-        // --- 新增：設定頁面渲染器 (包含光暗模式開關) ---
         function renderSettings() {
-            // 判斷當前主題狀態，決定開關是否為 active
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const isActive = currentTheme === 'light' ? 'active' : '';
 
@@ -543,7 +564,6 @@
             }
         }
 
-        // --- 新增：設定頁面邏輯 (處理主題切換) ---
         function initSettingsScripts() {
             const toggleRow = document.getElementById('themeToggleRow');
             const switchBtn = document.getElementById('settingsThemeSwitch');
@@ -553,12 +573,10 @@
                     const currentTheme = document.documentElement.getAttribute('data-theme');
                     
                     if (currentTheme === 'light') {
-                        // 切換回深色
                         document.documentElement.setAttribute('data-theme', 'dark');
                         switchBtn.classList.remove('active');
                         document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111111');
                     } else {
-                        // 切換回明亮
                         document.documentElement.setAttribute('data-theme', 'light');
                         switchBtn.classList.add('active');
                         document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
@@ -580,6 +598,11 @@
                     e.preventDefault();
                     navigateTo(e.target.closest('[data-link]').getAttribute('href'));
                 }
+            });
+            
+            // 點擊 Modal 外部背景也可關閉
+            document.getElementById('announcementModal').addEventListener('click', (e) => {
+                if(e.target.id === 'announcementModal') toggleModal(false);
             });
         });
 
