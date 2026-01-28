@@ -1,284 +1,130 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: blob: data: 'unsafe-inline' 'unsafe-eval'">
+<title>RSS Reader Pro</title>
 
-<!-- ===============================
-     📌 Meta 設定｜SEO + PWA 基礎
-     =============================== -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#0b0d10" />
-<title>Mobispace Media Vault</title>
-
-<!-- ===============================
-     🎨 UI 樣式系統（深色品牌主題）
-     =============================== -->
 <style>
-/* ------------------------------
-   全域變數｜品牌色系定義
-   ------------------------------ */
-:root {
-  --bg: #0b0d10;
-  --panel: #131720;
-  --accent: #7dd3fc;
-  --text: #e5e7eb;
-  --muted: #6b7280;
-  --radius: 14px;
-}
-
-/* ------------------------------
-   基礎排版重設
-   ------------------------------ */
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-}
-
-/* ------------------------------
-   Header 操作列
-   ------------------------------ */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(0,0,0,.6);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-}
-
-header input {
-  flex: 1;
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 999px;
-  padding: .6rem 1rem;
-  color: white;
-}
-
-/* ------------------------------
-   卡片 Feed 容器
-   ------------------------------ */
-#feed {
-  padding: 1rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
-}
-
-/* ------------------------------
-   影音卡片元件
-   ------------------------------ */
-.card {
-  background: var(--panel);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0,0,0,.4);
-  transition: transform .2s;
-}
-.card:hover {
-  transform: translateY(-4px);
-}
-
-/* 預覽縮圖 */
-.card img {
-  width: 100%;
-  aspect-ratio: 16/9;
-  object-fit: cover;
-}
-
-/* 卡片內容 */
-.card .content {
-  padding: .8rem;
-}
-
-/* 標籤樣式 */
-.tag {
-  display: inline-block;
-  font-size: .7rem;
-  padding: .2rem .5rem;
-  background: #1f2937;
-  border-radius: 999px;
-  margin-right: .3rem;
-}
-
-/* 收藏按鈕 */
-.fav {
-  float: right;
-  cursor: pointer;
-  color: var(--muted);
-}
-.fav.active { color: gold; }
-
-/* 播放器彈窗 */
-#playerModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.8);
-  display: none;
-  place-items: center;
-  z-index: 999;
-}
-
-#playerModal video {
-  width: 90%;
-  max-width: 900px;
-  border-radius: var(--radius);
-}
+:root{--bg:#fff;--text:#111;--card:#f2f2f2;--accent:#0066cc}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--text:#eee;--card:#1e1e1e;--accent:#4da3ff}}
+body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+header{padding:1rem;text-align:center;font-weight:bold}
+main{max-width:960px;margin:auto;padding:1rem}
+.controls{display:grid;gap:.5rem}
+.item{background:var(--card);border-radius:14px;overflow:hidden;margin:1rem 0;box-shadow:0 2px 6px #0001}
+.thumb{width:100%;aspect-ratio:16/9;object-fit:cover;filter:blur(8px);transition:.3s}
+.thumb.loaded{filter:none}
+.meta{font-size:.8rem;opacity:.7}
+button{border:0;background:none;color:var(--accent);cursor:pointer}
+.icon{width:16px;height:16px;fill:currentColor}
+#player{position:fixed;inset:0;background:#000c;display:none;align-items:center;justify-content:center}
+#player iframe{width:90%;height:60vh}
+.skeleton{background:linear-gradient(90deg,#ccc,#eee,#ccc);height:200px;animation:sh 1.2s infinite}
+@keyframes sh{0%{background-position:0}100%{background-position:200%}}
 </style>
-
-<!-- ===============================
-     📦 第三方庫載入
-     =============================== -->
-<script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
-
 <body>
 
-<!-- ===============================
-     🧠 SVG Icon Sprite
-     =============================== -->
+<header>📡 RSS Reader Pro</header>
+<main>
+  <div id="feed"></div>
+</main>
+
+<div id="player" onclick="closePlayer()"><iframe allowfullscreen></iframe></div>
+
 <svg style="display:none">
-  <symbol id="icon-star" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
-  </symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 21s-8-4.6-8-10a5 5 0 0 1 8-3 5 5 0 0 1 8 3c0 5.4-8 10-8 10z"/></symbol>
 </svg>
 
-<!-- ===============================
-     🔝 Header 控制列
-     =============================== -->
-<header>
-  <input id="search" placeholder="搜尋知識庫..." />
-  <button onclick="showFavorites()">⭐ 收藏</button>
-</header>
+<script type="module">
+// ============================
+// IndexedDB 永久儲存（收藏 + feed + 翻譯）
+// ============================
+const dbReq=indexedDB.open("rss-pro",1);
+let db;
+dbReq.onupgradeneeded=e=>{
+  const d=e.target.result;
+  d.createObjectStore("fav",{keyPath:"link"});
+  d.createObjectStore("feed",{keyPath:"link"});
+};
+dbReq.onsuccess=e=>db=e.target.result;
+const store=(s,m)=>db.transaction(s,m).objectStore(s);
 
-<!-- ===============================
-     📚 Feed 容器
-     =============================== -->
-<main id="feed"></main>
-
-<!-- ===============================
-     🎥 播放器 Modal
-     =============================== -->
-<div id="playerModal" onclick="closePlayer()">
-  <video id="video" controls></video>
-</div>
-
-<script>
-/* ======================================================
-   📦 資料模型：影片內容資料庫（可替換成你自己的）
-   ====================================================== */
-const DATA = [
-  {
-    id: "vid001",
-    title: "HLS 串流技術解析",
-    tags: ["影音", "工程"],
-    cover: "https://images.unsplash.com/photo-1522199755839-a2bacb67c546",
-    src: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  {
-    id: "vid002",
-    title: "AI 工具鏈設計思維",
-    tags: ["AI", "產品"],
-    cover: "https://images.unsplash.com/photo-1518770660439-4636190af475",
-    src: "https://test-streams.mux.dev/test_001/stream.m3u8"
-  }
+// ============================
+// RSS 載入 + 快取
+// ============================
+const feeds=[
+ {name:"18AV",url:"https://rss.app/feeds/eS2iB3hy0gfoMeSW.xml"},
+ {name:"Hanime1",url:"https://rss.app/feeds/FuIYGgvZZ4yvY9js.xml"},
 ];
+const proxy="https://api.rss2json.com/v1/api.json?rss_url=";
 
-/* ======================================================
-   🧠 IndexedDB 永久儲存層
-   ====================================================== */
-const db = indexedDB.open("mobispace-db", 1);
-db.onupgradeneeded = e => {
-  e.target.result.createObjectStore("fav", { keyPath: "id" });
+const feedEl=document.getElementById("feed");
+
+function skeleton(){
+  feedEl.innerHTML=[...Array(6)].map(()=>`<div class="item skeleton"></div>`).join("");
+}
+
+function pickImg(i){return i.thumbnail||i.enclosure?.link||"";}
+
+function render(items){
+  feedEl.innerHTML="";
+  items.forEach(i=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
+      <img class="thumb" src="${i.img}" onload="this.classList.add('loaded')">
+      <div style="padding:.8rem">
+        <b>${i.title}</b>
+        <div class="meta">${i.source}｜${new Date(i.date).toLocaleString()}</div>
+        <div>
+          <button onclick="play('${i.link}')"><svg class="icon"><use href="#play"/></svg> 播放</button>
+          <button onclick='fav(${JSON.stringify(i)})'><svg class="icon"><use href="#heart"/></svg> 收藏</button>
+        </div>
+      </div>`;
+    feedEl.appendChild(div);
+  });
+}
+
+async function load(){
+  skeleton();
+  const res=await Promise.all(feeds.map(f=>
+    fetch(proxy+encodeURIComponent(f.url))
+    .then(r=>r.json())
+    .then(d=>d.items.map(i=>({
+      title:i.title,link:i.link,img:pickImg(i),
+      source:f.name,date:i.pubDate
+    })))
+  ));
+  const flat=res.flat();
+  render(flat);
+}
+load();
+
+// ============================
+// 收藏
+// ============================
+window.fav=item=>{
+  store("fav","readwrite").put(item);
+  alert("已收藏");
 };
 
-/* ======================================================
-   🔍 MiniSearch 搜尋索引
-   ====================================================== */
-const miniSearch = new MiniSearch({
-  fields: ["title", "tags"],
-  storeFields: ["title", "tags", "cover", "src", "id"]
-});
-miniSearch.addAll(DATA);
-
-/* ======================================================
-   🖼️ 畫面渲染
-   ====================================================== */
-const feed = document.getElementById("feed");
-
-function render(list) {
-  feed.innerHTML = list.map(v => `
-    <div class="card">
-      <img src="${v.cover}" onclick="play('${v.src}')" />
-      <div class="content">
-        <b>${v.title}</b>
-        <span class="fav" onclick="toggleFav('${v.id}')">
-          <svg width="18"><use href="#icon-star"/></svg>
-        </span><br/>
-        ${v.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
-      </div>
-    </div>
-  `).join("");
-}
-render(DATA);
-
-/* ======================================================
-   🎥 播放器邏輯（支援 HLS.js）
-   ====================================================== */
-function play(url) {
-  const modal = document.getElementById("playerModal");
-  const video = document.getElementById("video");
-  modal.style.display = "grid";
-
-  if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(url);
-    hls.attachMedia(video);
-  } else {
-    video.src = url;
-  }
-}
-
-function closePlayer() {
-  document.getElementById("playerModal").style.display = "none";
-  document.getElementById("video").pause();
-}
-
-/* ======================================================
-   ⭐ 收藏系統
-   ====================================================== */
-function toggleFav(id) {
-  db.onsuccess = e => {
-    const tx = e.target.result.transaction("fav", "readwrite");
-    const store = tx.objectStore("fav");
-    store.put(DATA.find(v=>v.id===id));
-  };
-}
-
-function showFavorites() {
-  db.onsuccess = e => {
-    const tx = e.target.result.transaction("fav");
-    const store = tx.objectStore("fav");
-    const req = store.getAll();
-    req.onsuccess = () => render(req.result);
-  };
-}
-
-/* ======================================================
-   🔍 搜尋行為
-   ====================================================== */
-document.getElementById("search").addEventListener("input", e=>{
-  const q = e.target.value;
-  if(!q) return render(DATA);
-  render(miniSearch.search(q).map(r=>r));
-});
+// ============================
+// 播放器
+// ============================
+window.play=url=>{
+  const p=document.getElementById("player");
+  p.style.display="flex";
+  p.querySelector("iframe").src=url;
+};
+window.closePlayer=()=>{
+  const p=document.getElementById("player");
+  p.style.display="none";
+  p.querySelector("iframe").src="";
+};
 </script>
 </body>
 </html>
