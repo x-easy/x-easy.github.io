@@ -2,327 +2,308 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
+<!-- ================= SEO 旗艦級基礎 ================= -->
 <title>Mobispace Flagship Editor</title>
+<meta name="description" content="Mobispace 離線可用、多分頁、Markdown、Monaco 編輯器，支援多格式匯出的旗艦級筆記系統">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://example.com/editor">
 
-<!-- Markdown 渲染核心：marked.js（純前端即時轉 HTML） -->
+<!-- Open Graph -->
+<meta property="og:title" content="Mobispace Flagship Editor">
+<meta property="og:description" content="離線筆記 × Markdown × IDE 等級編輯體驗">
+<meta property="og:type" content="website">
+
+<!-- PWA Manifest（動態產生，避免拆檔） -->
+<script>
+const manifest = {
+  name: "Mobispace Editor",
+  short_name: "Mobispace",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#000000",
+  theme_color: "#111111",
+  icons: [
+    { src: "data:image/svg+xml;base64," + btoa(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='black'/><text x='50%' y='55%' fill='white' font-size='40' text-anchor='middle'>M</text></svg>`), sizes: "192x192", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
+document.head.appendChild(Object.assign(document.createElement("link"), {rel:"manifest", href:URL.createObjectURL(blob)}));
+</script>
+
+<!-- CDN libs -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-<!-- Monaco Editor CDN Loader -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <style>
-/* ============================= */
-/* Mobispace Editor Flagship CSS */
-/* ============================= */
-
+/* ================================
+   Flagship Responsive Layout
+================================ */
 body {
+  margin:0;
   background:#000;
   color:#eee;
-  font-family:"Noto Sans TC",system-ui;
+  font-family:"Noto Sans TC", system-ui;
 }
 
 #mobispace-editor {
-  max-width:900px;
-  margin:40px auto;
+  max-width: 1100px;
+  margin:auto;
   padding:20px;
-  border:1px solid #333;
-  border-radius:12px;
-  background:#111;
 }
 
-/* Tab 列容器 */
+/* 編輯 + 預覽 雙欄，手機自動變單欄 */
+.editor-main {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media(max-width:768px){
+  .editor-main { grid-template-columns:1fr; }
+}
+
+/* 文字區 */
+textarea, #preview, #monaco {
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  border-radius:10px;
+  padding:12px;
+  min-height:280px;
+}
+
+/* 工具列（下拉式控制） */
+.toolbar {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0;
+}
+select, input {
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  border-radius:6px;
+  padding:6px;
+}
+
+/* Tab 列移到底部 */
 #tabBar {
   display:flex;
   gap:6px;
   flex-wrap:wrap;
   justify-content:center;
-  margin-bottom:10px;
+  margin-top:12px;
 }
-
-/* 單一 Tab 樣式 */
 .tab {
-  padding:6px 10px;
-  background:#444;
+  background:#333;
   border:none;
   border-radius:6px;
+  padding:6px 10px;
   color:#fff;
   cursor:pointer;
 }
 .tab.active { background:#4caf50; }
 
-/* 新增分頁按鈕 */
-#addTab {
-  background:#2196f3;
-}
-
-/* 工具列 */
-.toolbar {
-  text-align:center;
-  margin:10px 0;
-}
-
-/* 編輯器區塊 */
-#editorContainer {
-  display:flex;
-  gap:10px;
-  min-height:300px;
-}
-
-/* 原生 textarea 模式 */
-#textArea {
-  flex:1;
-  background:#222;
-  color:#fff;
-  border:1px solid #333;
-  border-radius:8px;
-  padding:10px;
-}
-
-/* Markdown 預覽區 */
-#preview {
-  flex:1;
-  background:#181818;
-  border:1px solid #333;
-  border-radius:8px;
-  padding:10px;
-  overflow:auto;
-}
-
-/* Monaco Editor 容器 */
-#monaco {
-  height:400px;
-  display:none;
-  border:1px solid #333;
-  border-radius:8px;
-  overflow:hidden;
-}
-
-button {
-  padding:6px 12px;
-  border-radius:6px;
-  border:none;
-  cursor:pointer;
+/* SVG icon 統一樣式 */
+svg.icon {
+  width:16px;
+  height:16px;
+  fill:currentColor;
+  vertical-align:middle;
 }
 </style>
 </head>
 
 <body>
-
 <section id="mobispace-editor">
 
 <h2 style="text-align:center">Ⲙ𝔬ⳝ𝔭ⲁ𝔠ⲉ Flagship Editor</h2>
 
-<!-- 分頁列（預設僅一頁） -->
-<div id="tabBar">
-  <button class="tab active" data-id="1">1</button>
-  <button id="addTab">＋</button>
-</div>
-
-<!-- 工具列 -->
+<!-- ===== 工具列：全部改為下拉控制 ===== -->
 <div class="toolbar">
-  <button id="toggleMode">切換 Monaco 模式</button>
-  <button id="saveBtn">下載</button>
-  <button id="clearBtn">清空</button>
+
+  <!-- 模式切換 -->
+  <select id="modeSelect">
+    <option value="normal">一般編輯模式</option>
+    <option value="monaco">Monaco IDE 模式</option>
+  </select>
+
+  <!-- 下載格式 -->
+  <select id="formatSelect">
+    <option value="md">下載 .md</option>
+    <option value="txt">下載 .txt</option>
+    <option value="html">下載 .html</option>
+    <option value="zip">下載 .zip（全部）</option>
+  </select>
+
+  <!-- 下載範圍 -->
+  <select id="rangeSelect">
+    <option value="single">僅目前頁</option>
+    <option value="all">全部筆記</option>
+  </select>
+
+  <!-- 自訂檔名 -->
+  <input id="filenameInput" placeholder="檔名（不含副檔名）" />
+
+  <!-- 操作 -->
+  <select id="actionSelect">
+    <option value="">選擇操作</option>
+    <option value="add">新增筆記</option>
+    <option value="delete">刪除目前筆記</option>
+    <option value="download">執行下載</option>
+  </select>
+
 </div>
 
-<!-- 編輯器主體 -->
-<div id="editorContainer">
-
-  <!-- 原生輸入 -->
-  <textarea id="textArea" placeholder="Markdown / 文字輸入..."></textarea>
-
-  <!-- Markdown 預覽 -->
+<!-- ===== 編輯區 ===== -->
+<div class="editor-main">
+  <textarea id="textArea" placeholder="輸入 Markdown..."></textarea>
   <div id="preview">Markdown Preview</div>
 </div>
 
-<!-- Monaco Editor 專用容器 -->
-<div id="monaco"></div>
+<div id="monaco" style="display:none;"></div>
+
+<!-- ===== Tab 移到底部 ===== -->
+<div id="tabBar"></div>
 
 <p id="status" style="text-align:center;font-size:13px;color:#888;">Ready</p>
-
 </section>
 
 <script>
-/* =========================================================
-   Mobispace Flagship Editor Engine
-   功能模組：
-   - IndexedDB 儲存
-   - 動態分頁
-   - Markdown 即時渲染
-   - Monaco Editor 切換
-   - 離線支援（Service Worker）
-========================================================= */
+/* ==========================================================
+   Mobispace Flagship Editor Engine v2
+========================================================== */
 
-/* ------------------------
-   IndexedDB 初始化
------------------------- */
-const DB_NAME = "mobispace_db";           // 資料庫名稱
-const STORE = "notes";                   // 儲存區名稱
-let db;                                  // 全域資料庫實例
+/* ---------- IndexedDB ---------- */
+const DB="mobispaceDB", STORE="notes";
+let db, current=1, tabs=[1];
 
-const request = indexedDB.open(DB_NAME, 1); // 建立/打開資料庫
-
-request.onupgradeneeded = e => {
-  db = e.target.result;
-  db.createObjectStore(STORE, { keyPath: "id" }); // 每筆資料用 id 當 key
+indexedDB.open(DB,1).onupgradeneeded=e=>{
+  e.target.result.createObjectStore(STORE,{keyPath:"id"});
+};
+indexedDB.open(DB,1).onsuccess=e=>{
+  db=e.target.result;
+  load(1);
+  renderTabs();
 };
 
-request.onsuccess = e => {
-  db = e.target.result;
-  loadNote(1); // 預設只載入第一頁
+/* ---------- DOM ---------- */
+const ta=textArea, prev=preview, statusEl=status;
+
+/* ---------- Markdown ---------- */
+ta.oninput=()=>{
+  prev.innerHTML=marked.parse(ta.value);
+  save();
 };
 
-/* ------------------------
-   狀態控制
------------------------- */
-let currentTab = 1;      // 當前分頁
-let tabCount = 1;        // 頁數計數器
-let monacoEditor = null; // Monaco 實例
-let monacoMode = false;  // 是否啟用 Monaco
-
-const textArea = document.getElementById("textArea");
-const preview = document.getElementById("preview");
-const status = document.getElementById("status");
-
-/* ------------------------
-   Markdown 即時渲染
------------------------- */
-textArea.addEventListener("input", () => {
-  preview.innerHTML = marked.parse(textArea.value); // 即時渲染 Markdown
-  saveNote();                                       // 每次輸入即自動儲存
-});
-
-/* ------------------------
-   IndexedDB 儲存
------------------------- */
-function saveNote() {
-  const tx = db.transaction(STORE, "readwrite");
-  const store = tx.objectStore(STORE);
-
-  store.put({
-    id: currentTab,
-    content: monacoMode ? monacoEditor.getValue() : textArea.value
-  });
-
-  status.textContent = "已儲存 (IndexedDB)";
+/* ---------- 儲存 ---------- */
+function save(){
+  db.transaction(STORE,"readwrite").objectStore(STORE)
+  .put({id:current,content:ta.value});
 }
 
-/* ------------------------
-   IndexedDB 載入
------------------------- */
-function loadNote(id) {
-  const tx = db.transaction(STORE, "readonly");
-  const store = tx.objectStore(STORE);
-  const req = store.get(id);
-
-  req.onsuccess = () => {
-    const data = req.result?.content || "";
-    textArea.value = data;
-    preview.innerHTML = marked.parse(data);
-    if (monacoEditor) monacoEditor.setValue(data);
+/* ---------- 載入 ---------- */
+function load(id){
+  db.transaction(STORE).objectStore(STORE)
+  .get(id).onsuccess=e=>{
+    ta.value=e.target.result?.content||"";
+    prev.innerHTML=marked.parse(ta.value);
   };
 }
 
-/* ------------------------
-   分頁新增
------------------------- */
-document.getElementById("addTab").onclick = () => {
-  tabCount++;
-  const btn = document.createElement("button");
-  btn.className = "tab";
-  btn.dataset.id = tabCount;
-  btn.textContent = tabCount;
-
-  btn.onclick = () => switchTab(tabCount);
-
-  document.getElementById("tabBar").insertBefore(btn, document.getElementById("addTab"));
-};
-
-/* ------------------------
-   切換分頁
------------------------- */
-function switchTab(id) {
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  document.querySelector(`[data-id="${id}"]`).classList.add("active");
-  currentTab = id;
-  loadNote(id);
+/* ---------- Tabs ---------- */
+function renderTabs(){
+  tabBar.innerHTML="";
+  tabs.forEach(id=>{
+    const b=document.createElement("button");
+    b.className="tab"+(id===current?" active":"");
+    b.textContent=id;
+    b.onclick=()=>{current=id;load(id);renderTabs();}
+    tabBar.appendChild(b);
+  });
 }
 
-/* ------------------------
-   Monaco Editor 初始化
------------------------- */
-require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" }});
-require(["vs/editor/editor.main"], () => {
+/* ---------- 控制中心 ---------- */
+actionSelect.onchange=()=>{
+  const v=actionSelect.value;
+  actionSelect.value="";
+  if(v==="add"){ tabs.push(tabs.length+1); renderTabs(); }
+  if(v==="delete"){
+    if(confirm("刪除目前頁？")){
+      tabs=tabs.filter(t=>t!==current);
+      current=tabs[0]||1;
+      renderTabs(); load(current);
+    }
+  }
+  if(v==="download") download();
+};
 
-  monacoEditor = monaco.editor.create(document.getElementById("monaco"), {
-    value: "",
-    language: "markdown",
-    theme: "vs-dark",
-    automaticLayout: true
+/* ---------- 下載處理 ---------- */
+async function download(){
+  const name=filenameInput.value||"mobispace";
+  const format=formatSelect.value;
+  const range=rangeSelect.value;
+
+  if(format==="zip"){
+    const zip=new JSZip();
+    for(const id of tabs){
+      const req=await new Promise(r=>{
+        const tx=db.transaction(STORE).objectStore(STORE).get(id);
+        tx.onsuccess=()=>r(tx.result?.content||"");
+      });
+      zip.file(`${name}_${id}.md`,req);
+    }
+    const blob=await zip.generateAsync({type:"blob"});
+    trigger(blob,`${name}.zip`);
+    return;
+  }
+
+  const content=ta.value;
+  let data=content, ext=format;
+
+  if(format==="html") data=`<html><body>${marked.parse(content)}</body></html>`;
+
+  trigger(new Blob([data]),`${name}.${ext}`);
+}
+
+function trigger(blob,filename){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+}
+
+/* ---------- Monaco ---------- */
+require.config({ paths:{vs:"https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"}});
+require(["vs/editor/editor.main"],()=>{
+  const editor=monaco.editor.create(monaco,{
+    value:"",
+    language:"markdown",
+    theme:"vs-dark",
+    automaticLayout:true
   });
 
-  monacoEditor.onDidChangeModelContent(() => saveNote());
+  modeSelect.onchange=()=>{
+    if(modeSelect.value==="monaco"){
+      editor.setValue(ta.value);
+      editor.onDidChangeModelContent(()=>{ ta.value=editor.getValue(); ta.oninput(); });
+      document.querySelector(".editor-main").style.display="none";
+      monaco.style.display="block";
+    } else {
+      document.querySelector(".editor-main").style.display="grid";
+      monaco.style.display="none";
+    }
+  };
 });
 
-/* ------------------------
-   模式切換
------------------------- */
-document.getElementById("toggleMode").onclick = () => {
-  monacoMode = !monacoMode;
-
-  if (monacoMode) {
-    document.getElementById("editorContainer").style.display = "none";
-    document.getElementById("monaco").style.display = "block";
-    monacoEditor.setValue(textArea.value);
-  } else {
-    document.getElementById("editorContainer").style.display = "flex";
-    document.getElementById("monaco").style.display = "none";
-    textArea.value = monacoEditor.getValue();
-  }
-};
-
-/* ------------------------
-   清空
------------------------- */
-document.getElementById("clearBtn").onclick = () => {
-  if(confirm("清空目前分頁？")){
-    textArea.value = "";
-    preview.innerHTML = "";
-    saveNote();
-  }
-};
-
-/* ------------------------
-   下載檔案
------------------------- */
-document.getElementById("saveBtn").onclick = () => {
-  const content = monacoMode ? monacoEditor.getValue() : textArea.value;
-  const blob = new Blob([content], {type:"text/plain"});
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = `mobispace_tab_${currentTab}.md`;
-  a.click();
-};
-
-/* ------------------------
-   離線支援 Service Worker
------------------------- */
-if ("serviceWorker" in navigator) {
-
-  // 動態建立 SW 檔案內容（避免拆檔）
-  const swCode = `
-    self.addEventListener('install', e => self.skipWaiting());
-    self.addEventListener('fetch', e => {});
-  `;
-
-  const blob = new Blob([swCode], { type: "text/javascript" });
-  const swUrl = URL.createObjectURL(blob);
-
-  navigator.serviceWorker.register(swUrl);
+/* ---------- Service Worker ---------- */
+if("serviceWorker"in navigator){
+  const sw=`self.addEventListener('fetch',e=>{});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw])));
 }
 </script>
-
 </body>
 </html>
