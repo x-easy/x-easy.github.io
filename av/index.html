@@ -3,139 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RSS 聚合閱讀器</title>
+<title>Mobispace RSS Reader</title>
+<meta name="theme-color" content="#0b0d10">
 
 <style>
-:root {
-  --bg:#fff; --text:#111; --card:#f2f2f2; --accent:#0066cc;
+:root{
+  --bg:#0b0d10;
+  --panel:#131720;
+  --text:#e5e7eb;
+  --muted:#6b7280;
+  --accent:#7dd3fc;
 }
-@media (prefers-color-scheme: dark){
-  :root{--bg:#121212;--text:#eee;--card:#1e1e1e;--accent:#4da3ff;}
-}
-body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text);}
-header{padding:1rem;text-align:center;font-weight:bold;font-size:1.3rem;}
-main{max-width:900px;margin:auto;padding:1rem;}
-input,select{padding:.6rem;border-radius:8px;border:1px solid #888;background:var(--card);color:var(--text);width:100%;}
-.controls{display:grid;gap:.5rem;margin-bottom:1rem;}
-.item{background:var(--card);padding:1rem;border-radius:12px;margin-bottom:.8rem;}
-.item a{color:var(--accent);font-weight:bold;text-decoration:none;}
-.source{opacity:.6;font-size:.8rem;}
-#status{text-align:center;opacity:.6;margin:1rem;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui;}
+header{position:sticky;top:0;background:#000c;padding:.6rem;display:flex;gap:.5rem;z-index:9}
+input,select,button{background:#111;border:1px solid #222;color:white;padding:.4rem .7rem;border-radius:10px}
+#feed{padding:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
+.card{background:var(--panel);border-radius:14px;overflow:hidden}
+.card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#000}
+.card .c{padding:.6rem}
+.skel{height:200px;background:#111;animation:pulse 1.5s infinite}
+@keyframes pulse{50%{opacity:.4}}
+.tag{font-size:.7rem;background:#1f2937;padding:.1rem .4rem;border-radius:6px;margin-right:.3rem}
+.icon{width:18px;height:18px;vertical-align:-3px;cursor:pointer}
+#player{position:fixed;inset:0;background:black;display:none;flex-direction:column}
+#player video{flex:1;width:100%}
+#player .bar{background:#000c;padding:.5rem}
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
-
 <body>
-<header>📡 私人 RSS 聚合器</header>
 
-<main>
-  <div class="controls">
-    <input id="search" placeholder="搜尋 / 關鍵字過濾（空白分隔）">
-    <select id="sourceFilter">
-      <option value="all">所有來源</option>
-      <option value="18AV">18AV</option>
-      <option value="Hanime1">Hanime1</option>
-      <option value="Ero-Video">Ero-Video</option>
-    </select>
-  </div>
+<svg style="display:none">
+<symbol id="star" viewBox="0 0 24 24">
+<path fill="currentColor" d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
+</symbol>
+</svg>
 
-  <div id="status">載入中...</div>
-  <div id="feed"></div>
-</main>
+<header>
+<input id="search" placeholder="搜尋">
+<select id="lang"><option value="zh">中文</option><option value="orig">原文</option></select>
+<button onclick="showFav()">⭐</button>
+</header>
+
+<main id="feed"></main>
+
+<div id="player">
+  <div class="bar"><button onclick="closePlayer()">←</button></div>
+  <video id="video" controls></video>
+</div>
 
 <script>
-// =============================
-// PWA 自動建立 (manifest + SW)
-// =============================
-const manifest = {
-  name: "RSS Reader",
-  short_name: "RSS",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#000000",
-  theme_color: "#000000",
-  icons: []
-};
-const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement("link");
-link.rel = "manifest"; link.href = manifestURL;
-document.head.appendChild(link);
-
-if ("serviceWorker" in navigator) {
-  const swCode = `
-    self.addEventListener('install', e=>{
-      e.waitUntil(caches.open('rss-cache').then(c=>c.addAll(['./'])));
-    });
-    self.addEventListener('fetch', e=>{
-      e.respondWith(
-        caches.match(e.request).then(r=>r||fetch(e.request))
-      );
-    });
-  `;
-  const swBlob = new Blob([swCode], {type:"text/javascript"});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob));
-}
-
-// =============================
-// RSS 核心邏輯
-// =============================
-const feeds = [
-  {name:"18AV", url:"https://rss.app/feeds/eS2iB3hy0gfoMeSW.xml"},
-  {name:"Hanime1", url:"https://rss.app/feeds/FuIYGgvZZ4yvY9js.xml"},
-  {name:"Ero-Video", url:"https://rss.app/feeds/lrJwczmeZYPaSWFl.xml"}
+// =======================
+// RSS 設定
+// =======================
+const FEEDS=[
+ {name:"18AV",url:"https://rss.app/feeds/eS2iB3hy0gfoMeSW.xml"},
+ {name:"Hanime1",url:"https://rss.app/feeds/FuIYGgvZZ4yvY9js.xml"},
+ {name:"Ero",url:"https://rss.app/feeds/lrJwczmeZYPaSWFl.xml"}
 ];
+const RSS_PROXY="https://api.rss2json.com/v1/api.json?rss_url=";
 
-const proxy = "https://api.rss2json.com/v1/api.json?rss_url=";
-const container = document.getElementById("feed");
-const status = document.getElementById("status");
-const search = document.getElementById("search");
-const filter = document.getElementById("sourceFilter");
+// =======================
+// IndexedDB
+// =======================
+let db;
+const req=indexedDB.open("mobispace",1);
+req.onupgradeneeded=e=>{
+ db=e.target.result;
+ db.createObjectStore("items",{keyPath:"id"});
+ db.createObjectStore("fav",{keyPath:"id"});
+ db.createObjectStore("trans",{keyPath:"key"});
+};
+req.onsuccess=e=>{db=e.target.result;init()};
 
-let allItems = JSON.parse(localStorage.getItem("rss-cache")||"[]");
-if(allItems.length){ status.remove(); render(allItems); }
+// =======================
+// 翻譯
+// =======================
+async function translate(text){
+ const key=text.slice(0,80);
+ const tx=db.transaction("trans");
+ const store=tx.objectStore("trans");
+ const cached=await new Promise(r=>{const g=store.get(key);g.onsuccess=()=>r(g.result)});
+ if(cached)return cached.val;
 
-Promise.all(feeds.map(f=>
-  fetch(proxy+encodeURIComponent(f.url))
-    .then(r=>r.json())
-    .then(d=>d.items.map(i=>({
+ const res=await fetch("https://libretranslate.de/translate",{
+  method:"POST",
+  headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({q:text,source:"auto",target:"zh"})
+ });
+ const data=await res.json();
+ const txw=db.transaction("trans","readwrite");
+ txw.objectStore("trans").put({key,val:data.translatedText});
+ return data.translatedText;
+}
+
+// =======================
+// MiniSearch
+// =======================
+const ms=new MiniSearch({fields:["title","content"],storeFields:["*"]});
+
+// =======================
+// 載入 RSS
+// =======================
+let all=[];
+async function load(){
+ feed.innerHTML=[...Array(6)].map(()=>'<div class="skel"></div>').join("");
+ const arr=[];
+ for(const f of FEEDS){
+  const r=await fetch(RSS_PROXY+encodeURIComponent(f.url));
+  const j=await r.json();
+  j.items.forEach(i=>{
+    arr.push({
+      id:i.guid,
       title:i.title,
+      orig:i.title,
+      content:i.description.replace(/<[^>]+>/g,""),
       link:i.link,
-      date:new Date(i.pubDate||Date.now()),
+      thumb:i.thumbnail||"",
+      src:i.enclosure?.link,
       source:f.name
-    })))
-)).then(res=>{
-  allItems = res.flat().sort((a,b)=>b.date-a.date);
-  localStorage.setItem("rss-cache", JSON.stringify(allItems));
-  status.remove();
-  render(allItems);
-});
-
-function render(data){
-  container.innerHTML="";
-  data.forEach(i=>{
-    const div=document.createElement("div");
-    div.className="item";
-    div.innerHTML=`
-      <a href="${i.link}" target="_blank">${i.title}</a>
-      <div class="source">${i.source}｜${i.date.toLocaleString()}</div>
-    `;
-    container.appendChild(div);
-  });
+    })
+  })
+ }
+ all=arr;
+ ms.addAll(all);
+ render(all);
 }
 
-function applyFilter(){
-  const kw = search.value.toLowerCase().split(/\s+/).filter(Boolean);
-  const src = filter.value;
-  const filtered = allItems.filter(i=>{
-    const okSrc = src==="all"||i.source===src;
-    const okKw = kw.every(k=>i.title.toLowerCase().includes(k));
-    return okSrc && okKw;
-  });
-  render(filtered);
+// =======================
+// Render
+// =======================
+async function render(list){
+ feed.innerHTML="";
+ for(const it of list){
+  let title=it.title;
+  if(lang.value==="zh"){
+    title=await translate(it.orig);
+  }
+  const div=document.createElement("div");
+  div.className="card";
+  div.innerHTML=`
+    ${it.thumb?`<img src="${it.thumb}" onclick="play('${it.src||it.link}')">`:``}
+    <div class="c">
+      <b>${title}</b>
+      <svg class="icon" onclick="fav('${it.id}')"><use href="#star"/></svg><br>
+      <span class="tag">${it.source}</span>
+    </div>`;
+  feed.appendChild(div);
+ }
 }
 
-search.oninput = applyFilter;
-filter.onchange = applyFilter;
+// =======================
+// 收藏
+// =======================
+function fav(id){
+ const it=all.find(x=>x.id===id);
+ const tx=db.transaction("fav","readwrite");
+ tx.objectStore("fav").put(it);
+}
+function showFav(){
+ const tx=db.transaction("fav");
+ const r=tx.objectStore("fav").getAll();
+ r.onsuccess=()=>render(r.result);
+}
+
+// =======================
+// 搜尋
+// =======================
+search.oninput=e=>{
+ if(!e.target.value)return render(all);
+ render(ms.search(e.target.value));
+};
+
+// =======================
+// 播放
+// =======================
+function play(url){
+ player.style.display="flex";
+ const v=document.getElementById("video");
+ if(Hls.isSupported()){
+  const h=new Hls();h.loadSource(url);h.attachMedia(v);
+ }else v.src=url;
+ v.play();
+}
+function closePlayer(){
+ video.pause();
+ player.style.display="none";
+}
+
+// =======================
+// PWA
+// =======================
+if("serviceWorker"in navigator){
+ const sw=`
+ self.addEventListener('install',e=>e.waitUntil(caches.open('v1').then(c=>c.addAll(['./']))));
+ self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+ `;
+ navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw])));
+}
+
+// =======================
+function init(){load()}
+lang.onchange=()=>render(all);
 </script>
 </body>
 </html>
