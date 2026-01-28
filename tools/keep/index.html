@@ -6,7 +6,7 @@
 
 <!-- ================= SEO / 語意核心 ================= -->
 <title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
-<meta name="description" content="莫比空間 Mobispace 私密筆記 × 發布引擎 × 加密下載">
+<meta name="description" content="莫比空間 Mobispace 私密筆記 × 發布引擎">
 <meta name="robots" content="index,follow">
 
 <!-- ================= 動態網站名稱輪播 ================= -->
@@ -72,10 +72,7 @@ footer a:hover { text-decoration:underline; }
     <option value="publish">一鍵發布文章頁</option>
   </select>
 
-  <!-- 🔐 加密下載按鈕（新功能核心） -->
-  <button onclick="downloadEncrypted()">🔐 加密下載</button>
-
-  <!-- ⬇️ 一般下載按鈕 -->
+  <!-- ⬇️ 僅保留一般下載 -->
   <button onclick="download()">⬇️ 執行下載</button>
 </div>
 
@@ -103,7 +100,7 @@ const DB="mobispaceDB", STORE="notes";
 let db, current=1, tabs=[1];
 
 indexedDB.open(DB,1).onupgradeneeded=e=>{
-  e.target.result.createObjectStore(STORE,{keyPath:"id"}); // 建立 notes 表
+  e.target.result.createObjectStore(STORE,{keyPath:"id"});
 };
 indexedDB.open(DB,1).onsuccess=e=>{
   db=e.target.result;
@@ -114,8 +111,8 @@ const ta=textArea, prev=preview;
 
 /* ================= Markdown 即時渲染 ================= */
 ta.oninput=()=>{
-  prev.innerHTML = marked.parse(ta.value); // Markdown → HTML
-  save(); // 每次輸入即寫入 IndexedDB
+  prev.innerHTML = marked.parse(ta.value);
+  save();
 };
 
 function save(){
@@ -168,41 +165,6 @@ function download(){
   const content = ta.value;
   const ext = formatSelect.value;
   trigger(new Blob([content]),`${filenameInput.value||"note"}.${ext}`);
-}
-
-/* ================= 加密下載核心 ================= */
-async function downloadEncrypted(){
-  const password = crypto.getRandomValues(new Uint8Array(16))
-    .reduce((s,b)=>s+("0"+b.toString(16)).slice(-2),""); // 高強度隨機密碼
-
-  const enc = new TextEncoder().encode(ta.value);
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(password),
-    {name:"PBKDF2"},
-    false,
-    ["deriveKey"]
-  );
-
-  const aes = await crypto.subtle.deriveKey(
-    {name:"PBKDF2",salt:new TextEncoder().encode("mobispace"),iterations:100000,hash:"SHA-256"},
-    key,{name:"AES-GCM",length:256},false,["encrypt"]
-  );
-
-  const cipher = await crypto.subtle.encrypt({name:"AES-GCM",iv},aes,enc);
-
-  const payload = JSON.stringify({
-    iv:Array.from(iv),
-    data:Array.from(new Uint8Array(cipher))
-  });
-
-  // 同時下載兩個檔案
-  trigger(new Blob([payload]),`${filenameInput.value||"note"}.enc.txt`);
-  trigger(new Blob([`Password: ${password}`]),`${filenameInput.value||"note"}_password.txt`);
-
-  alert("已下載加密檔 + 密碼檔，請分開保存。");
 }
 
 /* ================= 通用下載觸發 ================= */
