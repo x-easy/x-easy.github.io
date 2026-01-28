@@ -1,70 +1,261 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MobiSpace</title>
+  <!-- =========================
+       SEO 核心語義結構
+       ========================= -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mobispace｜多功能搜尋 × WebApp 平台</title>
 
-  <!-- 主樣式 -->
-  <link rel="stylesheet" href="./assets/css/app.css" />
+  <meta name="description" content="mobispace 是一個融合搜尋、文章、短影音、工具模組的極簡 WebApp 平台。">
+  <meta name="keywords" content="mobispace, WebApp, 搜尋引擎, 工具平台, GitHub Pages">
+  <meta name="author" content="mobispace">
+
+  <meta property="og:title" content="mobispace WebApp">
+  <meta property="og:description" content="搜尋 × 模組 × 工具 × 極簡體驗">
+  <meta property="og:type" content="website">
+
+  <!-- JSON-LD 結構化資料 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "mobispace",
+    "url": "https://o-rrz.github.io",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://o-rrz.github.io/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- =========================
+       PWA Manifest (內嵌)
+       ========================= -->
+  <link rel="manifest" href="data:application/manifest+json,{
+    &quot;name&quot;:&quot;mobispace WebApp&quot;,
+    &quot;short_name&quot;:&quot;mobispace&quot;,
+    &quot;display&quot;:&quot;standalone&quot;,
+    &quot;background_color&quot;:&quot;#ffffff&quot;,
+    &quot;theme_color&quot;:&quot;#ffffff&quot;,
+    &quot;start_url&quot;:&quot;.&quot;
+  }">
+
+  <!-- =========================
+       UI 設計系統（LINE 極簡黑白）
+       ========================= -->
+  <style>
+    /* ========= 主題變數系統 ========= */
+    :root {
+      --bg: #000;
+      --card: #1a1a1a;
+      --soft: #222;
+      --text: #eaeaea;
+      --muted: #777;
+      --radius: 16px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f7f7f7;
+      --card: #fff;
+      --soft: #eee;
+      --text: #111;
+      --muted: #666;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding-bottom: 90px;
+    }
+
+    header {
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .search {
+      margin: 12px;
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .search input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      outline: none;
+    }
+
+    .hero {
+      margin: 12px;
+      background: var(--card);
+      border-radius: var(--radius);
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity .3s;
+    }
+
+    .quick {
+      display: flex;
+      gap: 10px;
+      padding: 0 12px;
+      overflow-x: auto;
+    }
+
+    .btn {
+      background: var(--card);
+      padding: 14px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .list .item {
+      padding: 14px;
+      border-bottom: 1px solid var(--soft);
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: var(--bg);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid var(--soft);
+    }
+
+    nav button {
+      background: var(--card);
+      border: none;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+    }
+  </style>
 </head>
 
-<body>
-  <!-- ===============================
-       Header｜頁首頂部區塊
-       功能：顯示品牌、快捷功能
-       =============================== -->
-  <header class="app-header">
-    <div class="header-left">
-      <!-- 品牌名稱 -->
-      <span class="brand">MobiSpace</span>
-    </div>
+<body data-theme="dark">
 
-    <div class="header-right">
-      <!-- 快捷功能按鈕（僅顯示，不綁功能） -->
-      <button class="icon-btn">📄</button>
-      <button class="icon-btn">🔔</button>
-      <button class="icon-btn">🎵</button>
-      <button class="icon-btn">⚙️</button>
-    </div>
-  </header>
+<header>
+  <div>🎧 簡易播放器</div>
+  <div>
+    <button onclick="toggleTheme()">🌓</button>
+  </div>
+</header>
 
-  <!-- ===============================
-       Main Content
-       =============================== -->
-  <main class="app-main">
+<div class="search">
+  🔍
+  <input id="searchInput" placeholder="搜尋文章 / 模組">
+</div>
 
-    <!-- ===============================
-         精選卡片輪播區
-         功能：橫向滑動卡片
-         =============================== -->
-    <section class="card-carousel">
-      <h2 class="section-title">精選卡片</h2>
+<div class="hero" id="hero">推薦內容載入中...</div>
 
-      <div class="carousel-track">
-        <!-- 卡片 1 -->
-        <article class="card">
-          <div class="card-placeholder"></div>
-          <span class="card-title">精選文章卡片 1</span>
-        </article>
+<div class="quick" id="quick"></div>
 
-        <!-- 卡片 2 -->
-        <article class="card">
-          <div class="card-placeholder"></div>
-          <span class="card-title">精選文章卡片 2</span>
-        </article>
+<div class="list" id="list"></div>
 
-        <!-- 卡片 3 -->
-        <article class="card">
-          <div class="card-placeholder"></div>
-          <span class="card-title">精選文章卡片 3</span>
-        </article>
-      </div>
-    </section>
+<nav>
+  <button onclick="route('#home')">首頁</button>
+  <button onclick="route('#articles')">文章</button>
+  <button onclick="route('#shorts')">短影</button>
+  <button onclick="route('#settings')">設定</button>
+</nav>
 
-  </main>
+<script>
+/* ============================
+   模擬資料（未來可改 JSON 檔）
+   ============================ */
+const data = [
+  { title: "mobispace 架構設計" },
+  { title: "GitHub Pages 模組化" },
+  { title: "搜尋系統建構" },
+  { title: "PWA 離線策略" }
+];
 
-  <!-- 主 JS -->
-  <script src="./assets/js/app.js"></script>
+/* ============================
+   搜尋系統（客戶端全文）
+   ============================ */
+const list = document.getElementById("list");
+function render(items) {
+  list.innerHTML = items.map(i => `<div class="item">${i.title}</div>`).join("");
+}
+render(data);
+
+document.getElementById("searchInput").oninput = e => {
+  const q = e.target.value.toLowerCase();
+  render(data.filter(i => i.title.toLowerCase().includes(q)));
+};
+
+/* ============================
+   Hero 自動輪播
+   ============================ */
+let idx = 0;
+const hero = document.getElementById("hero");
+setInterval(() => {
+  hero.style.opacity = 0;
+  setTimeout(() => {
+    hero.textContent = data[idx % data.length].title;
+    hero.style.opacity = 1;
+    idx++;
+  }, 300);
+}, 3000);
+
+/* ============================
+   快捷按鈕 JSON 驅動
+   ============================ */
+const quick = document.getElementById("quick");
+["工具庫", "會員", "專案", "設定", "資源"].forEach(t => {
+  const b = document.createElement("div");
+  b.className = "btn";
+  b.textContent = t;
+  quick.appendChild(b);
+});
+
+/* ============================
+   SPA Router
+   ============================ */
+function route(hash) {
+  history.pushState(null, "", hash);
+}
+
+/* ============================
+   主題切換
+   ============================ */
+function toggleTheme() {
+  document.body.dataset.theme =
+    document.body.dataset.theme === "dark" ? "light" : "dark";
+}
+
+/* ============================
+   PWA Service Worker
+   ============================ */
+if ('serviceWorker' in navigator) {
+  const blob = new Blob([`
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open('mobispace').then(c => c.addAll(['./'])));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+    });
+  `], {type:'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(blob));
+}
+</script>
 </body>
 </html>
