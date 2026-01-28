@@ -1,7 +1,0 @@
-{
-  "name": "留言板",
-  "short_name": "BBS",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#ffffff"
-}
