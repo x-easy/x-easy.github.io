@@ -4,43 +4,35 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!-- ================= SEO 旗艦級基礎 ================= -->
-<title>Mobispace Flagship Editor</title>
-<meta name="description" content="Mobispace 離線可用、多分頁、Markdown、Monaco 編輯器，支援多格式匯出的旗艦級筆記系統">
+<!-- ================= SEO / 語意核心 ================= -->
+<title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
+<meta name="description" content="莫比空間 Mobispace 私密筆記 × 加密編輯 × 發布引擎">
 <meta name="robots" content="index,follow">
-<link rel="canonical" href="https://example.com/editor">
 
-<!-- Open Graph -->
-<meta property="og:title" content="Mobispace Flagship Editor">
-<meta property="og:description" content="離線筆記 × Markdown × IDE 等級編輯體驗">
-<meta property="og:type" content="website">
-
-<!-- PWA Manifest（動態產生，避免拆檔） -->
+<!-- ================= 動態網站名稱輪播 ================= -->
 <script>
-const manifest = {
-  name: "Mobispace Editor",
-  short_name: "Mobispace",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#000000",
-  theme_color: "#111111",
-  icons: [
-    { src: "data:image/svg+xml;base64," + btoa(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='black'/><text x='50%' y='55%' fill='white' font-size='40' text-anchor='middle'>M</text></svg>`), sizes: "192x192", type: "image/svg+xml" }
-  ]
-};
-const blob = new Blob([JSON.stringify(manifest)], {type: "application/json"});
-document.head.appendChild(Object.assign(document.createElement("link"), {rel:"manifest", href:URL.createObjectURL(blob)}));
+/* 使用者指定的多組品牌名稱池（刷新或輪播顯示） */
+const titles = [
+  "莫比文件",
+  "空間編輯器",
+  "Ⲙⳝ編輯器",
+  "Ⲙ𝔬ⲃ¡ kⲉⲉ𝔭",
+  "ⳝ𝔭ⲁ𝔠ⲉ N𝔬tⲉ",
+  "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
+];
+let tIndex = Math.floor(Math.random()*titles.length);
+setInterval(()=>{
+  document.title = titles[tIndex++ % titles.length];
+}, 4000); // 每4秒切換一次品牌名稱
 </script>
 
-<!-- CDN libs -->
+<!-- ================= CDN libs ================= -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
 
 <style>
-/* ================================
-   Flagship Responsive Layout
-================================ */
+/* ================= 基礎視覺骨架 ================= */
 body {
   margin:0;
   background:#000;
@@ -48,13 +40,14 @@ body {
   font-family:"Noto Sans TC", system-ui;
 }
 
+/* 主編輯器容器（語意上為主要功能區塊） */
 #mobispace-editor {
   max-width: 1100px;
   margin:auto;
   padding:20px;
 }
 
-/* 編輯 + 預覽 雙欄，手機自動變單欄 */
+/* 雙欄編輯架構，RWD 自動降級為單欄 */
 .editor-main {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -64,7 +57,7 @@ body {
   .editor-main { grid-template-columns:1fr; }
 }
 
-/* 文字區 */
+/* 輸入與預覽統一風格 */
 textarea, #preview, #monaco {
   background:#111;
   color:#fff;
@@ -74,14 +67,14 @@ textarea, #preview, #monaco {
   min-height:280px;
 }
 
-/* 工具列（下拉式控制） */
+/* 工具列：下拉邏輯中樞 */
 .toolbar {
   display:flex;
   flex-wrap:wrap;
   gap:8px;
   margin:12px 0;
 }
-select, input {
+select, input, button {
   background:#111;
   color:#fff;
   border:1px solid #333;
@@ -89,7 +82,7 @@ select, input {
   padding:6px;
 }
 
-/* Tab 列移到底部 */
+/* 分頁 Tab 區 */
 #tabBar {
   display:flex;
   gap:6px;
@@ -107,12 +100,19 @@ select, input {
 }
 .tab.active { background:#4caf50; }
 
-/* SVG icon 統一樣式 */
-svg.icon {
-  width:16px;
-  height:16px;
-  fill:currentColor;
-  vertical-align:middle;
+/* 頁尾聲明 */
+footer {
+  margin-top:40px;
+  text-align:center;
+  font-size:13px;
+  color:#666;
+}
+footer a {
+  color:#888;
+  text-decoration:none;
+}
+footer a:hover {
+  text-decoration:underline;
 }
 </style>
 </head>
@@ -120,64 +120,60 @@ svg.icon {
 <body>
 <section id="mobispace-editor">
 
-<h2 style="text-align:center">Ⲙ𝔬ⳝ𝔭ⲁ𝔠ⲉ Flagship Editor</h2>
+<h2 style="text-align:center">莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h2>
 
-<!-- ===== 工具列：全部改為下拉控制 ===== -->
+<!-- ================= 工具列控制核心 ================= -->
 <div class="toolbar">
 
-  <!-- 模式切換 -->
   <select id="modeSelect">
-    <option value="normal">一般編輯模式</option>
-    <option value="monaco">Monaco IDE 模式</option>
+    <option value="normal">一般模式</option>
+    <option value="monaco">IDE 模式</option>
   </select>
 
-  <!-- 下載格式 -->
   <select id="formatSelect">
     <option value="md">下載 .md</option>
     <option value="txt">下載 .txt</option>
     <option value="html">下載 .html</option>
-    <option value="zip">下載 .zip（全部）</option>
+    <option value="zip">下載 .zip</option>
   </select>
 
-  <!-- 下載範圍 -->
-  <select id="rangeSelect">
-    <option value="single">僅目前頁</option>
-    <option value="all">全部筆記</option>
-  </select>
+  <input id="filenameInput" placeholder="檔名" />
 
-  <!-- 自訂檔名 -->
-  <input id="filenameInput" placeholder="檔名（不含副檔名）" />
-
-  <!-- 操作 -->
   <select id="actionSelect">
-    <option value="">選擇操作</option>
+    <option value="">操作</option>
     <option value="add">新增筆記</option>
-    <option value="delete">刪除目前筆記</option>
-    <option value="download">執行下載</option>
+    <option value="delete">刪除筆記</option>
+    <option value="download">下載</option>
+    <option value="publish">一鍵發布文章頁</option>
   </select>
 
+  <input id="passInput" placeholder="加密密碼" type="password" />
+  <button onclick="encryptNote()">加密</button>
+  <button onclick="decryptNote()">解密</button>
 </div>
 
-<!-- ===== 編輯區 ===== -->
+<!-- ================= 編輯核心 ================= -->
 <div class="editor-main">
   <textarea id="textArea" placeholder="輸入 Markdown..."></textarea>
-  <div id="preview">Markdown Preview</div>
+  <div id="preview">Preview</div>
 </div>
 
 <div id="monaco" style="display:none;"></div>
-
-<!-- ===== Tab 移到底部 ===== -->
 <div id="tabBar"></div>
 
-<p id="status" style="text-align:center;font-size:13px;color:#888;">Ready</p>
+<p id="status" style="text-align:center;font-size:13px;color:#777;">Mobispace Engine Ready</p>
+
+<!-- ================= 頁尾品牌聲明 ================= -->
+<footer>
+  <a href="https://x-easy.github.io" target="_blank">
+    莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025
+  </a>
+</footer>
+
 </section>
 
 <script>
-/* ==========================================================
-   Mobispace Flagship Editor Engine v2
-========================================================== */
-
-/* ---------- IndexedDB ---------- */
+/* ================= 資料庫層 ================= */
 const DB="mobispaceDB", STORE="notes";
 let db, current=1, tabs=[1];
 
@@ -190,31 +186,31 @@ indexedDB.open(DB,1).onsuccess=e=>{
   renderTabs();
 };
 
-/* ---------- DOM ---------- */
-const ta=textArea, prev=preview, statusEl=status;
+/* ================= DOM 快捷綁定 ================= */
+const ta=textArea, prev=preview;
 
-/* ---------- Markdown ---------- */
+/* ================= Markdown 渲染 ================= */
 ta.oninput=()=>{
-  prev.innerHTML=marked.parse(ta.value);
-  save();
+  prev.innerHTML = marked.parse(ta.value); // 即時轉譯 Markdown → HTML
+  save(); // 每次輸入即同步保存
 };
 
-/* ---------- 儲存 ---------- */
+/* ================= 儲存 ================= */
 function save(){
   db.transaction(STORE,"readwrite").objectStore(STORE)
-  .put({id:current,content:ta.value});
+    .put({id:current,content:ta.value});
 }
 
-/* ---------- 載入 ---------- */
+/* ================= 載入 ================= */
 function load(id){
   db.transaction(STORE).objectStore(STORE)
-  .get(id).onsuccess=e=>{
-    ta.value=e.target.result?.content||"";
-    prev.innerHTML=marked.parse(ta.value);
-  };
+    .get(id).onsuccess=e=>{
+      ta.value=e.target.result?.content||"";
+      prev.innerHTML = marked.parse(ta.value);
+    };
 }
 
-/* ---------- Tabs ---------- */
+/* ================= Tabs 渲染 ================= */
 function renderTabs(){
   tabBar.innerHTML="";
   tabs.forEach(id=>{
@@ -226,7 +222,7 @@ function renderTabs(){
   });
 }
 
-/* ---------- 控制中心 ---------- */
+/* ================= 控制中心 ================= */
 actionSelect.onchange=()=>{
   const v=actionSelect.value;
   actionSelect.value="";
@@ -239,70 +235,74 @@ actionSelect.onchange=()=>{
     }
   }
   if(v==="download") download();
+  if(v==="publish") publishHTML();
 };
 
-/* ---------- 下載處理 ---------- */
-async function download(){
-  const name=filenameInput.value||"mobispace";
-  const format=formatSelect.value;
-  const range=rangeSelect.value;
-
-  if(format==="zip"){
-    const zip=new JSZip();
-    for(const id of tabs){
-      const req=await new Promise(r=>{
-        const tx=db.transaction(STORE).objectStore(STORE).get(id);
-        tx.onsuccess=()=>r(tx.result?.content||"");
-      });
-      zip.file(`${name}_${id}.md`,req);
-    }
-    const blob=await zip.generateAsync({type:"blob"});
-    trigger(blob,`${name}.zip`);
-    return;
-  }
-
-  const content=ta.value;
-  let data=content, ext=format;
-
-  if(format==="html") data=`<html><body>${marked.parse(content)}</body></html>`;
-
-  trigger(new Blob([data]),`${name}.${ext}`);
+/* ================= 發布器 ================= */
+function publishHTML(){
+  const html = `
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>${filenameInput.value||"莫比文件"}</title>
+<meta name="description" content="由 Mobispace 發布">
+</head>
+<body>
+<article>
+${marked.parse(ta.value)}
+</article>
+</body>
+</html>`;
+  trigger(new Blob([html]), `${filenameInput.value||"article"}.html`);
 }
 
+/* ================= AES 加密核心 ================= */
+async function getKey(pass){
+  const enc=new TextEncoder();
+  const key=await crypto.subtle.importKey(
+    "raw",
+    enc.encode(pass),
+    {name:"PBKDF2"},
+    false,
+    ["deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2",salt:enc.encode("mobispace"),iterations:100000,hash:"SHA-256"},
+    key,
+    {name:"AES-GCM",length:256},
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+
+async function encryptNote(){
+  const key=await getKey(passInput.value);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=new TextEncoder().encode(ta.value);
+  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc);
+  ta.value=btoa(JSON.stringify({iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))}));
+  ta.oninput();
+}
+
+async function decryptNote(){
+  const obj=JSON.parse(atob(ta.value));
+  const key=await getKey(passInput.value);
+  const plain=await crypto.subtle.decrypt(
+    {name:"AES-GCM",iv:new Uint8Array(obj.iv)},
+    key,
+    new Uint8Array(obj.data)
+  );
+  ta.value=new TextDecoder().decode(plain);
+  ta.oninput();
+}
+
+/* ================= 下載 ================= */
 function trigger(blob,filename){
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download=filename;
   a.click();
-}
-
-/* ---------- Monaco ---------- */
-require.config({ paths:{vs:"https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"}});
-require(["vs/editor/editor.main"],()=>{
-  const editor=monaco.editor.create(monaco,{
-    value:"",
-    language:"markdown",
-    theme:"vs-dark",
-    automaticLayout:true
-  });
-
-  modeSelect.onchange=()=>{
-    if(modeSelect.value==="monaco"){
-      editor.setValue(ta.value);
-      editor.onDidChangeModelContent(()=>{ ta.value=editor.getValue(); ta.oninput(); });
-      document.querySelector(".editor-main").style.display="none";
-      monaco.style.display="block";
-    } else {
-      document.querySelector(".editor-main").style.display="grid";
-      monaco.style.display="none";
-    }
-  };
-});
-
-/* ---------- Service Worker ---------- */
-if("serviceWorker"in navigator){
-  const sw=`self.addEventListener('fetch',e=>{});`;
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw])));
 }
 </script>
 </body>
