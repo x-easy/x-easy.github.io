@@ -1,354 +1,170 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <!-- ============================================================
-       一、文件語義層 (HTML5 Semantic + SEO + WebApp)
-       ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-  <meta charset="UTF-8" /> <!-- UTF-8 編碼，避免所有中文字亂碼 -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <!-- viewport-fit=cover 可支援 iPhone 瀏海安全區 -->
+<title id="seo-title">mobispace</title>
+<meta id="seo-desc" name="description" content="mobispace WebApp 平台">
 
-  <title id="seo-title">mobispace｜多功能全站搜尋引擎</title>
-  <meta id="seo-desc" name="description" content="mobispace WebApp 平台首頁，融合搜尋、內容、工具與模組化架構。" />
+<meta property="og:title" content="mobispace">
+<meta property="og:description" content="搜尋 × 內容 × 模組化平台">
+<meta property="og:type" content="website">
 
-  <!-- SEO 延伸欄位 -->
-  <meta name="keywords" content="mobispace, WebApp, 搜尋引擎, 工具平台, GitHub Pages, PWA" />
-  <meta name="author" content="mobispace" />
+<script id="seo-jsonld" type="application/ld+json"></script>
 
-  <!-- OpenGraph：社群分享預覽 -->
-  <meta property="og:title" content="mobispace WebApp" />
-  <meta property="og:description" content="搜尋 × 工具 × 內容 × 模組化 Web 平台" />
-  <meta property="og:type" content="website" />
+<!-- =======================
+ PWA 全套 Manifest (含 icons)
+======================= -->
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;:&quot;mobispace&quot;,
+  &quot;short_name&quot;:&quot;mobispace&quot;,
+  &quot;start_url&quot;:&quot;/&quot;,
+  &quot;display&quot;:&quot;standalone&quot;,
+  &quot;background_color&quot;:&quot;#000000&quot;,
+  &quot;theme_color&quot;:&quot;#000000&quot;,
+  &quot;icons&quot;:[
+    {&quot;src&quot;:&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA...&quot;,&quot;sizes&quot;:&quot;192x192&quot;,&quot;type&quot;:&quot;image/png&quot;},
+    {&quot;src&quot;:&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA...&quot;,&quot;sizes&quot;:&quot;512x512&quot;,&quot;type&quot;:&quot;image/png&quot;}
+  ]
+}">
 
-  <!-- JSON-LD：Google 結構化資料入口 -->
-  <script id="seo-jsonld" type="application/ld+json"></script>
+<meta name="theme-color" content="#000000">
 
-  <!-- ============================================================
-       二、PWA Manifest (使用 data URI 內嵌)
-       ============================================================ -->
-  <link rel="manifest" href="data:application/manifest+json,{
-    &quot;name&quot;:&quot;mobispace WebApp&quot;,
-    &quot;short_name&quot;:&quot;mobispace&quot;,
-    &quot;start_url&quot;:&quot;.&quot;,
-    &quot;display&quot;:&quot;standalone&quot;,
-    &quot;background_color&quot;:&quot;#000000&quot;,
-    &quot;theme_color&quot;:&quot;#000000&quot;
-  }">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
-  <!-- ============================================================
-       三、外部函式庫 (搜尋 + Markdown CMS)
-       ============================================================ -->
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script> <!-- 模糊搜尋核心 -->
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Markdown 轉 HTML -->
-
-  <!-- ============================================================
-       四、樣式系統 (完整 Design System)
-       ============================================================ -->
-  <style>
-    /* -------------------------------
-       核心設計變數（品牌設計系統）
-       ------------------------------- */
-    :root {
-      --bg: #000;          /* 整體背景色 */
-      --card: #1a1a1a;     /* 卡片背景 */
-      --soft: #222;        /* 搜尋框、分隔柔色 */
-      --text: #eaeaea;     /* 主文字 */
-      --muted: #888;       /* 次要文字 */
-      --radius: 18px;      /* 統一卡片圓角 */
-      --accent: #06c755;   /* 品牌綠 */
-    }
-
-    /* Reset：確保各瀏覽器渲染一致 */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, sans-serif;
-      padding-bottom: 90px; /* 預留底部導航空間 */
-    }
-
-    /* -------------------------------
-       Header 區（頂部播放器 + icon）
-       ------------------------------- */
-    header {
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .player {
-      font-size: 12px;
-      opacity: .6;
-    }
-
-    .icons {
-      display: flex;
-      gap: 16px;
-      font-size: 14px;
-    }
-
-    /* -------------------------------
-       搜尋列元件
-       ------------------------------- */
-    .search {
-      margin: 12px;
-      background: var(--soft);
-      border-radius: 999px;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .search input {
-      flex: 1;
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 15px;
-      outline: none;
-    }
-
-    /* -------------------------------
-       Hero 輪播區
-       ------------------------------- */
-    .hero {
-      margin: 12px;
-      border-radius: var(--radius);
-      overflow: hidden;
-      position: relative;
-      background: var(--card);
-    }
-
-    .hero-track {
-      display: flex;
-      transition: transform .4s ease;
-    }
-
-    .hero-slide {
-      min-width: 100%;
-      height: 160px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: var(--muted);
-    }
-
-    /* -------------------------------
-       快捷功能列
-       ------------------------------- */
-    .quick {
-      display: flex;
-      gap: 10px;
-      padding: 0 12px;
-      overflow-x: auto;
-    }
-
-    .btn {
-      background: var(--card);
-      padding: 16px;
-      border-radius: 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      font-size: 14px;
-    }
-
-    /* -------------------------------
-       文章列表區
-       ------------------------------- */
-    .list {
-      margin-top: 10px;
-    }
-
-    .item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px;
-      border-bottom: 1px solid #111;
-    }
-
-    .thumb {
-      width: 48px;
-      height: 48px;
-      background: #333;
-      border-radius: 12px;
-      flex-shrink: 0;
-    }
-
-    /* -------------------------------
-       底部導航列
-       ------------------------------- */
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #050505;
-      display: flex;
-      justify-content: space-around;
-      padding: 12px 0;
-      border-top: 1px solid #111;
-    }
-
-    nav button {
-      background: var(--card);
-      border: none;
-      color: var(--text);
-      padding: 10px 16px;
-      border-radius: 12px;
-    }
-  </style>
+<style>
+body{background:#000;color:#eee;font-family:system-ui;padding-bottom:80px}
+header,nav{position:fixed;left:0;width:100%;background:#050505}
+header{top:0;padding:12px}
+nav{bottom:0;display:flex;justify-content:space-around;padding:12px}
+#app{padding:80px 12px}
+.item{border-bottom:1px solid #111;padding:16px}
+a{color:#0f0;text-decoration:none}
+button{background:#111;color:#eee;border:0;padding:10px 14px;border-radius:10px}
+</style>
 </head>
 
 <body>
 
-  <!-- ============================================================
-       Header
-       ============================================================ -->
-  <header>
-    <div class="player">🎧 簡易音樂播放器</div>
-    <div class="icons">
-      <div>KEEP</div>
-      <div>音樂</div>
-      <div>設定</div>
-    </div>
-  </header>
+<header>mobispace WebApp</header>
 
-  <!-- ============================================================
-       搜尋列
-       ============================================================ -->
-  <div class="search">
-    🔍
-    <input id="searchInput" placeholder="多功能全站搜尋引擎" />
-  </div>
+<div id="app"></div>
 
-  <!-- ============================================================
-       Hero 輪播
-       ============================================================ -->
-  <div class="hero">
-    <div class="hero-track" id="heroTrack"></div>
-  </div>
+<nav>
+<button onclick="route('/')">首頁</button>
+<button onclick="route('/articles')">文章</button>
+<button onclick="generateSitemap()">產生 Sitemap</button>
+</nav>
 
-  <!-- ============================================================
-       快捷功能列
-       ============================================================ -->
-  <div class="quick" id="quick"></div>
+<script>
+/* ===============================
+  路由系統 (History API)
+================================ */
+function route(path){
+  history.pushState({}, "", path);
+  render();
+}
+window.onpopstate = render;
 
-  <!-- ============================================================
-       主內容渲染區（SPA Router 注入）
-       ============================================================ -->
-  <div class="list" id="app"></div>
+/* ===============================
+  CMS 文章索引 (真實檔案列表)
+  → 對應 /posts/*
+================================ */
+const postIndex = [
+  {slug:"hello", file:"/posts/hello.md", title:"Hello World"},
+  {slug:"guide", file:"/posts/guide.html", title:"使用指南"},
+  {slug:"data", file:"/posts/data.json", title:"JSON 範例"}
+];
 
-  <!-- ============================================================
-       底部導航
-       ============================================================ -->
-  <nav>
-    <button onclick="go('home')">首頁</button>
-    <button onclick="go('articles')">文章</button>
-    <button onclick="go('video')">短影</button>
-    <button onclick="go('settings')">設定</button>
-  </nav>
+/* ===============================
+  Render 核心
+================================ */
+async function render(){
+  const path = location.pathname;
+  const app = document.getElementById("app");
 
-  <!-- ============================================================
-       JavaScript 系統核心
-       ============================================================ -->
-  <script>
-    /* -------------------------------
-       模擬 CMS 資料層
-       ------------------------------- */
-    const pages = {
-      home: { title: "首頁", desc: "mobispace 首頁", content: "# 歡迎\n這是首頁內容" },
-      articles: { title: "文章", desc: "文章清單", content: "# 技術文章\n- PWA\n- SEO" },
-      video: { title: "短影", desc: "短影音區", content: "# 短影音內容" },
-      settings: { title: "設定", desc: "使用者設定", content: "# 深色模式\n- PWA\n- 偏好" }
-    };
+  if(path === "/"){
+    app.innerHTML = `<h2>首頁</h2>`;
+  }
 
-    /* -------------------------------
-       Router：Hash SPA
-       ------------------------------- */
-    function go(page){ location.hash = page; }
+  else if(path === "/articles"){
+    app.innerHTML = postIndex.map(p=>
+      `<div class="item"><a href="/post/${p.slug}" onclick="event.preventDefault();route('/post/${p.slug}')">${p.title}</a></div>`
+    ).join("");
+  }
 
-    function render(){
-      const page = location.hash.replace("#","") || "home";
-      const data = pages[page];
+  else if(path.startsWith("/post/")){
+    const slug = path.split("/post/")[1];
+    const post = postIndex.find(p=>p.slug===slug);
+    if(!post){ app.innerHTML="404"; return; }
 
-      document.getElementById("seo-title").textContent = `mobispace｜${data.title}`;
-      document.getElementById("seo-desc").content = data.desc;
+    const res = await fetch(post.file);
+    let content = await res.text();
 
-      document.getElementById("seo-jsonld").textContent = JSON.stringify({
-        "@context":"https://schema.org",
-        "@type":"WebPage",
-        "name": data.title,
-        "description": data.desc
-      });
+    if(post.file.endsWith(".md")) content = marked.parse(content);
+    if(post.file.endsWith(".json")) content = `<pre>${content}</pre>`;
 
-      document.getElementById("app").innerHTML =
-        `<div class="item">${marked.parse(data.content)}</div>`;
-    }
+    app.innerHTML = `<div class="item">${content}</div>`;
 
-    window.addEventListener("hashchange", render);
-    render();
+    updateSEO(post.title, content.replace(/<[^>]+>/g,"").slice(0,120));
+  }
+}
+render();
 
-    /* -------------------------------
-       搜尋功能（Fuse.js）
-       ------------------------------- */
-    const fuse = new Fuse(Object.values(pages), { keys:["title","content"], threshold:0.4 });
+/* ===============================
+ SEO 動態更新
+================================ */
+function updateSEO(title,desc){
+  document.getElementById("seo-title").textContent = title;
+  document.getElementById("seo-desc").content = desc;
 
-    document.getElementById("searchInput").oninput = e => {
-      const q = e.target.value;
-      if(!q){ render(); return; }
-      const result = fuse.search(q).map(r=>r.item);
-      document.getElementById("app").innerHTML =
-        result.map(r=>`<div class="item">${marked.parse(r.content)}</div>`).join("");
-    };
+  document.getElementById("seo-jsonld").textContent = JSON.stringify({
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":title,
+    "description":desc,
+    "url":location.href
+  });
+}
 
-    /* -------------------------------
-       Hero 輪播初始化
-       ------------------------------- */
-    const heroData=["隨機文章卡片輪播","精選內容推薦","mobispace 模組展示"];
-    const track=document.getElementById("heroTrack");
-    heroData.forEach(text=>{
-      const d=document.createElement("div");
-      d.className="hero-slide";
-      d.textContent=text;
-      track.appendChild(d);
+/* ===============================
+ Sitemap.xml 生成器
+================================ */
+function generateSitemap(){
+  const urls = [
+    "/",
+    "/articles",
+    ...postIndex.map(p=>`/post/${p.slug}`)
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map(u=>`<url><loc>${location.origin}${u}</loc></url>`).join("\n") +
+    "\n</urlset>";
+
+  const blob = new Blob([xml],{type:"application/xml"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "sitemap.xml";
+  a.click();
+}
+
+/* ===============================
+ PWA Service Worker
+================================ */
+if('serviceWorker' in navigator){
+  const sw = new Blob([`
+    self.addEventListener('install',e=>{
+      e.waitUntil(caches.open('v1').then(c=>c.addAll(['/'])));
     });
-
-    let i=0;
-    setInterval(()=>{
-      i=(i+1)%heroData.length;
-      track.style.transform=`translateX(-${i*100}%)`;
-    },3000);
-
-    /* -------------------------------
-       快捷按鈕生成
-       ------------------------------- */
-    ["工具","會員","專案","資源","設定"].forEach(label=>{
-      const b=document.createElement("div");
-      b.className="btn";
-      b.textContent=label;
-      document.getElementById("quick").appendChild(b);
+    self.addEventListener('fetch',e=>{
+      e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
     });
+  `],{type:'text/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(sw));
+}
+</script>
 
-    /* -------------------------------
-       PWA Service Worker
-       ------------------------------- */
-    if ('serviceWorker' in navigator) {
-      const swBlob = new Blob([`
-        self.addEventListener('install', e => {
-          e.waitUntil(caches.open('mobispace').then(c => c.addAll(['./'])));
-        });
-        self.addEventListener('fetch', e => {
-          e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-        });
-      `], { type: 'text/javascript' });
-
-      navigator.serviceWorker.register(URL.createObjectURL(swBlob));
-    }
-  </script>
 </body>
 </html>
