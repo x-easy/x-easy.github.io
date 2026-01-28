@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Mobispace Flagship Editor</title>
+
+<!-- Markdown 渲染核心：marked.js（純前端即時轉 HTML） -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- Monaco Editor CDN Loader -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+
+<style>
+/* ============================= */
+/* Mobispace Editor Flagship CSS */
+/* ============================= */
+
+body {
+  background:#000;
+  color:#eee;
+  font-family:"Noto Sans TC",system-ui;
+}
+
+#mobispace-editor {
+  max-width:900px;
+  margin:40px auto;
+  padding:20px;
+  border:1px solid #333;
+  border-radius:12px;
+  background:#111;
+}
+
+/* Tab 列容器 */
+#tabBar {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-bottom:10px;
+}
+
+/* 單一 Tab 樣式 */
+.tab {
+  padding:6px 10px;
+  background:#444;
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  cursor:pointer;
+}
+.tab.active { background:#4caf50; }
+
+/* 新增分頁按鈕 */
+#addTab {
+  background:#2196f3;
+}
+
+/* 工具列 */
+.toolbar {
+  text-align:center;
+  margin:10px 0;
+}
+
+/* 編輯器區塊 */
+#editorContainer {
+  display:flex;
+  gap:10px;
+  min-height:300px;
+}
+
+/* 原生 textarea 模式 */
+#textArea {
+  flex:1;
+  background:#222;
+  color:#fff;
+  border:1px solid #333;
+  border-radius:8px;
+  padding:10px;
+}
+
+/* Markdown 預覽區 */
+#preview {
+  flex:1;
+  background:#181818;
+  border:1px solid #333;
+  border-radius:8px;
+  padding:10px;
+  overflow:auto;
+}
+
+/* Monaco Editor 容器 */
+#monaco {
+  height:400px;
+  display:none;
+  border:1px solid #333;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+button {
+  padding:6px 12px;
+  border-radius:6px;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<section id="mobispace-editor">
+
+<h2 style="text-align:center">Ⲙ𝔬ⳝ𝔭ⲁ𝔠ⲉ Flagship Editor</h2>
+
+<!-- 分頁列（預設僅一頁） -->
+<div id="tabBar">
+  <button class="tab active" data-id="1">1</button>
+  <button id="addTab">＋</button>
+</div>
+
+<!-- 工具列 -->
+<div class="toolbar">
+  <button id="toggleMode">切換 Monaco 模式</button>
+  <button id="saveBtn">下載</button>
+  <button id="clearBtn">清空</button>
+</div>
+
+<!-- 編輯器主體 -->
+<div id="editorContainer">
+
+  <!-- 原生輸入 -->
+  <textarea id="textArea" placeholder="Markdown / 文字輸入..."></textarea>
+
+  <!-- Markdown 預覽 -->
+  <div id="preview">Markdown Preview</div>
+</div>
+
+<!-- Monaco Editor 專用容器 -->
+<div id="monaco"></div>
+
+<p id="status" style="text-align:center;font-size:13px;color:#888;">Ready</p>
+
+</section>
+
+<script>
+/* =========================================================
+   Mobispace Flagship Editor Engine
+   功能模組：
+   - IndexedDB 儲存
+   - 動態分頁
+   - Markdown 即時渲染
+   - Monaco Editor 切換
+   - 離線支援（Service Worker）
+========================================================= */
+
+/* ------------------------
+   IndexedDB 初始化
+------------------------ */
+const DB_NAME = "mobispace_db";           // 資料庫名稱
+const STORE = "notes";                   // 儲存區名稱
+let db;                                  // 全域資料庫實例
+
+const request = indexedDB.open(DB_NAME, 1); // 建立/打開資料庫
+
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  db.createObjectStore(STORE, { keyPath: "id" }); // 每筆資料用 id 當 key
+};
+
+request.onsuccess = e => {
+  db = e.target.result;
+  loadNote(1); // 預設只載入第一頁
+};
+
+/* ------------------------
+   狀態控制
+------------------------ */
+let currentTab = 1;      // 當前分頁
+let tabCount = 1;        // 頁數計數器
+let monacoEditor = null; // Monaco 實例
+let monacoMode = false;  // 是否啟用 Monaco
+
+const textArea = document.getElementById("textArea");
+const preview = document.getElementById("preview");
+const status = document.getElementById("status");
+
+/* ------------------------
+   Markdown 即時渲染
+------------------------ */
+textArea.addEventListener("input", () => {
+  preview.innerHTML = marked.parse(textArea.value); // 即時渲染 Markdown
+  saveNote();                                       // 每次輸入即自動儲存
+});
+
+/* ------------------------
+   IndexedDB 儲存
+------------------------ */
+function saveNote() {
+  const tx = db.transaction(STORE, "readwrite");
+  const store = tx.objectStore(STORE);
+
+  store.put({
+    id: currentTab,
+    content: monacoMode ? monacoEditor.getValue() : textArea.value
+  });
+
+  status.textContent = "已儲存 (IndexedDB)";
+}
+
+/* ------------------------
+   IndexedDB 載入
+------------------------ */
+function loadNote(id) {
+  const tx = db.transaction(STORE, "readonly");
+  const store = tx.objectStore(STORE);
+  const req = store.get(id);
+
+  req.onsuccess = () => {
+    const data = req.result?.content || "";
+    textArea.value = data;
+    preview.innerHTML = marked.parse(data);
+    if (monacoEditor) monacoEditor.setValue(data);
+  };
+}
+
+/* ------------------------
+   分頁新增
+------------------------ */
+document.getElementById("addTab").onclick = () => {
+  tabCount++;
+  const btn = document.createElement("button");
+  btn.className = "tab";
+  btn.dataset.id = tabCount;
+  btn.textContent = tabCount;
+
+  btn.onclick = () => switchTab(tabCount);
+
+  document.getElementById("tabBar").insertBefore(btn, document.getElementById("addTab"));
+};
+
+/* ------------------------
+   切換分頁
+------------------------ */
+function switchTab(id) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelector(`[data-id="${id}"]`).classList.add("active");
+  currentTab = id;
+  loadNote(id);
+}
+
+/* ------------------------
+   Monaco Editor 初始化
+------------------------ */
+require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" }});
+require(["vs/editor/editor.main"], () => {
+
+  monacoEditor = monaco.editor.create(document.getElementById("monaco"), {
+    value: "",
+    language: "markdown",
+    theme: "vs-dark",
+    automaticLayout: true
+  });
+
+  monacoEditor.onDidChangeModelContent(() => saveNote());
+});
+
+/* ------------------------
+   模式切換
+------------------------ */
+document.getElementById("toggleMode").onclick = () => {
+  monacoMode = !monacoMode;
+
+  if (monacoMode) {
+    document.getElementById("editorContainer").style.display = "none";
+    document.getElementById("monaco").style.display = "block";
+    monacoEditor.setValue(textArea.value);
+  } else {
+    document.getElementById("editorContainer").style.display = "flex";
+    document.getElementById("monaco").style.display = "none";
+    textArea.value = monacoEditor.getValue();
+  }
+};
+
+/* ------------------------
+   清空
+------------------------ */
+document.getElementById("clearBtn").onclick = () => {
+  if(confirm("清空目前分頁？")){
+    textArea.value = "";
+    preview.innerHTML = "";
+    saveNote();
+  }
+};
+
+/* ------------------------
+   下載檔案
+------------------------ */
+document.getElementById("saveBtn").onclick = () => {
+  const content = monacoMode ? monacoEditor.getValue() : textArea.value;
+  const blob = new Blob([content], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `mobispace_tab_${currentTab}.md`;
+  a.click();
+};
+
+/* ------------------------
+   離線支援 Service Worker
+------------------------ */
+if ("serviceWorker" in navigator) {
+
+  // 動態建立 SW 檔案內容（避免拆檔）
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('fetch', e => {});
+  `;
+
+  const blob = new Blob([swCode], { type: "text/javascript" });
+  const swUrl = URL.createObjectURL(blob);
+
+  navigator.serviceWorker.register(swUrl);
+}
+</script>
+
+</body>
+</html>
