@@ -1,212 +1,284 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobispace RSS Reader</title>
-<meta name="theme-color" content="#0b0d10">
+<meta charset="UTF-8" />
 
+<!-- ===============================
+     📌 Meta 設定｜SEO + PWA 基礎
+     =============================== -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b0d10" />
+<title>Mobispace Media Vault</title>
+
+<!-- ===============================
+     🎨 UI 樣式系統（深色品牌主題）
+     =============================== -->
 <style>
-:root{
-  --bg:#0b0d10;
-  --panel:#131720;
-  --text:#e5e7eb;
-  --muted:#6b7280;
-  --accent:#7dd3fc;
+/* ------------------------------
+   全域變數｜品牌色系定義
+   ------------------------------ */
+:root {
+  --bg: #0b0d10;
+  --panel: #131720;
+  --accent: #7dd3fc;
+  --text: #e5e7eb;
+  --muted: #6b7280;
+  --radius: 14px;
 }
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui;}
-header{position:sticky;top:0;background:#000c;padding:.6rem;display:flex;gap:.5rem;z-index:9}
-input,select,button{background:#111;border:1px solid #222;color:white;padding:.4rem .7rem;border-radius:10px}
-#feed{padding:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.card{background:var(--panel);border-radius:14px;overflow:hidden}
-.card img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#000}
-.card .c{padding:.6rem}
-.skel{height:200px;background:#111;animation:pulse 1.5s infinite}
-@keyframes pulse{50%{opacity:.4}}
-.tag{font-size:.7rem;background:#1f2937;padding:.1rem .4rem;border-radius:6px;margin-right:.3rem}
-.icon{width:18px;height:18px;vertical-align:-3px;cursor:pointer}
-#player{position:fixed;inset:0;background:black;display:none;flex-direction:column}
-#player video{flex:1;width:100%}
-#player .bar{background:#000c;padding:.5rem}
+
+/* ------------------------------
+   基礎排版重設
+   ------------------------------ */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* ------------------------------
+   Header 操作列
+   ------------------------------ */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+header input {
+  flex: 1;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 999px;
+  padding: .6rem 1rem;
+  color: white;
+}
+
+/* ------------------------------
+   卡片 Feed 容器
+   ------------------------------ */
+#feed {
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+/* ------------------------------
+   影音卡片元件
+   ------------------------------ */
+.card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,.4);
+  transition: transform .2s;
+}
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* 預覽縮圖 */
+.card img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+/* 卡片內容 */
+.card .content {
+  padding: .8rem;
+}
+
+/* 標籤樣式 */
+.tag {
+  display: inline-block;
+  font-size: .7rem;
+  padding: .2rem .5rem;
+  background: #1f2937;
+  border-radius: 999px;
+  margin-right: .3rem;
+}
+
+/* 收藏按鈕 */
+.fav {
+  float: right;
+  cursor: pointer;
+  color: var(--muted);
+}
+.fav.active { color: gold; }
+
+/* 播放器彈窗 */
+#playerModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.8);
+  display: none;
+  place-items: center;
+  z-index: 999;
+}
+
+#playerModal video {
+  width: 90%;
+  max-width: 900px;
+  border-radius: var(--radius);
+}
 </style>
 
+<!-- ===============================
+     📦 第三方庫載入
+     =============================== -->
 <script src="https://cdn.jsdelivr.net/npm/minisearch@6.1.0/dist/umd/index.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
+
 <body>
 
+<!-- ===============================
+     🧠 SVG Icon Sprite
+     =============================== -->
 <svg style="display:none">
-<symbol id="star" viewBox="0 0 24 24">
-<path fill="currentColor" d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
-</symbol>
+  <symbol id="icon-star" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M12 17.3l6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7l-7.1.6 5.4 4.7-1.6 7z"/>
+  </symbol>
 </svg>
 
+<!-- ===============================
+     🔝 Header 控制列
+     =============================== -->
 <header>
-<input id="search" placeholder="搜尋">
-<select id="lang"><option value="zh">中文</option><option value="orig">原文</option></select>
-<button onclick="showFav()">⭐</button>
+  <input id="search" placeholder="搜尋知識庫..." />
+  <button onclick="showFavorites()">⭐ 收藏</button>
 </header>
 
+<!-- ===============================
+     📚 Feed 容器
+     =============================== -->
 <main id="feed"></main>
 
-<div id="player">
-  <div class="bar"><button onclick="closePlayer()">←</button></div>
+<!-- ===============================
+     🎥 播放器 Modal
+     =============================== -->
+<div id="playerModal" onclick="closePlayer()">
   <video id="video" controls></video>
 </div>
 
 <script>
-// =======================
-// RSS 設定
-// =======================
-const FEEDS=[
- {name:"18AV",url:"https://rss.app/feeds/eS2iB3hy0gfoMeSW.xml"},
- {name:"Hanime1",url:"https://rss.app/feeds/FuIYGgvZZ4yvY9js.xml"},
- {name:"Ero",url:"https://rss.app/feeds/lrJwczmeZYPaSWFl.xml"}
-];
-const RSS_PROXY="https://api.rss2json.com/v1/api.json?rss_url=";
-
-// =======================
-// IndexedDB
-// =======================
-let db;
-const req=indexedDB.open("mobispace",1);
-req.onupgradeneeded=e=>{
- db=e.target.result;
- db.createObjectStore("items",{keyPath:"id"});
- db.createObjectStore("fav",{keyPath:"id"});
- db.createObjectStore("trans",{keyPath:"key"});
-};
-req.onsuccess=e=>{db=e.target.result;init()};
-
-// =======================
-// 翻譯
-// =======================
-async function translate(text){
- const key=text.slice(0,80);
- const tx=db.transaction("trans");
- const store=tx.objectStore("trans");
- const cached=await new Promise(r=>{const g=store.get(key);g.onsuccess=()=>r(g.result)});
- if(cached)return cached.val;
-
- const res=await fetch("https://libretranslate.de/translate",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({q:text,source:"auto",target:"zh"})
- });
- const data=await res.json();
- const txw=db.transaction("trans","readwrite");
- txw.objectStore("trans").put({key,val:data.translatedText});
- return data.translatedText;
-}
-
-// =======================
-// MiniSearch
-// =======================
-const ms=new MiniSearch({fields:["title","content"],storeFields:["*"]});
-
-// =======================
-// 載入 RSS
-// =======================
-let all=[];
-async function load(){
- feed.innerHTML=[...Array(6)].map(()=>'<div class="skel"></div>').join("");
- const arr=[];
- for(const f of FEEDS){
-  const r=await fetch(RSS_PROXY+encodeURIComponent(f.url));
-  const j=await r.json();
-  j.items.forEach(i=>{
-    arr.push({
-      id:i.guid,
-      title:i.title,
-      orig:i.title,
-      content:i.description.replace(/<[^>]+>/g,""),
-      link:i.link,
-      thumb:i.thumbnail||"",
-      src:i.enclosure?.link,
-      source:f.name
-    })
-  })
- }
- all=arr;
- ms.addAll(all);
- render(all);
-}
-
-// =======================
-// Render
-// =======================
-async function render(list){
- feed.innerHTML="";
- for(const it of list){
-  let title=it.title;
-  if(lang.value==="zh"){
-    title=await translate(it.orig);
+/* ======================================================
+   📦 資料模型：影片內容資料庫（可替換成你自己的）
+   ====================================================== */
+const DATA = [
+  {
+    id: "vid001",
+    title: "HLS 串流技術解析",
+    tags: ["影音", "工程"],
+    cover: "https://images.unsplash.com/photo-1522199755839-a2bacb67c546",
+    src: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  {
+    id: "vid002",
+    title: "AI 工具鏈設計思維",
+    tags: ["AI", "產品"],
+    cover: "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    src: "https://test-streams.mux.dev/test_001/stream.m3u8"
   }
-  const div=document.createElement("div");
-  div.className="card";
-  div.innerHTML=`
-    ${it.thumb?`<img src="${it.thumb}" onclick="play('${it.src||it.link}')">`:``}
-    <div class="c">
-      <b>${title}</b>
-      <svg class="icon" onclick="fav('${it.id}')"><use href="#star"/></svg><br>
-      <span class="tag">${it.source}</span>
-    </div>`;
-  feed.appendChild(div);
- }
-}
+];
 
-// =======================
-// 收藏
-// =======================
-function fav(id){
- const it=all.find(x=>x.id===id);
- const tx=db.transaction("fav","readwrite");
- tx.objectStore("fav").put(it);
-}
-function showFav(){
- const tx=db.transaction("fav");
- const r=tx.objectStore("fav").getAll();
- r.onsuccess=()=>render(r.result);
-}
-
-// =======================
-// 搜尋
-// =======================
-search.oninput=e=>{
- if(!e.target.value)return render(all);
- render(ms.search(e.target.value));
+/* ======================================================
+   🧠 IndexedDB 永久儲存層
+   ====================================================== */
+const db = indexedDB.open("mobispace-db", 1);
+db.onupgradeneeded = e => {
+  e.target.result.createObjectStore("fav", { keyPath: "id" });
 };
 
-// =======================
-// 播放
-// =======================
-function play(url){
- player.style.display="flex";
- const v=document.getElementById("video");
- if(Hls.isSupported()){
-  const h=new Hls();h.loadSource(url);h.attachMedia(v);
- }else v.src=url;
- v.play();
+/* ======================================================
+   🔍 MiniSearch 搜尋索引
+   ====================================================== */
+const miniSearch = new MiniSearch({
+  fields: ["title", "tags"],
+  storeFields: ["title", "tags", "cover", "src", "id"]
+});
+miniSearch.addAll(DATA);
+
+/* ======================================================
+   🖼️ 畫面渲染
+   ====================================================== */
+const feed = document.getElementById("feed");
+
+function render(list) {
+  feed.innerHTML = list.map(v => `
+    <div class="card">
+      <img src="${v.cover}" onclick="play('${v.src}')" />
+      <div class="content">
+        <b>${v.title}</b>
+        <span class="fav" onclick="toggleFav('${v.id}')">
+          <svg width="18"><use href="#icon-star"/></svg>
+        </span><br/>
+        ${v.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+      </div>
+    </div>
+  `).join("");
 }
-function closePlayer(){
- video.pause();
- player.style.display="none";
+render(DATA);
+
+/* ======================================================
+   🎥 播放器邏輯（支援 HLS.js）
+   ====================================================== */
+function play(url) {
+  const modal = document.getElementById("playerModal");
+  const video = document.getElementById("video");
+  modal.style.display = "grid";
+
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(url);
+    hls.attachMedia(video);
+  } else {
+    video.src = url;
+  }
 }
 
-// =======================
-// PWA
-// =======================
-if("serviceWorker"in navigator){
- const sw=`
- self.addEventListener('install',e=>e.waitUntil(caches.open('v1').then(c=>c.addAll(['./']))));
- self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
- `;
- navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw])));
+function closePlayer() {
+  document.getElementById("playerModal").style.display = "none";
+  document.getElementById("video").pause();
 }
 
-// =======================
-function init(){load()}
-lang.onchange=()=>render(all);
+/* ======================================================
+   ⭐ 收藏系統
+   ====================================================== */
+function toggleFav(id) {
+  db.onsuccess = e => {
+    const tx = e.target.result.transaction("fav", "readwrite");
+    const store = tx.objectStore("fav");
+    store.put(DATA.find(v=>v.id===id));
+  };
+}
+
+function showFavorites() {
+  db.onsuccess = e => {
+    const tx = e.target.result.transaction("fav");
+    const store = tx.objectStore("fav");
+    const req = store.getAll();
+    req.onsuccess = () => render(req.result);
+  };
+}
+
+/* ======================================================
+   🔍 搜尋行為
+   ====================================================== */
+document.getElementById("search").addEventListener("input", e=>{
+  const q = e.target.value;
+  if(!q) return render(DATA);
+  render(miniSearch.search(q).map(r=>r));
+});
 </script>
 </body>
 </html>
