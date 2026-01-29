@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>設定中心｜莫比空間</title>
+
+<style>
+:root {
+  --bg:#f6f7f9;
+  --card:#fff;
+  --text:#222;
+  --border:#ddd;
+  --primary:#0984e3;
+}
+body {
+  font-family: system-ui;
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+.card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+h2 { margin-top: 0; }
+label { display:block; margin: 8px 0; }
+input, textarea, select, button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚙️ 莫比空間 · 全站設定中心</h1>
+
+  <!-- 公告管理 -->
+  <div class="card">
+    <h2>📢 公告後台管理</h2>
+    <label>公告標題</label>
+    <input id="noticeTitle" placeholder="輸入公告標題">
+
+    <label>公告內容</label>
+    <textarea id="noticeContent" rows="4"></textarea>
+
+    <label>公告分類</label>
+    <select id="noticeType">
+      <option>系統</option>
+      <option>維護</option>
+      <option>法律</option>
+      <option>功能</option>
+    </select>
+
+    <button onclick="publishNotice()">發佈公告（全站同步）</button>
+  </div>
+
+  <!-- 顯示設定 -->
+  <div class="card">
+    <h2>🎨 外觀設定</h2>
+
+    <label>模式</label>
+    <select id="themeSelect" onchange="saveTheme()">
+      <option value="system">系統預設</option>
+      <option value="light">淺色模式</option>
+      <option value="dark">深色模式</option>
+    </select>
+
+    <label>全站字體大小</label>
+    <input type="range" min="12" max="22" id="fontSize" oninput="saveFont()">
+  </div>
+
+  <!-- 快捷鍵模組 -->
+  <div class="card">
+    <h2>🎛 快捷功能模組</h2>
+    <label><input type="checkbox" id="showShortcuts"> 顯示快捷按鈕</label>
+    <button onclick="saveModules()">儲存模組設定</button>
+  </div>
+
+  <!-- 會員系統 -->
+  <div class="card">
+    <h2>👤 會員系統（前端狀態）</h2>
+    <label>使用者名稱</label>
+    <input id="username">
+
+    <label>會員狀態</label>
+    <select id="role">
+      <option>訪客</option>
+      <option>會員</option>
+      <option>管理員</option>
+    </select>
+
+    <button onclick="saveUser()">儲存會員資料</button>
+  </div>
+
+</div>
+
+<script>
+/* ===== 公告發佈 ===== */
+function publishNotice() {
+  const data = {
+    title: noticeTitle.value,
+    content: noticeContent.value,
+    type: noticeType.value,
+    time: new Date().toISOString()
+  };
+  localStorage.setItem("mobispace_notice", JSON.stringify(data));
+  alert("公告已全站同步發佈");
+}
+
+/* ===== 主題 ===== */
+function saveTheme() {
+  localStorage.setItem("theme", themeSelect.value);
+}
+function saveFont() {
+  localStorage.setItem("fontSize", fontSize.value);
+}
+function saveModules() {
+  localStorage.setItem("showShortcuts", showShortcuts.checked);
+  alert("模組已更新");
+}
+function saveUser() {
+  localStorage.setItem("user", JSON.stringify({
+    name: username.value,
+    role: role.value
+  }));
+  alert("會員資料已儲存");
+}
+
+/* 預載設定 */
+(function load(){
+  themeSelect.value = localStorage.getItem("theme") || "system";
+  fontSize.value = localStorage.getItem("fontSize") || 16;
+  showShortcuts.checked = localStorage.getItem("showShortcuts")==="true";
+  const user = JSON.parse(localStorage.getItem("user")||"{}");
+  username.value = user.name || "";
+  role.value = user.role || "訪客";
+})();
+</script>
+
+</body>
+</html>
