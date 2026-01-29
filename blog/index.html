@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>莫比空間</title>
+    
+    <link rel="icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+
     <meta name="description" content="莫比空間 - 全方位的內容聚合平台">
     <meta name="author" content="莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ">
-    <link rel="canonical" href="https://your-domain.com/">
+    <link rel="canonical" href="https://x-easy.github.io/blog/">
 
     <meta name="theme-color" content="#111111">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3756/3756770.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -22,7 +25,7 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "莫比空間",
-      "url": "https://your-domain.com/"
+      "url": "https://x-easy.github.io/blog/"
     }
     </script>
 
@@ -65,7 +68,7 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             transition: background-color 0.3s, color 0.3s;
-            overflow: hidden; /* 防止 Body 滾動，交由容器處理 */
+            overflow: hidden; 
         }
 
         #app-container {
@@ -79,26 +82,17 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
-        /* ====================
-           Header
-           ==================== */
+        /* Header */
         .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            background-color: var(--bg-container);
-            z-index: 100;
-            flex-shrink: 0; /* 防止被壓縮 */
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 15px; background-color: var(--bg-container);
+            z-index: 100; flex-shrink: 0;
         }
 
         .line-music-player {
-            display: flex; align-items: center;
-            background-color: var(--bg-input);
-            padding: 4px 12px; border-radius: 20px;
-            border: 1px solid var(--border-color);
-            flex: 1; margin-right: 10px; height: 38px;
-            cursor: pointer; min-width: 0;
+            display: flex; align-items: center; background-color: var(--bg-input);
+            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-color);
+            flex: 1; margin-right: 10px; height: 38px; cursor: pointer; min-width: 0;
         }
 
         .music-title-scroll {
@@ -119,9 +113,7 @@
         }
         .icon-btn:hover i { color: var(--accent-color); border-color: var(--accent-color); }
 
-        /* ====================
-           Main Content Area
-           ==================== */
+        /* Main Content Area */
         .search-section { padding: 5px 15px 10px; flex-shrink: 0; }
         .search-box {
             background-color: var(--bg-input); border-radius: 10px;
@@ -132,20 +124,13 @@
             width: 100%; margin-left: 10px; font-size: 14px; outline: none;
         }
 
-        /* 可滾動的主視圖區域 */
         #main-view {
-            flex: 1;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 80px; /* 避開底部導航 */
-            animation: fadeIn 0.3s ease;
+            flex: 1; overflow-y: auto; scroll-behavior: smooth;
+            padding-bottom: 80px; animation: fadeIn 0.3s ease;
         }
-        /* 隱藏 Scrollbar 但保持功能 */
         #main-view::-webkit-scrollbar { display: none; }
 
-        /* ====================
-           Home Components
-           ==================== */
+        /* Home Components */
         .hero-carousel { padding: 10px 0; overflow: hidden; position: relative; }
         .carousel-track {
             display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
@@ -183,43 +168,33 @@
         .list-title { font-size: 15px; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); }
         .list-meta { font-size: 12px; color: var(--text-sub); }
 
-        /* ====================
-           Footer (版權聲明)
-           ==================== */
+        /* Footer */
         .app-footer {
             text-align: center; padding: 30px 15px; margin-top: 20px;
             border-top: 1px solid var(--border-color);
         }
         .footer-link {
             color: var(--text-sub); text-decoration: none; font-size: 11px; letter-spacing: 0.5px;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-            transition: color 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 5px; transition: color 0.3s;
         }
         .footer-link:hover { color: var(--accent-color); }
 
-        /* ====================
-           Shorts (短影音模式)
-           ==================== */
+        /* Shorts (短影音模式) */
         .shorts-container {
-            height: 100%; width: 100%;
-            background-color: #000;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
+            height: 100%; width: 100%; background-color: #000;
+            overflow-y: scroll; scroll-snap-type: y mandatory;
         }
         .shorts-container::-webkit-scrollbar { display: none; }
         
         .shorts-card {
-            height: 100%; width: 100%;
-            scroll-snap-align: start;
-            position: relative;
-            background-color: #1a1a1a;
+            height: 100%; width: 100%; scroll-snap-align: start;
+            position: relative; background-color: #000;
             display: flex; justify-content: center; align-items: center;
         }
-        .shorts-video-placeholder {
-            width: 100%; height: 100%; object-fit: cover; opacity: 0.8;
+        .shorts-video {
+            width: 100%; height: 100%; object-fit: cover;
         }
         
-        /* Shorts UI Overlay */
         .shorts-ui-right {
             position: absolute; right: 10px; bottom: 100px;
             display: flex; flex-direction: column; gap: 20px;
@@ -233,20 +208,17 @@
             font-size: 26px; margin-bottom: 5px; background: rgba(0,0,0,0.2);
             padding: 10px; border-radius: 50%; transition: 0.2s;
         }
-        .shorts-action-btn:active i { transform: scale(0.9); background: rgba(255,255,255,0.2); }
         
         .shorts-ui-bottom {
             position: absolute; left: 15px; bottom: 80px; right: 60px;
             color: white; z-index: 10; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         .shorts-user { display: flex; align-items: center; margin-bottom: 10px; }
-        .shorts-avatar { width: 32px; height: 32px; border-radius: 50%; background: #555; margin-right: 10px; }
+        .shorts-avatar-img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; margin-right: 10px; }
         .shorts-username { font-weight: bold; font-size: 14px; }
-        .shorts-desc { font-size: 13px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .shorts-desc { font-size: 13px; line-height: 1.4; }
 
-        /* ====================
-           Modals (全屏 & 半屏)
-           ==================== */
+        /* Modals */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 2000;
@@ -255,69 +227,29 @@
         }
         .modal-overlay.show { display: flex; opacity: 1; }
 
-        /* 公告 Modal (置中) */
         .modal-center-content {
             background-color: var(--bg-card); width: 85%; max-width: 320px;
             padding: 25px 20px; border-radius: 16px; position: relative; text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
             transform: scale(0.9); transition: transform 0.3s;
         }
         .modal-overlay.show .modal-center-content { transform: scale(1); }
 
-        /* KEEP 半屏 Modal (底部滑出) */
         .half-modal-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 2000;
             display: none; flex-direction: column; justify-content: flex-end;
         }
         .half-modal-content {
-            background-color: var(--bg-card);
-            width: 100%; max-width: 480px; margin: 0 auto;
-            height: 75vh; /* 佔據 75% 高度 */
-            border-radius: 20px 20px 0 0;
-            display: flex; flex-direction: column;
+            background-color: var(--bg-card); width: 100%; max-width: 480px; margin: 0 auto;
+            height: 75vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
             transform: translateY(100%); transition: transform 0.3s ease-out;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
         .half-modal-container.show { display: flex; }
         .half-modal-container.show .half-modal-content { transform: translateY(0); }
 
-        .keep-frame { flex: 1; border: none; width: 100%; background: #fff; } /* Iframe 背景設為白以免透明 */
+        .keep-frame { flex: 1; border: none; width: 100%; background: #fff; }
         
-        .keep-footer {
-            padding: 15px; display: flex; gap: 10px;
-            background-color: var(--bg-container); border-top: 1px solid var(--border-color);
-        }
-        .keep-btn {
-            flex: 1; padding: 12px; border: none; border-radius: 8px;
-            font-size: 14px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-        .keep-btn.expand { background-color: var(--accent-color); color: white; }
-        .keep-btn.close { background-color: var(--bg-input); color: var(--text-main); }
-
-        /* ====================
-           Settings & Nav
-           ==================== */
-        .settings-container { padding: 0; }
-        .settings-group { margin-bottom: 20px; }
-        .settings-header { padding: 15px; font-size: 14px; color: var(--text-sub); font-weight: bold; }
-        .setting-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px; background-color: var(--setting-item-bg);
-            border-bottom: 1px solid var(--border-color); color: var(--text-main);
-        }
-        .toggle-switch {
-            width: 40px; height: 20px; background-color: #555;
-            border-radius: 10px; position: relative; transition: 0.3s;
-        }
-        .toggle-switch.active { background-color: var(--accent-color); }
-        .toggle-switch::after {
-            content: ''; position: absolute; width: 16px; height: 16px;
-            background-color: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.3s;
-        }
-        .toggle-switch.active::after { transform: translateX(20px); }
-
+        /* Settings & Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             max-width: 480px; margin: 0 auto; height: 60px;
@@ -330,7 +262,6 @@
         }
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .nav-item.active { color: var(--text-main); }
-        .nav-item.active i { color: var(--text-main); }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -339,38 +270,24 @@
             background-color: var(--accent-color); color: #fff; text-decoration: none;
             border-radius: 30px; font-size: 14px; font-weight: bold;
         }
-        .modal-close { position: absolute; top: 15px; left: 15px; font-size: 20px; color: var(--text-sub); cursor: pointer; padding: 5px; }
+        .modal-close { position: absolute; top: 15px; left: 15px; font-size: 20px; color: var(--text-sub); cursor: pointer; }
 
     </style>
 </head>
 <body>
 
     <div id="app-container">
-        
         <header class="app-header" id="appHeader">
             <div class="line-music-player" id="miniPlayer">
                 <i class="fa-solid fa-music" style="color: var(--accent-color); margin-right: 8px;"></i>
                 <div class="music-title-scroll" id="playerText">點擊播放推薦音樂...</div>
                 <i class="fa-solid fa-play" style="font-size: 12px; margin-left: 8px; color: var(--text-sub);"></i>
             </div>
-
             <div class="header-icons">
-                <button class="icon-btn" onclick="toggleAnnouncement(true)" aria-label="公告">
-                    <i class="fa-solid fa-scroll"></i>
-                    <span>公告</span>
-                </button>
-                <button class="icon-btn" onclick="alert('開啟音樂播放器頁面')" aria-label="音樂">
-                    <i class="fa-solid fa-compact-disc"></i>
-                    <span>音樂</span>
-                </button>
-                <button class="icon-btn" onclick="toggleKeepModal(true)" aria-label="KEEP">
-                    <i class="fa-regular fa-bookmark"></i>
-                    <span>KEEP</span>
-                </button>
-                <a href="/settings" class="icon-btn" data-link aria-label="設定">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>設定</span>
-                </a>
+                <button class="icon-btn" onclick="toggleAnnouncement(true)"><i class="fa-solid fa-scroll"></i><span>公告</span></button>
+                <button class="icon-btn" onclick="alert('開啟音樂播放器')"><i class="fa-solid fa-compact-disc"></i><span>音樂</span></button>
+                <button class="icon-btn" onclick="toggleKeepModal(true)"><i class="fa-regular fa-bookmark"></i><span>KEEP</span></button>
+                <a href="/settings" class="icon-btn" data-link><i class="fa-solid fa-gear"></i><span>設定</span></a>
             </div>
         </header>
 
@@ -381,133 +298,82 @@
             </div>
         </section>
 
-        <main id="main-view">
-            </main>
+        <main id="main-view"></main>
 
         <nav class="bottom-nav">
-            <a href="/" class="nav-item active" data-link>
-                <i class="fa-solid fa-house"></i>
-                <span>首頁</span>
-            </a>
-            <a href="/explore" class="nav-item" data-link>
-                <i class="fa-solid fa-compass"></i>
-                <span>探索</span>
-            </a>
-            <a href="/shorts" class="nav-item" data-link>
-                <i class="fa-brands fa-youtube"></i>
-                <span>Shorts</span>
-            </a>
-            <a href="/settings" class="nav-item" data-link>
-                <i class="fa-solid fa-gear"></i>
-                <span>設定</span>
-            </a>
+            <a href="/" class="nav-item active" data-link><i class="fa-solid fa-house"></i><span>首頁</span></a>
+            <a href="/explore" class="nav-item" data-link><i class="fa-solid fa-compass"></i><span>探索</span></a>
+            <a href="/shorts" class="nav-item" data-link><i class="fa-brands fa-youtube"></i><span>Shorts</span></a>
+            <a href="/settings" class="nav-item" data-link><i class="fa-solid fa-gear"></i><span>設定</span></a>
         </nav>
 
         <div id="announcementModal" class="modal-overlay">
             <div class="modal-center-content">
                 <i class="fa-solid fa-times modal-close" onclick="toggleAnnouncement(false)"></i>
-                <div style="margin-bottom: 20px;">
-                    <i class="fa-solid fa-bullhorn" style="font-size: 40px; color: var(--accent-color); margin-bottom: 10px;"></i>
-                    <h3 style="color: var(--text-main); margin-bottom: 5px;">最新公告</h3>
-                    <p style="color: var(--text-sub); font-size: 13px;">查看最新的系統更新與維護資訊</p>
-                </div>
-                <div style="text-align: left; background: var(--bg-input); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; color: var(--text-sub);">
-                    <p>• 新增 KEEP 半屏工具視窗</p>
-                    <p>• Shorts 短影音功能上線</p>
-                    <p>• 品牌識別更新</p>
-                </div>
+                <h3 style="color: var(--text-main); margin: 15px 0;">最新公告</h3>
+                <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">歡迎來到莫比空間，功能持續更新中！</p>
                 <a href="https://x-easy.github.io/" class="modal-btn-link">返回公告頁</a>
             </div>
         </div>
 
         <div id="keepModal" class="half-modal-container">
             <div class="half-modal-content">
-                <iframe src="https://x-easy.github.io/tools/keep/index.html" class="keep-frame" title="Keep Tools"></iframe>
-                <div class="keep-footer">
-                    <button class="keep-btn expand" onclick="window.open('https://x-easy.github.io/tools/keep/index.html', '_blank')">
-                        <i class="fa-solid fa-up-right-from-square"></i> 全部展開
-                    </button>
-                    <button class="keep-btn close" onclick="toggleKeepModal(false)">
-                        <i class="fa-solid fa-xmark"></i> 關閉視窗
-                    </button>
+                <iframe src="https://x-easy.github.io/tools/keep/index.html" class="keep-frame"></iframe>
+                <div style="padding:15px; background:var(--bg-container); display:flex; gap:10px;">
+                    <button style="flex:1; padding:12px; border-radius:8px; background:var(--accent-color); color:#fff; border:none; font-weight:bold;" onclick="window.open('https://x-easy.github.io/tools/keep/index.html')">展開</button>
+                    <button style="flex:1; padding:12px; border-radius:8px; background:var(--bg-input); color:var(--text-main); border:none;" onclick="toggleKeepModal(false)">關閉</button>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
-        /**
-         * =============================================
-         * 動態標題設定 (刷新變換)
-         * =============================================
-         */
         const brandTitles = ["莫比空間", "Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ", "Ⲙⳝ ⲃl𝔬g"];
-        const randomTitle = brandTitles[Math.floor(Math.random() * brandTitles.length)];
-        document.title = randomTitle;
+        document.title = brandTitles[Math.floor(Math.random() * brandTitles.length)];
 
-        /**
-         * =============================================
-         * 資料庫
-         * =============================================
-         */
         const db = {
             carousel: [
-                { id: 1, title: "沉浸式 3D 音效體驗", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80" },
-                { id: 2, title: "2024 獨立音樂排行榜", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=800&q=80" }
+                { id: 1, title: "沉浸式 3D 音效體驗", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800" },
+                { id: 2, title: "2024 獨立音樂排行榜", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=800" }
             ],
             shortcuts: [
                 { name: "排行榜", icon: "fa-chart-simple", route: "/rank" },
                 { name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
                 { name: "Podcast", icon: "fa-microphone", route: "/podcast" },
-                { name: "我的最愛", icon: "fa-heart", route: "/fav" },
-                { name: "演唱會", icon: "fa-ticket", route: "/ticket" },
-                { name: "社群", icon: "fa-users", route: "/community" },
-                { name: "更多", icon: "fa-ellipsis", route: "/more" }
+                { name: "我的最愛", icon: "fa-heart", route: "/fav" }
             ],
             articles: [
                 { id: 1, title: "如何選擇你的第一把吉他？", category: "教學", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" },
-                { id: 2, title: "Spotify 與 Apple Music 音質大比拼", category: "科技", date: "5小時前", img: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=200" }
+                { id: 2, title: "Spotify 與 Apple Music 音質比拼", category: "科技", date: "5小時前", img: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=200" }
             ],
             shorts: [
-                { id: 1, user: "MusicDaily", desc: "這段吉他 Solo 太神了！🎸 #guitar #solo", img: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&q=80" },
-                { id: 2, user: "LiveHouse", desc: "昨晚的現場氣氛嗨到爆 🔥 #live #concert", img: "https://images.unsplash.com/photo-1459749411177-0473ef71607b?w=400&q=80" },
-                { id: 3, user: "DJ_Mike", desc: "新單曲製作幕後花絮 🎧 #producer", img: "https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?w=400&q=80" }
+                { 
+                    id: 1, 
+                    user: "莫比音樂頻道", 
+                    desc: "跟著節奏一起搖頭又晃腦 DJ Ⲹⳝ 2024 Mix 🔥 #EDM #Remix", 
+                    videoUrl: "https://raw.githubusercontent.com/x-easy/x-easy.github.io/0cac4dc74d1050f9cd627bc165d3d43cc95bc484/medias/%E8%B7%9F%E8%91%97%E7%AF%80%E5%A5%8F%E4%B8%80%E8%B5%B7%E6%90%96%E9%A0%AD%E5%8F%88%E6%99%83%E8%85%A6%20DJ%20%E2%B2%98%E2%B3%9D%202024%20Mix.mp4",
+                    avatar: "https://x-easy.github.io/medias/莫比音樂Logo.jpeg"
+                }
             ]
         };
 
-        const fuse = new Fuse(db.articles, { keys: ['title', 'category'], threshold: 0.3 });
-
-        /**
-         * =============================================
-         * SPA 路由系統
-         * =============================================
-         */
+        const fuse = new Fuse(db.articles, { keys: ['title'], threshold: 0.3 });
         const mainView = document.getElementById('main-view');
         const appHeader = document.getElementById('appHeader');
         const searchSection = document.getElementById('searchSection');
 
-        const routes = {
-            '/': renderHome,
-            '/explore': renderExplore,
-            '/shorts': renderShorts,
-            '/settings': renderSettings
-        };
+        const routes = { '/': renderHome, '/explore': renderExplore, '/shorts': renderShorts, '/settings': renderSettings };
 
-        const navigateTo = url => {
-            history.pushState(null, null, url);
-            router();
-        };
+        const navigateTo = url => { history.pushState(null, null, url); router(); };
 
         async function router() {
             const path = window.location.pathname;
             const view = routes[path] || routes['/'];
             
-            // UI 狀態控制 (Shorts 頁面隱藏 Header 與 Search)
             if (path === '/shorts') {
                 appHeader.style.display = 'none';
                 searchSection.style.display = 'none';
-                mainView.style.paddingBottom = '60px'; // 僅保留底部導航高度
+                mainView.style.paddingBottom = '0';
             } else {
                 appHeader.style.display = 'flex';
                 searchSection.style.display = 'block';
@@ -515,251 +381,101 @@
             }
 
             mainView.innerHTML = await view();
-            
             if(path === '/') initHomeScripts();
-            if(path === '/settings') initSettingsScripts();
-            
             updateNavState(path);
         }
 
         function updateNavState(path) {
             document.querySelectorAll('.nav-item').forEach(el => {
-                if(el.getAttribute('href') === path) el.classList.add('active');
-                else el.classList.remove('active');
+                el.classList.toggle('active', el.getAttribute('href') === path);
             });
         }
 
-        /**
-         * =============================================
-         * 彈窗控制邏輯
-         * =============================================
-         */
-        // 公告
         function toggleAnnouncement(show) {
-            const modal = document.getElementById('announcementModal');
-            if(show) {
-                modal.style.display = 'flex';
-                setTimeout(() => modal.classList.add('show'), 10);
-            } else {
-                modal.classList.remove('show');
-                setTimeout(() => modal.style.display = 'none', 300);
-            }
+            const m = document.getElementById('announcementModal');
+            m.style.display = show ? 'flex' : 'none';
+            setTimeout(() => m.classList.toggle('show', show), 10);
         }
 
-        // KEEP 半屏
         function toggleKeepModal(show) {
-            const container = document.getElementById('keepModal');
-            if(show) {
-                container.style.display = 'flex';
-                setTimeout(() => container.classList.add('show'), 10);
-            } else {
-                container.classList.remove('show');
-                setTimeout(() => container.style.display = 'none', 300);
-            }
+            const m = document.getElementById('keepModal');
+            m.style.display = show ? 'flex' : 'none';
+            setTimeout(() => m.classList.toggle('show', show), 10);
         }
 
-        /**
-         * =============================================
-         * 視圖渲染器
-         * =============================================
-         */
         function renderHome() {
-            const carouselHtml = db.carousel.map(item => `
-                <div class="hero-card">
-                    <img src="${item.img}" alt="${item.title}" loading="lazy">
-                    <div class="hero-overlay"><h3>${item.title}</h3></div>
-                </div>
-            `).join('');
-
-            const shortcutsHtml = db.shortcuts.map(btn => `
-                <a href="${btn.route}" class="shortcut-item" onclick="event.preventDefault(); alert('功能: ${btn.name}')">
-                    <div class="shortcut-icon"><i class="fa-solid ${btn.icon}"></i></div>
-                    <span>${btn.name}</span>
-                </a>
-            `).join('');
-
-            const articlesHtml = renderArticleList(db.articles);
-
-            // 加入頁尾
-            const footerHtml = `
-                <footer class="app-footer">
-                    <a href="https://x-easy.github.io/blog/" class="footer-link">
-                        莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025
-                    </a>
-                </footer>
-            `;
-
-            return `
-                <section class="hero-carousel"><div class="carousel-track" id="heroTrack">${carouselHtml}</div></section>
-                <section class="shortcut-grid">${shortcutsHtml}</section>
-                <section class="list-section" id="contentList">
-                    <h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>
-                    ${articlesHtml}
-                </section>
-                ${footerHtml}
-            `;
+            const carouselHtml = db.carousel.map(i => `<div class="hero-card"><img src="${i.img}"><div class="hero-overlay"><h3>${i.title}</h3></div></div>`).join('');
+            const shortcutsHtml = db.shortcuts.map(b => `<a href="#" class="shortcut-item"><div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div><span>${b.name}</span></a>`).join('');
+            return `<section class="hero-carousel"><div class="carousel-track" id="heroTrack">${carouselHtml}</div></section>
+                    <section class="shortcut-grid">${shortcutsHtml}</section>
+                    <section class="list-section">${renderArticleList(db.articles)}</section>
+                    <footer class="app-footer"><a href="#" class="footer-link">莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025</a></footer>`;
         }
 
-        function renderExplore() {
-            return `<div style="padding:20px;"><h2>探索頁面</h2><p>這裡是動態載入的探索內容。</p></div>`;
-        }
-
-        // --- Shorts 頁面渲染 (100% 仿 YouTube App) ---
         function renderShorts() {
-            const shortsHtml = db.shorts.map(video => `
+            const shortsHtml = db.shorts.map(v => `
                 <div class="shorts-card">
-                    <img src="${video.img}" class="shorts-video-placeholder" alt="Shorts Video">
-                    
+                    <video class="shorts-video" src="${v.videoUrl}" loop autoplay muted playsinline onclick="this.paused ? this.play() : this.pause()"></video>
                     <div class="shorts-ui-right">
-                        <div class="shorts-action-btn"><i class="fa-solid fa-thumbs-up"></i><span>1.2W</span></div>
-                        <div class="shorts-action-btn"><i class="fa-solid fa-comment-dots"></i><span>324</span></div>
+                        <div class="shorts-action-btn"><i class="fa-solid fa-thumbs-up"></i><span>讚</span></div>
                         <div class="shorts-action-btn"><i class="fa-solid fa-share"></i><span>分享</span></div>
                     </div>
-                    
                     <div class="shorts-ui-bottom">
                         <div class="shorts-user">
-                            <div class="shorts-avatar"></div>
-                            <span class="shorts-username">@${video.user}</span>
+                            <img src="${v.avatar}" class="shorts-avatar-img">
+                            <span class="shorts-username">@${v.user}</span>
                         </div>
-                        <div class="shorts-desc">${video.desc}</div>
+                        <div class="shorts-desc">${v.desc}</div>
                     </div>
                 </div>
             `).join('');
-
             return `<div class="shorts-container">${shortsHtml}</div>`;
         }
 
-        function renderSettings() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const isActive = currentTheme === 'light' ? 'active' : '';
-
-            return `
-                <div class="settings-container">
-                    <div class="settings-group">
-                        <div class="settings-header">基本設定</div>
-                        <div class="setting-row">
-                            <div class="setting-label"><i class="fa-regular fa-user"></i> 個人檔案</div>
-                            <i class="fa-solid fa-chevron-right" style="font-size: 12px; color: #666;"></i>
-                        </div>
-                    </div>
-                    <div class="settings-group">
-                        <div class="settings-header">外觀與顯示</div>
-                        <div class="setting-row" id="themeToggleRow" style="cursor: pointer;">
-                            <div class="setting-label">
-                                <i class="fa-solid fa-moon"></i> <span>明亮模式</span>
-                            </div>
-                            <div class="toggle-switch ${isActive}" id="settingsThemeSwitch"></div>
-                        </div>
-                    </div>
-                </div>
-                <footer class="app-footer">
-                    <a href="https://x-easy.github.io/blog/" class="footer-link">
-                        莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025
-                    </a>
-                </footer>
-            `;
-        }
+        function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2><p>內容加載中...</p></div>`; }
+        function renderSettings() { return `<div style="padding:20px;"><h2>設定</h2><p>深色模式已啟用</p></div>`; }
 
         function renderArticleList(data) {
-            if(data.length === 0) return '<p style="text-align:center; padding:20px; color:var(--text-sub)">沒有找到相關結果</p>';
-            return data.map(item => `
-                <article class="list-card">
-                    <div class="list-thumb"><img src="${item.img}" alt="${item.title}" loading="lazy"></div>
-                    <div class="list-content">
-                        <h3 class="list-title">${item.title}</h3>
-                        <span class="list-meta">${item.date} • ${item.category}</span>
-                    </div>
-                </article>
-            `).join('');
+            return data.map(i => `<article class="list-card"><div class="list-thumb"><img src="${i.img}"></div><div class="list-content"><h3 class="list-title">${i.title}</h3><span class="list-meta">${i.date}</span></div></article>`).join('');
         }
 
-        /**
-         * =============================================
-         * 邏輯初始化
-         * =============================================
-         */
         function initHomeScripts() {
             const track = document.getElementById('heroTrack');
-            if(track) {
-                let scrollAmount = 0;
-                const autoScroll = setInterval(() => {
-                    scrollAmount += track.offsetWidth;
-                    if (scrollAmount >= track.scrollWidth) scrollAmount = 0;
-                    track.scrollTo({ left: scrollAmount, behavior: 'smooth' });
-                }, 4000);
-                track.addEventListener('touchstart', () => clearInterval(autoScroll));
-            }
+            if(track) setInterval(() => {
+                track.scrollLeft += track.offsetWidth;
+                if(track.scrollLeft >= track.scrollWidth - track.offsetWidth) track.scrollLeft = 0;
+            }, 4000);
         }
 
-        function initSettingsScripts() {
-            const toggleRow = document.getElementById('themeToggleRow');
-            const switchBtn = document.getElementById('settingsThemeSwitch');
-            if(toggleRow && switchBtn) {
-                toggleRow.addEventListener('click', () => {
-                    const currentTheme = document.documentElement.getAttribute('data-theme');
-                    if (currentTheme === 'light') {
-                        document.documentElement.setAttribute('data-theme', 'dark');
-                        switchBtn.classList.remove('active');
-                        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111111');
-                    } else {
-                        document.documentElement.setAttribute('data-theme', 'light');
-                        switchBtn.classList.add('active');
-                        document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
-                    }
-                });
-            }
-        }
-
-        /**
-         * =============================================
-         * 全域事件監聽
-         * =============================================
-         */
         window.addEventListener('popstate', router);
         document.addEventListener('DOMContentLoaded', () => {
             router();
             document.body.addEventListener('click', e => {
-                if (e.target.closest('[data-link]')) {
-                    e.preventDefault();
-                    navigateTo(e.target.closest('[data-link]').getAttribute('href'));
-                }
-            });
-            
-            // 點擊 Modal 外部關閉
-            document.getElementById('announcementModal').addEventListener('click', (e) => {
-                if(e.target.id === 'announcementModal') toggleAnnouncement(false);
-            });
-            document.getElementById('keepModal').addEventListener('click', (e) => {
-                if(e.target.id === 'keepModal') toggleKeepModal(false);
+                const link = e.target.closest('[data-link]');
+                if (link) { e.preventDefault(); navigateTo(link.getAttribute('href')); }
             });
         });
 
-        // 搜尋與播放器邏輯...
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', (e) => {
+        // 搜尋邏輯
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             const term = e.target.value;
-            const contentList = document.getElementById('contentList');
+            const contentList = document.querySelector('.list-section');
             if (!contentList) return;
             if (term.trim() === '') {
-                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">為您推薦</h3>` + renderArticleList(db.articles);
+                contentList.innerHTML = renderArticleList(db.articles);
             } else {
                 const results = fuse.search(term);
-                contentList.innerHTML = `<h3 style="margin-bottom: 15px; font-size: 18px;">搜尋結果</h3>` + renderArticleList(results.map(r => r.item));
+                contentList.innerHTML = renderArticleList(results.map(r => r.item));
             }
         });
 
+        // 播放器模擬
         const miniPlayer = document.getElementById('miniPlayer');
-        let isPlaying = false;
         miniPlayer.addEventListener('click', () => {
             const icon = miniPlayer.querySelector('.fa-play, .fa-pause');
-            isPlaying = !isPlaying;
-            if (isPlaying) {
-                icon.className = 'fa-solid fa-pause';
-                document.getElementById('playerText').innerText = "正在播放: 模擬音頻串流...";
-            } else {
-                icon.className = 'fa-solid fa-play';
-                document.getElementById('playerText').innerText = "已暫停";
-            }
+            const isPaused = icon.classList.contains('fa-play');
+            icon.className = isPaused ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+            document.getElementById('playerText').innerText = isPaused ? "正在播放: 莫比推薦音樂..." : "已暫停";
         });
     </script>
 </body>
