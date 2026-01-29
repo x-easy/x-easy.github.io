@@ -2,8 +2,33 @@
 <html lang="zh-TW" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>莫比空間</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ｜工具・Shorts・音樂・創作平台</title>
+
+<!-- ===== SEO 核心 ===== -->
+<meta name="description" content="莫比空間 Mobispace｜集結線上工具、Shorts、音樂、創作內容與技術筆記的平台。所有資源盡在莫比。">
+<meta name="keywords" content="莫比空間, Mobispace, 工具平台, Shorts, 音樂頻道, 技術筆記, GitHub Pages">
+<meta name="author" content="莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ">
+<link rel="canonical" href="https://x-easy.github.io/">
+
+<!-- ===== Open Graph ===== -->
+<meta property="og:title" content="莫比空間 Mobispace">
+<meta property="og:description" content="線上工具 × Shorts × 音樂 × 創作聚合平台">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://x-easy.github.io/">
+<meta property="og:image" content="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+
+<!-- ===== Twitter Card ===== -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="莫比空間 Mobispace">
+<meta name="twitter:description" content="線上工具、Shorts、音樂與創作聚合平台">
+<meta name="twitter:image" content="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+
+<!-- ===== PWA ===== -->
+<meta name="theme-color" content="#000000">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+<link rel="apple-touch-icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
 
 <style>
 :root {
@@ -19,7 +44,7 @@
   --icon-size:22px;
 }
 
-/* Light mode */
+/* Light Mode */
 html[data-theme="light"] {
   --bg-body:#f7f7f7;
   --bg-container:#fff;
@@ -31,36 +56,69 @@ html[data-theme="light"] {
   --nav-bg:#fff;
 }
 
-body { margin:0; background:var(--bg-body); color:var(--text-main); font-family:-apple-system; }
+body {
+  margin:0;
+  background:var(--bg-body);
+  color:var(--text-main);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
 
+#app-container {
+  max-width:480px;
+  margin:auto;
+  min-height:100vh;
+  background:var(--bg-container);
+}
+
+/* SVG 圖示系統 */
 svg.icon {
-  width: var(--icon-size);
-  height: var(--icon-size);
-  stroke: currentColor;
-  fill: none;
+  width:var(--icon-size);
+  height:var(--icon-size);
+  stroke:currentColor;
+  fill:none;
   stroke-width:2;
+}
+
+/* 主內容 */
+#main-view {
+  padding:20px;
+  padding-bottom:100px;
 }
 
 /* 底部導覽 */
 .bottom-nav {
-  position:fixed; bottom:0; left:0; right:0;
-  max-width:480px; margin:auto;
+  position:fixed;
+  bottom:0; left:0; right:0;
+  max-width:480px;
+  margin:auto;
   height:60px;
   background:var(--nav-bg);
   border-top:1px solid var(--border-color);
-  display:flex; justify-content:space-around; align-items:center;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
 }
-.nav-item { font-size:10px; color:var(--text-sub); text-decoration:none; text-align:center; }
+
+.nav-item {
+  font-size:10px;
+  color:var(--text-sub);
+  text-decoration:none;
+  text-align:center;
+}
 .nav-item.active { color:var(--text-main); }
 
 /* 設定彈窗 */
 .settings-modal {
-  position:fixed; inset:0;
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.6);
   display:none;
   z-index:5000;
 }
-.settings-modal.show { display:flex; align-items:flex-end; }
+.settings-modal.show {
+  display:flex;
+  align-items:flex-end;
+}
 
 .settings-sheet {
   width:100%;
@@ -76,20 +134,16 @@ svg.icon {
 
 .settings-sheet.full { height:95vh; }
 
-.settings-header {
+.settings-header,
+.settings-footer {
   padding:12px;
+  border-bottom:1px solid var(--border-color);
   display:flex;
   justify-content:space-between;
-  border-bottom:1px solid var(--border-color);
+  align-items:center;
 }
 
 .settings-body { flex:1; overflow:hidden; }
-
-.settings-footer {
-  padding:12px;
-  display:flex;
-  gap:10px;
-}
 
 .btn {
   flex:1;
@@ -99,33 +153,38 @@ svg.icon {
   background:var(--accent-color);
   color:white;
 }
-
-/* 修正 keep 彈窗 */
-#keepModal .half-modal-content { display:flex; flex-direction:column; }
 </style>
 </head>
 
 <body>
 
-<!-- 原結構保留 -->
 <div id="app-container">
-  <main id="main-view" style="padding-bottom:80px;"></main>
 
+  <!-- 主畫面不再是空白 -->
+  <main id="main-view">
+    <h1>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h1>
+    <p>系統正常運行中。歡迎進入 Mobispace 數位創作宇宙。</p>
+  </main>
+
+  <!-- 底部導覽 -->
   <nav class="bottom-nav">
-    <a href="/" class="nav-item active" data-link>
+    <a href="/" class="nav-item active">
       <svg class="icon"><path d="M3 12L12 3l9 9v8H3z"/></svg>
       首頁
     </a>
-    <a href="/explore" class="nav-item" data-link>
+    <a href="/explore" class="nav-item">
       <svg class="icon"><circle cx="12" cy="12" r="9"/></svg>
       探索
     </a>
-    <a href="/shorts" class="nav-item" data-link>
+    <a href="/shorts" class="nav-item">
       <svg class="icon"><polygon points="9,7 17,12 9,17"/></svg>
       Shorts
     </a>
     <a href="#" class="nav-item" onclick="openSettings()">
-      <svg class="icon"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+      <svg class="icon">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+      </svg>
       設定
     </a>
   </nav>
@@ -135,7 +194,7 @@ svg.icon {
 <div id="settingsModal" class="settings-modal" onclick="closeSettings()">
   <div class="settings-sheet" onclick="event.stopPropagation()">
     <div class="settings-header">
-      <strong>⚙️ 設定中心</strong>
+      <strong>設定中心</strong>
       <button onclick="toggleFull()">展開</button>
     </div>
 
@@ -150,20 +209,37 @@ svg.icon {
 </div>
 
 <script>
-/* 彈窗控制 */
+/* ===== 修正致命錯誤 ===== */
+const settingsModal = document.getElementById("settingsModal");
+
 function openSettings(){ settingsModal.classList.add('show'); }
 function closeSettings(){ settingsModal.classList.remove('show'); }
 function toggleFull(){
   document.querySelector('.settings-sheet').classList.toggle('full');
 }
 
-/* 同步設定 */
+/* 套用設定同步 */
 (function(){
   const theme = localStorage.getItem("theme");
   const font = localStorage.getItem("fontSize");
   if(theme) document.documentElement.setAttribute("data-theme", theme);
   if(font) document.documentElement.style.fontSize = font+"px";
 })();
+</script>
+
+<!-- 結構化資料 JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "莫比空間 Mobispace",
+  "url": "https://x-easy.github.io/",
+  "description": "集結線上工具、Shorts、音樂與創作的內容聚合平台",
+  "publisher": {
+    "@type": "Organization",
+    "name": "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
+  }
+}
 </script>
 
 </body>
