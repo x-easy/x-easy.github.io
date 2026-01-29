@@ -1,172 +1,174 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>網站公告 | X-Easy</title>
-    <meta name="description" content="X-Easy 網站入口公告與導覽頁面。">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <style>
-        :root {
-            /* 現代極簡配色 */
-            --bg-color: #f4f6f8;
-            --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-sub: #636e72;
-            --primary-color: #0984e3; /* 連結按鈕藍色 */
-            --primary-hover: #74b9ff;
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
+<title>網站公告 | X-Easy</title>
+<meta name="description" content="X-Easy 網站入口公告與導覽頁面。" />
 
-        /* 暗黑模式支援 (自動偵測系統設定) */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #1a1a1a;
-                --card-bg: #2d2d2d;
-                --text-main: #ecf0f1;
-                --text-sub: #b2bec3;
-                --primary-color: #00cec9;
-                --primary-hover: #81ecec;
-                --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            }
-        }
+<style>
+:root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --text-main: #2c3e50;
+    --text-sub: #636e72;
+    --primary-color: #0984e3;
+    --primary-hover: #74b9ff;
+    --shadow: 0 10px 30px rgba(0,0,0,.1);
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --card-bg: #2d2d2d;
+        --text-main: #ecf0f1;
+        --text-sub: #b2bec3;
+        --primary-color: #00cec9;
+        --primary-hover: #81ecec;
+        --shadow: 0 10px 30px rgba(0,0,0,.4);
+    }
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            transition: background-color 0.3s ease;
-        }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* 卡片容器 */
-        .notice-card {
-            background-color: var(--card-bg);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            text-align: center;
-            max-width: 480px;
-            width: 100%;
-            animation: fadeIn 0.8s ease-out;
-            border-top: 5px solid var(--primary-color); /* 頂部裝飾線 */
-        }
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont;
+    background: var(--bg-color);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-        /* 標題與圖標 */
-        .icon-area {
-            font-size: 48px;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-        }
+/* Card */
+.notice-card {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 16px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border-top: 5px solid var(--primary-color);
+    animation: fadeIn .8s ease;
+}
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
+/* SVG Icon */
+.svg-icon {
+    width: 48px;
+    height: 48px;
+    fill: currentColor;
+    color: var(--primary-color);
+}
 
-        p {
-            color: var(--text-sub);
-            line-height: 1.6;
-            margin-bottom: 30px;
-            font-size: 16px;
-        }
+.icon-area {
+    margin-bottom: 20px;
+}
 
-        /* 互動按鈕 */
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
+h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
 
-        .action-btn i {
-            margin-left: 8px;
-            transition: transform 0.3s ease;
-        }
+p {
+    color: var(--text-sub);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
 
-        /* 按鈕 Hover 特效 */
-        .action-btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: .3s;
+}
 
-        .action-btn:hover i {
-            transform: translateX(5px); /* 箭頭向右移動 */
-        }
+.action-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-3px);
+}
 
-        .action-btn:active {
-            transform: translateY(-1px);
-        }
+.action-btn svg {
+    width: 18px;
+    height: 18px;
+    transition: transform .3s;
+}
 
-        /* 底部版權 */
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: var(--text-sub);
-            opacity: 0.7;
-        }
+.action-btn:hover svg {
+    transform: translateX(5px);
+}
 
-        /* 進場動畫 */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
+.footer {
+    margin-top: 30px;
+    font-size: 12px;
+    opacity: .6;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
+
 <body>
 
-    <div class="notice-card">
-        <div class="icon-area">
-            <i class="fa-solid fa-bullhorn"></i>
-        </div>
+<!-- =========================================================
+     SVG SPRITE DEFINITIONS（一次定義，全站共用）
+     ========================================================= -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
 
-        <h1>歡迎來到 X-Easy</h1>
+    <!-- 公告 Bullhorn -->
+    <symbol id="icon-bullhorn" viewBox="0 0 24 24">
+        <path d="M3 10v4c0 1.1.9 2 2 2h2l3 4v-4h4l7-4V8l-7-4H5c-1.1 0-2 .9-2 2zm12 4H9v-4h6v4z"/>
+    </symbol>
 
-        <p>
-            您好！目前您位於網站的首頁入口。<br>
-            我們的主要內容、技術文章與最新動態皆已發布於部落格頁面。
-            <br><br>
-            請點擊下方按鈕繼續瀏覽。
-        </p>
+    <!-- 右箭頭 -->
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24">
+        <path d="M13 5l7 7-7 7v-4H4v-6h9V5z"/>
+    </symbol>
 
-        <a href="https://x-easy.github.io/blog/" class="action-btn">
-            前往部落格 <i class="fa-solid fa-arrow-right"></i>
-        </a>
+</svg>
 
-        <div class="footer">
-            &copy; 2024 X-Easy. All rights reserved.
-        </div>
+<div class="notice-card">
+
+    <div class="icon-area">
+        <svg class="svg-icon" aria-hidden="true">
+            <use href="#icon-bullhorn"></use>
+        </svg>
     </div>
+
+    <h1>歡迎來到 X-Easy</h1>
+
+    <p>
+        您好！目前您位於網站的首頁入口。<br>
+        我們的主要內容、技術文章與最新動態皆已發布於部落格頁面。
+        <br><br>
+        請點擊下方按鈕繼續瀏覽。
+    </p>
+
+    <a href="https://x-easy.github.io/blog/" class="action-btn">
+        前往部落格
+        <svg aria-hidden="true">
+            <use href="#icon-arrow-right"></use>
+        </svg>
+    </a>
+
+    <div class="footer">
+        &copy; 2024 X-Easy. All rights reserved.
+    </div>
+
+</div>
 
 </body>
 </html>
