@@ -3,75 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SVG 批量抓取器</title>
+<title>SVG 批次抓取打包器</title>
+
+<!-- JSZip CDN -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
 <style>
-body {
-  font-family: system-ui;
-  padding: 20px;
-}
-textarea {
-  width: 100%;
-  height: 200px;
-}
-button {
-  padding: 10px 20px;
-  margin-top: 10px;
-}
-.log {
-  margin-top: 20px;
-  white-space: pre-wrap;
-  background: #f5f5f5;
-  padding: 10px;
-}
+body { font-family: system-ui; padding: 16px; }
+textarea { width: 100%; height: 160px; }
+button { padding: 10px 16px; margin-top: 10px; }
+pre { background: #111; color: #0f0; padding: 10px; overflow: auto; }
 </style>
 </head>
 <body>
 
-<h1>SVG 批量下載工具</h1>
+<h2>SVG 批次抓取 → 打包 ZIP</h2>
 
-<p>每行一個 SVG URL：</p>
+<textarea id="urls" placeholder="每行一個 SVG URL"></textarea>
+<button onclick="start()">開始抓取並打包</button>
 
-<textarea id="urls">
-https://raw.githubusercontent.com/Klarr-Agency/Circum-Icons/main/svg/video_on.svg
-https://raw.githubusercontent.com/Klarr-Agency/Circum-Icons/main/svg/youtube.svg
-</textarea>
-
-<br>
-<button onclick="start()">開始抓取</button>
-
-<div class="log" id="log"></div>
+<pre id="log"></pre>
 
 <script>
 async function start() {
-  const log = document.getElementById("log");
-  log.textContent = "";
+  const log = msg => document.getElementById("log").textContent += msg + "\n";
+  const urls = document.getElementById("urls").value.trim().split("\n");
 
-  const urls = document.getElementById("urls").value
-    .split("\n")
-    .map(u => u.trim())
-    .filter(Boolean);
+  if (!urls.length) return alert("請貼上網址");
+
+  const zip = new JSZip();
+  let ok = 0, fail = 0;
+
+  log("開始抓取 " + urls.length + " 個 icons...\n");
 
   for (const url of urls) {
+    const name = url.split("/").pop();
     try {
       const res = await fetch(url);
-      if (!res.ok) throw new Error(res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
 
-      const text = await res.text();
-
-      const filename = url.split("/").pop();
-      const blob = new Blob([text], { type: "image/svg+xml" });
-
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-
-      log.textContent += `✔ 成功：${filename}\n`;
+      const svg = await res.text();
+      zip.file(name, svg);
+      ok++;
+      log("✔ 成功：" + name);
     } catch (e) {
-      log.textContent += `✖ 失敗：${url}\n`;
+      fail++;
+      log("✖ 失敗：" + name);
     }
   }
+
+  log("\n====================");
+  log("成功：" + ok);
+  log("失敗：" + fail);
+  log("打包中...");
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "icons.zip";
+  a.click();
+
+  log("✔ 已下載 icons.zip");
 }
 </script>
 
