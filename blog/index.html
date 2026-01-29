@@ -20,15 +20,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "莫比空間",
-      "url": "https://x-easy.github.io/blog/"
-    }
-    </script>
-
     <style>
         /* ====================
            變數與基礎設定
@@ -44,21 +35,6 @@
             --accent-color: #06c755;
             --nav-bg: #111111;
             --shadow: 0 4px 6px rgba(0,0,0,0.3);
-            --setting-item-bg: #222222;
-        }
-
-        [data-theme="light"] {
-            --bg-body: #f0f0f0;
-            --bg-container: #ffffff;
-            --bg-card: #f8f9fa;
-            --bg-input: #f2f2f2;
-            --text-main: #111111;
-            --text-sub: #666666;
-            --border-color: #e5e5e5;
-            --accent-color: #00b900;
-            --nav-bg: #ffffff;
-            --shadow: 0 2px 8px rgba(0,0,0,0.05);
-            --setting-item-bg: #ffffff;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -67,7 +43,6 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
-            transition: background-color 0.3s, color 0.3s;
             overflow: hidden; 
         }
 
@@ -79,7 +54,6 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
         /* Header */
@@ -105,15 +79,14 @@
         .icon-btn {
             background: none; border: none; color: var(--text-main);
             font-size: 10px; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; text-decoration: none; min-width: 30px;
+            cursor: pointer; text-decoration: none;
         }
         .icon-btn i {
             font-size: 18px; margin-bottom: 2px; padding: 5px;
-            border: 1px solid var(--text-main); border-radius: 8px; transition: 0.2s;
+            border: 1px solid var(--text-main); border-radius: 8px;
         }
-        .icon-btn:hover i { color: var(--accent-color); border-color: var(--accent-color); }
 
-        /* Main Content Area */
+        /* Search & Main View */
         .search-section { padding: 5px 15px 10px; flex-shrink: 0; }
         .search-box {
             background-color: var(--bg-input); border-radius: 10px;
@@ -126,7 +99,7 @@
 
         #main-view {
             flex: 1; overflow-y: auto; scroll-behavior: smooth;
-            padding-bottom: 80px; animation: fadeIn 0.3s ease;
+            padding-bottom: 80px; 
         }
         #main-view::-webkit-scrollbar { display: none; }
 
@@ -134,11 +107,11 @@
         .hero-carousel { padding: 10px 0; overflow: hidden; position: relative; }
         .carousel-track {
             display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-            scroll-behavior: smooth; scrollbar-width: none;
+            scrollbar-width: none;
         }
         .carousel-track::-webkit-scrollbar { display: none; }
         .hero-card {
-            min-width: 92%; margin-left: 4%; margin-right: 4%; height: 180px;
+            min-width: 92%; margin: 0 4%; height: 180px;
             border-radius: 12px; scroll-snap-align: center; position: relative;
             overflow: hidden; flex-shrink: 0;
         }
@@ -155,47 +128,28 @@
             width: 45px; height: 45px; background-color: var(--bg-card);
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
             margin-bottom: 6px; font-size: 20px; color: var(--accent-color);
-            box-shadow: var(--shadow);
         }
 
         .list-section { padding: 0 15px; }
         .list-card {
-            display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color); cursor: pointer;
+            display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color);
         }
         .list-thumb { width: 90px; height: 90px; border-radius: 10px; overflow: hidden; flex-shrink: 0; }
         .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .list-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-        .list-title { font-size: 15px; margin-bottom: 6px; line-height: 1.4; color: var(--text-main); }
-        .list-meta { font-size: 12px; color: var(--text-sub); }
 
-        /* Footer */
-        .app-footer {
-            text-align: center; padding: 30px 15px; margin-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        .footer-link {
-            color: var(--text-sub); text-decoration: none; font-size: 11px; letter-spacing: 0.5px;
-            display: flex; align-items: center; justify-content: center; gap: 5px; transition: color 0.3s;
-        }
-        .footer-link:hover { color: var(--accent-color); }
-
-        /* Shorts (短影音模式) */
+        /* Shorts Specific Styles */
         .shorts-container {
             height: 100%; width: 100%; background-color: #000;
             overflow-y: scroll; scroll-snap-type: y mandatory;
         }
         .shorts-container::-webkit-scrollbar { display: none; }
-        
         .shorts-card {
             height: 100%; width: 100%; scroll-snap-align: start;
             position: relative; background-color: #000;
             display: flex; justify-content: center; align-items: center;
         }
-        .shorts-video {
-            width: 100%; height: 100%; object-fit: cover;
-        }
-
-        /* 靜音狀態圖示 */
+        .shorts-video { width: 100%; height: 100%; object-fit: cover; }
+        
         .shorts-mute-indicator {
             position: absolute; top: 20px; right: 20px;
             background: rgba(0,0,0,0.4); color: white;
@@ -204,7 +158,6 @@
             font-size: 18px; z-index: 20; pointer-events: none;
         }
 
-        /* 解除靜音提示 (Toast) */
         .shorts-toast {
             position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
             background: rgba(255,255,255,0.9); color: #000;
@@ -213,46 +166,42 @@
             animation: fadeInOut 2s ease forwards;
         }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translate(-50%, -10px); }
-            20% { opacity: 1; transform: translate(-50%, 0); }
-            80% { opacity: 1; transform: translate(-50%, 0); }
-            100% { opacity: 0; transform: translate(-50%, -10px); }
-        }
-        
-        .shorts-ui-right {
-            position: absolute; right: 10px; bottom: 100px;
-            display: flex; flex-direction: column; gap: 20px;
-            align-items: center; z-index: 10;
-        }
-        .shorts-action-btn {
-            color: white; display: flex; flex-direction: column; align-items: center;
-            font-size: 12px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); cursor: pointer;
-        }
-        .shorts-action-btn i {
-            font-size: 26px; margin-bottom: 5px; background: rgba(0,0,0,0.2);
-            padding: 10px; border-radius: 50%; transition: 0.2s;
-        }
-        
         .shorts-ui-bottom {
             position: absolute; left: 15px; bottom: 80px; right: 60px;
-            color: white; z-index: 10; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            color: white; z-index: 10;
         }
-        .shorts-user { display: flex; align-items: center; margin-bottom: 10px; }
-        .shorts-avatar-img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; margin-right: 10px; }
-        .shorts-username { font-weight: bold; font-size: 14px; }
-        .shorts-desc { font-size: 13px; line-height: 1.4; }
 
-        /* Modals */
-        .modal-overlay {
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            20%, 80% { opacity: 1; }
+        }
+
+        /* Modals (修復彈窗預設顯示問題) */
+        .modal-overlay, .half-modal-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 2000;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px); opacity: 0; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.7); z-index: 3000; /* 確保在最上層 */
+            display: none; /* 初始完全隱藏 */
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
         }
-        .modal-overlay.show { display: flex; opacity: 1; }
 
-        /* Settings & Nav */
+        .half-modal-container {
+            flex-direction: column; justify-content: flex-end;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .half-modal-content {
+            background-color: var(--bg-card); width: 100%; max-width: 480px;
+            height: 75vh; border-radius: 20px 20px 0 0; display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.3s ease-out;
+        }
+
+        .modal-overlay.show, .half-modal-container.show { display: flex; }
+        .half-modal-container.show .half-modal-content { transform: translateY(0); }
+
+        .keep-frame { flex: 1; border: none; width: 100%; background: #fff; }
+
+        /* Footer Nav */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             max-width: 480px; margin: 0 auto; height: 60px;
@@ -266,14 +215,11 @@
         .nav-item i { font-size: 20px; margin-bottom: 4px; }
         .nav-item.active { color: var(--text-main); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .modal-btn-link {
-            display: inline-block; margin-top: 20px; padding: 10px 24px;
-            background-color: var(--accent-color); color: #fff; text-decoration: none;
-            border-radius: 30px; font-size: 14px; font-weight: bold;
+        .modal-center-content {
+            background-color: var(--bg-card); width: 85%; max-width: 320px;
+            padding: 25px 20px; border-radius: 16px; position: relative; text-align: center;
         }
-        .modal-close { position: absolute; top: 15px; left: 15px; font-size: 20px; color: var(--text-sub); cursor: pointer; }
+        .modal-close { position: absolute; top: 15px; left: 15px; font-size: 20px; color: var(--text-sub); }
 
     </style>
 </head>
@@ -313,9 +259,9 @@
         <div id="announcementModal" class="modal-overlay">
             <div class="modal-center-content">
                 <i class="fa-solid fa-times modal-close" onclick="toggleAnnouncement(false)"></i>
-                <h3 style="color: var(--text-main); margin: 15px 0;">最新公告</h3>
-                <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">歡迎來到莫比空間，功能持續更新中！</p>
-                <a href="https://x-easy.github.io/" class="modal-btn-link">返回公告頁</a>
+                <h3 style="margin: 15px 0;">最新公告</h3>
+                <p style="color: var(--text-sub); font-size: 13px; margin-bottom: 20px;">功能持續更新中！</p>
+                <a href="https://x-easy.github.io/" style="display:inline-block; padding:10px 20px; background:var(--accent-color); color:#fff; border-radius:20px; text-decoration:none;">了解更多</a>
             </div>
         </div>
 
@@ -331,9 +277,6 @@
     </div>
 
     <script>
-        const brandTitles = ["莫比空間", "Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ", "Ⲙⳝ ⲃl𝔬g"];
-        document.title = brandTitles[Math.floor(Math.random() * brandTitles.length)];
-
         const db = {
             carousel: [
                 { id: 1, title: "沉浸式 3D 音效體驗", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800" },
@@ -373,6 +316,7 @@
             const path = window.location.pathname;
             const view = routes[path] || routes['/'];
             
+            // Shorts 模式下隱藏頂部
             if (path === '/shorts') {
                 appHeader.style.display = 'none';
                 searchSection.style.display = 'none';
@@ -396,89 +340,60 @@
 
         function toggleAnnouncement(show) {
             const m = document.getElementById('announcementModal');
-            m.style.display = show ? 'flex' : 'none';
-            setTimeout(() => m.classList.toggle('show', show), 10);
+            m.classList.toggle('show', show);
         }
 
         function toggleKeepModal(show) {
             const m = document.getElementById('keepModal');
-            m.style.display = show ? 'flex' : 'none';
-            setTimeout(() => m.classList.toggle('show', show), 10);
+            m.classList.toggle('show', show);
         }
 
         function renderHome() {
             const carouselHtml = db.carousel.map(i => `<div class="hero-card"><img src="${i.img}"><div class="hero-overlay"><h3>${i.title}</h3></div></div>`).join('');
             const shortcutsHtml = db.shortcuts.map(b => `<a href="#" class="shortcut-item"><div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div><span>${b.name}</span></a>`).join('');
+            const articlesHtml = renderArticleList(db.articles);
             return `<section class="hero-carousel"><div class="carousel-track" id="heroTrack">${carouselHtml}</div></section>
                     <section class="shortcut-grid">${shortcutsHtml}</section>
-                    <section class="list-section">${renderArticleList(db.articles)}</section>
-                    <footer class="app-footer"><a href="#" class="footer-link">莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ • 2025</a></footer>`;
+                    <section class="list-section">${articlesHtml}</section>`;
         }
 
-        /**
-         * Shorts 播放處理邏輯
-         */
         function handleShortsClick(videoElement) {
             const muteIcon = videoElement.parentElement.querySelector('.shorts-mute-indicator i');
             const toast = videoElement.parentElement.querySelector('.shorts-toast');
 
             if (videoElement.muted) {
-                // 1. 如果是靜音，解除靜音並顯示提示
                 videoElement.muted = false;
-                muteIcon.className = 'fa-solid fa-volume-high'; // 更新右上角圖示
-                
-                // 顯示 Toast 提示
+                muteIcon.className = 'fa-solid fa-volume-high';
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 2000);
-                
-                // 確保影片正在播放
                 if (videoElement.paused) videoElement.play();
             } else {
-                // 2. 如果已有聲音，執行正常播放/暫停
-                if (videoElement.paused) {
-                    videoElement.play();
-                } else {
-                    videoElement.pause();
-                }
+                videoElement.paused ? videoElement.play() : videoElement.pause();
             }
         }
 
         function renderShorts() {
-            const shortsHtml = db.shorts.map(v => `
+            return `<div class="shorts-container">` + db.shorts.map(v => `
                 <div class="shorts-card">
                     <div class="shorts-toast">音量已開啟</div>
-                    
-                    <div class="shorts-mute-indicator">
-                        <i class="fa-solid fa-volume-xmark"></i>
-                    </div>
-
-                    <video class="shorts-video" 
-                           src="${v.videoUrl}" 
-                           loop autoplay muted playsinline 
-                           onclick="handleShortsClick(this)">
-                    </video>
-
-                    <div class="shorts-ui-right">
-                        <div class="shorts-action-btn"><i class="fa-solid fa-thumbs-up"></i><span>讚</span></div>
-                        <div class="shorts-action-btn"><i class="fa-solid fa-share"></i><span>分享</span></div>
-                    </div>
+                    <div class="shorts-mute-indicator"><i class="fa-solid fa-volume-xmark"></i></div>
+                    <video class="shorts-video" src="${v.videoUrl}" loop autoplay muted playsinline onclick="handleShortsClick(this)"></video>
                     <div class="shorts-ui-bottom">
-                        <div class="shorts-user">
-                            <img src="${v.avatar}" class="shorts-avatar-img">
-                            <span class="shorts-username">@${v.user}</span>
+                        <div style="display:flex; align-items:center; margin-bottom:10px;">
+                            <img src="${v.avatar}" style="width:36px; height:36px; border-radius:50%; border:2px solid #fff; margin-right:10px;">
+                            <span style="font-weight:bold;">@${v.user}</span>
                         </div>
-                        <div class="shorts-desc">${v.desc}</div>
+                        <div style="font-size:13px;">${v.desc}</div>
                     </div>
                 </div>
-            `).join('');
-            return `<div class="shorts-container">${shortsHtml}</div>`;
+            `).join('') + `</div>`;
         }
 
         function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2><p>內容加載中...</p></div>`; }
         function renderSettings() { return `<div style="padding:20px;"><h2>設定</h2><p>深色模式已啟用</p></div>`; }
 
         function renderArticleList(data) {
-            return data.map(i => `<article class="list-card"><div class="list-thumb"><img src="${i.img}"></div><div class="list-content"><h3 class="list-title">${i.title}</h3><span class="list-meta">${i.date}</span></div></article>`).join('');
+            return data.map(i => `<article class="list-card"><div class="list-thumb"><img src="${i.img}"></div><div class="list-content"><h3 style="font-size:15px; margin-bottom:5px;">${i.title}</h3><span style="color:var(--text-sub); font-size:12px;">${i.date}</span></div></article>`).join('');
         }
 
         function initHomeScripts() {
@@ -496,28 +411,6 @@
                 const link = e.target.closest('[data-link]');
                 if (link) { e.preventDefault(); navigateTo(link.getAttribute('href')); }
             });
-        });
-
-        // 搜尋邏輯
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            const term = e.target.value;
-            const contentList = document.querySelector('.list-section');
-            if (!contentList) return;
-            if (term.trim() === '') {
-                contentList.innerHTML = renderArticleList(db.articles);
-            } else {
-                const results = fuse.search(term);
-                contentList.innerHTML = renderArticleList(results.map(r => r.item));
-            }
-        });
-
-        // 播放器模擬
-        const miniPlayer = document.getElementById('miniPlayer');
-        miniPlayer.addEventListener('click', () => {
-            const icon = miniPlayer.querySelector('.fa-play, .fa-pause');
-            const isPaused = icon.classList.contains('fa-play');
-            icon.className = isPaused ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-            document.getElementById('playerText').innerText = isPaused ? "正在播放: 莫比推薦音樂..." : "已暫停";
         });
     </script>
 </body>
