@@ -159,5 +159,20 @@ if (ref.includes("youtube")) location.href = "/music/";
 if (ref.includes("google")) location.href = "/blog/";
 </script>
 
+<script>
+/* 套用設定 */
+const theme = localStorage.getItem("theme");
+const fontSize = localStorage.getItem("fontSize");
+if (fontSize) document.documentElement.style.fontSize = fontSize + "px";
+if (theme === "dark") document.documentElement.style.colorScheme = "dark";
+if (theme === "light") document.documentElement.style.colorScheme = "light";
+
+/* 讀取公告 */
+const notice = JSON.parse(localStorage.getItem("mobispace_notice") || "null");
+if (notice) {
+  console.log("最新公告：", notice.title);
+}
+</script>
+
 </body>
 </html>
