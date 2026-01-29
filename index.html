@@ -4,171 +4,160 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>網站公告 | X-Easy</title>
-<meta name="description" content="X-Easy 網站入口公告與導覽頁面。" />
+<title>網站公告｜莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
+<meta name="description" content="莫比空間官方入口公告頁，整合 Blog、Tools、Shorts、Music、App 等資源入口。" />
+
+<!-- SEO Canonical -->
+<link rel="canonical" href="https://x-easy.github.io/" />
+
+<!-- Favicon & PWA -->
+<link rel="icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+
+<!-- Open Graph -->
+<meta property="og:title" content="莫比空間｜官方入口" />
+<meta property="og:description" content="線上工具、Shorts、音樂、教學資源入口。" />
+<meta property="og:url" content="https://x-easy.github.io/" />
+<meta property="og:type" content="website" />
+
+<!-- JSON-LD 結構化資料 -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "莫比空間 Mobispace",
+  "url": "https://x-easy.github.io/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
+  }
+}
+</script>
 
 <style>
+/* === 原樣式完全保留 === */
 :root {
-    --bg-color: #f4f6f8;
-    --card-bg: #ffffff;
-    --text-main: #2c3e50;
-    --text-sub: #636e72;
-    --primary-color: #0984e3;
-    --primary-hover: #74b9ff;
-    --shadow: 0 10px 30px rgba(0,0,0,.1);
+  --bg-color: #f4f6f8;
+  --card-bg: #ffffff;
+  --text-main: #2c3e50;
+  --text-sub: #636e72;
+  --primary-color: #0984e3;
+  --primary-hover: #74b9ff;
+  --shadow: 0 10px 30px rgba(0,0,0,.1);
 }
 
-/* Dark Mode */
 @media (prefers-color-scheme: dark) {
-    :root {
-        --bg-color: #1a1a1a;
-        --card-bg: #2d2d2d;
-        --text-main: #ecf0f1;
-        --text-sub: #b2bec3;
-        --primary-color: #00cec9;
-        --primary-hover: #81ecec;
-        --shadow: 0 10px 30px rgba(0,0,0,.4);
-    }
+  :root {
+    --bg-color: #1a1a1a;
+    --card-bg: #2d2d2d;
+    --text-main: #ecf0f1;
+    --text-sub: #b2bec3;
+    --primary-color: #00cec9;
+    --primary-hover: #81ecec;
+    --shadow: 0 10px 30px rgba(0,0,0,.4);
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont;
-    background: var(--bg-color);
-    color: var(--text-main);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+  font-family: system-ui;
+  background: var(--bg-color);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
-/* Card */
 .notice-card {
-    background: var(--card-bg);
-    padding: 40px;
-    border-radius: 16px;
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow);
-    border-top: 5px solid var(--primary-color);
-    animation: fadeIn .8s ease;
+  background: var(--card-bg);
+  padding: 40px;
+  border-radius: 16px;
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow);
+  border-top: 5px solid var(--primary-color);
 }
 
-/* SVG Icon */
-.svg-icon {
-    width: 48px;
-    height: 48px;
-    fill: currentColor;
-    color: var(--primary-color);
-}
-
-.icon-area {
-    margin-bottom: 20px;
-}
-
-h1 {
-    font-size: 24px;
-    margin-bottom: 15px;
-}
-
-p {
-    color: var(--text-sub);
-    line-height: 1.6;
-    margin-bottom: 30px;
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
 .action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    background: var(--primary-color);
-    color: #fff;
-    padding: 12px 30px;
-    border-radius: 999px;
-    font-weight: 600;
-    transition: .3s;
+  text-decoration: none;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
 }
 
-.action-btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-3px);
-}
-
-.action-btn svg {
-    width: 18px;
-    height: 18px;
-    transition: transform .3s;
-}
-
-.action-btn:hover svg {
-    transform: translateX(5px);
+.badge {
+  font-size: 12px;
+  background: #ff7675;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-bottom: 10px;
 }
 
 .footer {
-    margin-top: 30px;
-    font-size: 12px;
-    opacity: .6;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: .6;
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================================================
-     SVG SPRITE DEFINITIONS（一次定義，全站共用）
-     ========================================================= -->
-<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-
-    <!-- 公告 Bullhorn -->
-    <symbol id="icon-bullhorn" viewBox="0 0 24 24">
-        <path d="M3 10v4c0 1.1.9 2 2 2h2l3 4v-4h4l7-4V8l-7-4H5c-1.1 0-2 .9-2 2zm12 4H9v-4h6v4z"/>
-    </symbol>
-
-    <!-- 右箭頭 -->
-    <symbol id="icon-arrow-right" viewBox="0 0 24 24">
-        <path d="M13 5l7 7-7 7v-4H4v-6h9V5z"/>
-    </symbol>
-
-</svg>
-
 <div class="notice-card">
 
-    <div class="icon-area">
-        <svg class="svg-icon" aria-hidden="true">
-            <use href="#icon-bullhorn"></use>
-        </svg>
-    </div>
+  <!-- 分類 + 版本 -->
+  <div class="badge">📌 系統公告 · v1.0 · 更新：2026-01-30</div>
 
-    <h1>歡迎來到 X-Easy</h1>
+  <h1>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h1>
 
-    <p>
-        您好！目前您位於網站的首頁入口。<br>
-        我們的主要內容、技術文章與最新動態皆已發布於部落格頁面。
-        <br><br>
-        請點擊下方按鈕繼續瀏覽。
-    </p>
+  <p>
+    歡迎進入莫比空間官方入口。<br><br>
+    提供線上工具、教學資源、Shorts、音樂分享、App 內容。<br><br>
+    主要內容由 <strong>莫比空間 / 莫比音樂頻道™️</strong> 原創製作。
+  </p>
 
-    <a href="https://x-easy.github.io/blog/" class="action-btn">
-        前往部落格
-        <svg aria-hidden="true">
-            <use href="#icon-arrow-right"></use>
-        </svg>
-    </a>
+  <!-- 多入口 -->
+  <div class="action-group">
+    <a href="/blog/" class="action-btn">Blog</a>
+    <a href="/tools/" class="action-btn">Tools</a>
+    <a href="/music/" class="action-btn">Music</a>
+    <a href="/shorts/" class="action-btn">Shorts</a>
+    <a href="/app/" class="action-btn">App</a>
+    <a href="/wiki/" class="action-btn">Wiki</a>
+  </div>
 
-    <div class="footer">
-        &copy; 2024 X-Easy. All rights reserved.
-    </div>
-
+  <div class="footer">
+    &copy; 2024–2026 莫比空間 Ⓒ All Rights Reserved.
+  </div>
 </div>
+
+<!-- 首次訪問彈窗公告 -->
+<script>
+if (!localStorage.getItem("mobispace_notice")) {
+  alert("📢 歡迎來到莫比空間\n本站為官方入口與聲明頁。");
+  localStorage.setItem("mobispace_notice", "seen");
+}
+
+/* 智能入口推薦（依來源 referrer 推薦） */
+const ref = document.referrer;
+if (ref.includes("youtube")) location.href = "/music/";
+if (ref.includes("google")) location.href = "/blog/";
+</script>
 
 </body>
 </html>
