@@ -48,24 +48,15 @@
             background-color: var(--bg-container);
             z-index: 100; 
             flex-shrink: 0;
-        /* 修改 Header 樣式 */
-.app-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    /* 這裡增加了頂部間距，20px 可以根據你的需求調整 */
-    padding: 25px 15px 10px; 
-    background-color: var(--bg-container);
-    z-index: 100; 
-    flex-shrink: 0;
-}
-
-/* 針對 iPhone 等瀏海機型的優化（可選） */
-@supports (padding-top: env(safe-area-inset-top)) {
-    .app-header {
-        padding-top: calc(env(safe-area-inset-top) + 15px);
-    }
-}
+inset-top))
+/* 針對有瀏海的行動裝置自動調整 */
+@supports (padding-top: env(safe-area-
+｛
+• app-header {
+a-inset-top) + 20px);
+｝
+padding-top: calc(env(safe-are
+｝
 
         .line-music-player {
             display: flex; align-items: center; background-color: var(--bg-input);
