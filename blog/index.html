@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>莫比空間 | 優化版</title>
+    <title>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ </title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
@@ -48,14 +48,24 @@
             background-color: var(--bg-container);
             z-index: 100; 
             flex-shrink: 0;
-        }
+        /* 修改 Header 樣式 */
+.app-header {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    /* 這裡增加了頂部間距，20px 可以根據你的需求調整 */
+    padding: 25px 15px 10px; 
+    background-color: var(--bg-container);
+    z-index: 100; 
+    flex-shrink: 0;
+}
 
-        /* 針對有瀏海的行動裝置自動調整 */
-        @supports (padding-top: env(safe-area-inset-top)) {
-            .app-header {
-                padding-top: calc(env(safe-area-inset-top) + 20px);
-            }
-        }
+/* 針對 iPhone 等瀏海機型的優化（可選） */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .app-header {
+        padding-top: calc(env(safe-area-inset-top) + 15px);
+    }
+}
 
         .line-music-player {
             display: flex; align-items: center; background-color: var(--bg-input);
