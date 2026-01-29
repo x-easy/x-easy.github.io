@@ -21,146 +21,58 @@
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
     <style>
-        /* ====================
-           變數與基礎設定
-           ==================== */
         :root {
-            --bg-body: #000000;
-            --bg-container: #111111;
-            --bg-card: #222222;
-            --bg-input: #333333;
-            --text-main: #ffffff;
-            --text-sub: #aaaaaa;
-            --border-color: #333333;
-            --accent-color: #06c755;
-            --nav-bg: #111111;
-            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --bg-body: #000000; --bg-container: #111111; --bg-card: #222222;
+            --bg-input: #333333; --text-main: #ffffff; --text-sub: #aaaaaa;
+            --border-color: #333333; --accent-color: #06c755; --nav-bg: #111111;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            overflow: hidden; 
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
+        #app-container { max-width: 480px; margin: 0 auto; background-color: var(--bg-container); height: 100vh; position: relative; display: flex; flex-direction: column; }
 
-        #app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            background-color: var(--bg-container);
-            height: 100vh;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Header */
-        .app-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 15px; background-color: var(--bg-container);
-            z-index: 100; flex-shrink: 0;
-        }
-
-        .line-music-player {
-            display: flex; align-items: center; background-color: var(--bg-input);
-            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-color);
-            flex: 1; margin-right: 10px; height: 38px; cursor: pointer; min-width: 0;
-        }
-
-        .music-title-scroll {
-            font-size: 12px; white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis; color: var(--text-main); flex: 1;
-        }
-
+        /* Header & Search */
+        .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; flex-shrink: 0; }
+        .line-music-player { display: flex; align-items: center; background-color: var(--bg-input); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-color); flex: 1; margin-right: 10px; height: 38px; cursor: pointer; min-width: 0; }
+        .music-title-scroll { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); flex: 1; }
         .header-icons { display: flex; gap: 10px; flex-shrink: 0; }
-        
-        .icon-btn {
-            background: none; border: none; color: var(--text-main);
-            font-size: 10px; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; text-decoration: none;
-        }
-        .icon-btn i {
-            font-size: 18px; margin-bottom: 2px; padding: 5px;
-            border: 1px solid var(--text-main); border-radius: 8px;
-        }
-
-        /* Search Section */
+        .icon-btn { background: none; border: none; color: var(--text-main); font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
+        .icon-btn i { font-size: 18px; margin-bottom: 2px; padding: 5px; border: 1px solid var(--text-main); border-radius: 8px; }
         .search-section { padding: 5px 15px 10px; flex-shrink: 0; }
-        .search-box {
-            background-color: var(--bg-input); border-radius: 10px;
-            padding: 8px 15px; display: flex; align-items: center; color: var(--text-sub);
-        }
-        .search-box input {
-            background: transparent; border: none; color: var(--text-main);
-            width: 100%; margin-left: 10px; font-size: 14px; outline: none;
-        }
+        .search-box { background-color: var(--bg-input); border-radius: 10px; padding: 8px 15px; display: flex; align-items: center; color: var(--text-sub); }
+        .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; margin-left: 10px; font-size: 14px; outline: none; }
 
+        /* Main View */
         #main-view { flex: 1; overflow-y: auto; scroll-behavior: smooth; padding-bottom: 80px; }
         #main-view::-webkit-scrollbar { display: none; }
 
-        /* Home Shortcuts */
+        /* Shortcuts */
         .shortcut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 20px 10px; }
         .shortcut-item { display: flex; flex-direction: column; align-items: center; color: var(--text-main); text-decoration: none; font-size: 10px; }
-        .shortcut-icon {
-            width: 42px; height: 42px; background-color: var(--bg-card);
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 6px; font-size: 18px; color: var(--accent-color);
-        }
+        .shortcut-icon { width: 42px; height: 42px; background-color: var(--bg-card); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 18px; color: var(--accent-color); }
 
-        /* Shorts Container & Video */
+        /* Shorts */
         .shorts-container { height: 100%; width: 100%; background-color: #000; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .shorts-container::-webkit-scrollbar { display: none; }
         .shorts-card { height: 100%; width: 100%; scroll-snap-align: start; position: relative; background-color: #000; display: flex; justify-content: center; align-items: center; }
         .shorts-video { width: 100%; height: 100%; object-fit: cover; }
-        
-        .shorts-ui-right {
-            position: absolute; right: 10px; bottom: 120px;
-            display: flex; flex-direction: column; gap: 20px;
-            align-items: center; z-index: 20;
-        }
-        .shorts-action-btn {
-            color: white; display: flex; flex-direction: column; align-items: center;
-            font-size: 12px; cursor: pointer;
-        }
-        .shorts-action-btn i {
-            font-size: 24px; margin-bottom: 5px; background: rgba(0,0,0,0.3);
-            width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; transition: 0.2s;
-        }
-        .shorts-action-btn.active i { color: #ff3b30; }
+        .shorts-ui-right { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
+        .shorts-action-btn { color: white; display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; }
+        .shorts-action-btn i { font-size: 24px; margin-bottom: 5px; background: rgba(0,0,0,0.3); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
 
-        .shorts-mute-indicator {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(0,0,0,0.4); color: white;
-            width: 40px; height: 40px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 20; pointer-events: none;
-        }
-
-        /* Modals & Menus */
-        .modal-overlay, .half-modal-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); z-index: 4000;
-            display: none; justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
-        }
+        /* Modals */
+        .modal-overlay, .half-modal-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-overlay.show, .half-modal-container.show { display: flex; }
-
-        .action-sheet {
-            position: absolute; bottom: 0; width: 100%; max-width: 480px;
-            background: var(--bg-card); border-radius: 20px 20px 0 0;
-            padding: 20px; transform: translateY(100%); transition: transform 0.3s;
-        }
+        .action-sheet { position: absolute; bottom: 0; width: 100%; max-width: 480px; background: var(--bg-card); border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.3s; }
         .show .action-sheet { transform: translateY(0); }
-        .sheet-item {
-            display: flex; align-items: center; padding: 15px;
-            color: var(--text-main); font-size: 16px; border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-        }
-        .sheet-item i { margin-right: 15px; width: 20px; text-align: center; }
+        .sheet-item { display: flex; align-items: center; padding: 15px; color: var(--text-main); border-bottom: 1px solid var(--border-color); cursor: pointer; }
 
-        /* General UI */
+        /* Settings Style */
+        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); }
+        .toggle-switch { width: 40px; height: 20px; background: var(--bg-input); border-radius: 20px; position: relative; cursor: pointer; transition: .3s; }
+        .toggle-switch.on { background: var(--accent-color); }
+        .toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: .3s; }
+        .toggle-switch.on::after { left: 22px; }
+
+        /* Nav */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 60px; background-color: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 999; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; width: 25%; font-size: 10px; }
         .nav-item.active { color: var(--text-main); }
@@ -198,164 +110,93 @@
             <a href="/settings" class="nav-item" data-link><i class="fa-solid fa-gear"></i><span>設定</span></a>
         </nav>
 
-        <div id="shortsActionModal" class="modal-overlay" onclick="toggleShortsMenu(false)">
-            <div class="action-sheet" onclick="event.stopPropagation()">
-                <div class="sheet-item" onclick="copyShortsLink()"><i class="fa-solid fa-link"></i>複製影片連結</div>
-                <div class="sheet-item" onclick="systemShare()"><i class="fa-solid fa-arrow-up-from-bracket"></i>系統分享 (iOS/Android)</div>
-                <div class="sheet-item" onclick="addToCollection('最愛')"><i class="fa-solid fa-heart"></i>添加至最愛</div>
-                <div class="sheet-item" onclick="addToCollection('收藏')"><i class="fa-solid fa-bookmark"></i>添加至收藏</div>
-                <div class="sheet-item" style="color:#ff3b30; border-bottom:none;" onclick="toggleShortsMenu(false)">取消</div>
-            </div>
-        </div>
-
         <div id="keepModal" class="half-modal-container">
-            <div class="half-modal-content" style="background:var(--bg-card); width:100%; height:75vh; border-radius:20px 20px 0 0; position:absolute; bottom:0;">
+            <div class="half-modal-content" style="background:var(--bg-card); width:100%; height:75vh; border-radius:20px 20px 0 0; position:absolute; bottom:0; display:flex; flex-direction:column;">
                 <iframe src="https://x-easy.github.io/tools/keep/index.html" style="flex:1; border:none; width:100%;"></iframe>
-                <div style="padding:15px; background:var(--bg-container); display:flex; gap:10px;">
-                    <button style="flex:1; padding:12px; border-radius:8px; background:var(--accent-color); color:#fff; border:none;" onclick="toggleKeepModal(false)">關閉</button>
-                </div>
+                <div style="padding:15px; background:var(--bg-container);"><button style="width:100%; padding:12px; border-radius:8px; background:var(--accent-color); color:#fff; border:none;" onclick="toggleKeepModal(false)">關閉</button></div>
             </div>
         </div>
     </div>
 
     <script>
+        // --- 快捷鍵庫 (可擴展) ---
+        const shortcutLibrary = [
+            { id: "rank", name: "排行榜", icon: "fa-chart-line", route: "/rank" },
+            { id: "new", name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
+            { id: "podcast", name: "Podcast", icon: "fa-microphone", route: "/podcast" },
+            { id: "collection", name: "收藏", icon: "fa-bookmark", route: "/collection" },
+            { id: "fav", name: "最愛", icon: "fa-heart", route: "/fav" },
+            { id: "radio", name: "電台", icon: "fa-radio", route: "/radio" },
+            { id: "mv", name: "影音", icon: "fa-clapperboard", route: "/mv" }
+        ];
+
+        // 初始化或讀取用戶設定
+        let userShortcuts = JSON.parse(localStorage.getItem('user_shortcuts')) || ["rank", "new", "podcast", "collection", "fav"];
+
         const db = {
-            carousel: [
-                { id: 1, title: "沉浸式 3D 音效體驗", img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800" }
-            ],
-            // 更新排序後的快捷鍵
-            shortcuts: [
-                { name: "排行榜", icon: "fa-chart-line", route: "/rank" },
-                { name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
-                { name: "Podcast", icon: "fa-microphone", route: "/podcast" },
-                { name: "收藏", icon: "fa-bookmark", route: "/collection" },
-                { name: "最愛", icon: "fa-heart", route: "/fav" }
-            ],
-            articles: [
-                { id: 1, title: "如何選擇你的第一把吉他？", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" }
-            ],
-            shorts: [
-                { 
-                    id: 1, 
-                    user: "莫比音樂頻道", 
-                    desc: "DJ Ⲹⳝ 2024 Mix 🔥 #EDM #Remix", 
-                    videoUrl: "https://raw.githubusercontent.com/x-easy/x-easy.github.io/0cac4dc74d1050f9cd627bc165d3d43cc95bc484/medias/%E8%B7%9F%E8%91%97%E7%AF%80%E5%A5%8F%E4%B8%80%E8%B5%B7%E6%90%96%E9%A0%AD%E5%8F%88%E6%99%83%E8%85%A6%20DJ%20%E2%B2%98%E2%B3%9D%202024%20Mix.mp4",
-                    avatar: "https://x-easy.github.io/medias/莫比音樂Logo.jpeg"
-                }
-            ]
+            articles: [{ id: 1, title: "如何選擇你的第一把吉他？", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" }],
+            shorts: [{ id: 1, user: "莫比音樂頻道", desc: "DJ Ⲹⳝ 2024 Mix 🔥", videoUrl: "https://raw.githubusercontent.com/x-easy/x-easy.github.io/0cac4dc74d1050f9cd627bc165d3d43cc95bc484/medias/%E8%B7%9F%E8%91%97%E7%AF%80%E5%A5%8F%E4%B8%80%E8%B5%B7%E6%90%96%E9%A0%AD%E5%8F%88%E6%99%83%E8%85%A6%20DJ%20%E2%B2%98%E2%B3%9D%202024%20Mix.mp4", avatar: "https://x-easy.github.io/medias/莫比音樂Logo.jpeg" }]
         };
 
-        const mainView = document.getElementById('main-view');
         const routes = { '/': renderHome, '/explore': renderExplore, '/shorts': renderShorts, '/settings': renderSettings };
 
         async function router() {
             const path = window.location.pathname;
-            const view = routes[path] || routes['/'];
-            
             document.getElementById('appHeader').style.display = (path === '/shorts') ? 'none' : 'flex';
             document.getElementById('searchSection').style.display = (path === '/shorts') ? 'none' : 'block';
-
-            mainView.innerHTML = await view();
-            updateNavState(path);
+            document.getElementById('main-view').innerHTML = await (routes[path] || routes['/'])();
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('href') === path));
         }
 
-        function updateNavState(path) {
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.toggle('active', el.getAttribute('href') === path);
-            });
-        }
-
-        // --- Shorts 功能邏輯 ---
-        function toggleShortsMenu(show) {
-            document.getElementById('shortsActionModal').classList.toggle('show', show);
-        }
-
-        function toggleLike(btn) {
-            btn.classList.toggle('active');
-            const icon = btn.querySelector('i');
-            icon.classList.toggle('fa-solid');
-            icon.classList.toggle('fa-regular');
-        }
-
-        function copyShortsLink() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("連結已複製！");
-            toggleShortsMenu(false);
-        }
-
-        function systemShare() {
-            if (navigator.share) {
-                navigator.share({ title: '莫比空間 Shorts', url: window.location.href });
-            } else {
-                alert("您的瀏覽器不支持直接分享，請使用複製連結。");
-            }
-            toggleShortsMenu(false);
-        }
-
-        function addToCollection(type) {
-            alert(`已成功添加至${type}！`);
-            toggleShortsMenu(false);
-        }
-
-        function handleShortsClick(video) {
-            if (video.muted) {
-                video.muted = false;
-                video.parentElement.querySelector('.shorts-mute-indicator i').className = 'fa-solid fa-volume-high';
-            } else {
-                video.paused ? video.play() : video.pause();
-            }
-        }
-
-        function renderShorts() {
-            return db.shorts.map(v => `
-                <div class="shorts-card">
-                    <div class="shorts-mute-indicator"><i class="fa-solid fa-volume-xmark"></i></div>
-                    <video class="shorts-video" src="${v.videoUrl}" loop autoplay muted playsinline onclick="handleShortsClick(this)"></video>
-                    
-                    <div class="shorts-ui-right">
-                        <div class="shorts-action-btn" onclick="toggleLike(this)">
-                            <i class="fa-regular fa-thumbs-up"></i>
-                            <span>讚</span>
-                        </div>
-                        <div class="shorts-action-btn" onclick="toggleShortsMenu(true)">
-                            <i class="fa-solid fa-ellipsis"></i>
-                            <span>更多</span>
-                        </div>
-                    </div>
-
-                    <div style="position:absolute; left:15px; bottom:80px; color:white; z-index:10;">
-                        <div style="display:flex; align-items:center; margin-bottom:8px;">
-                            <img src="${v.avatar}" style="width:36px; height:36px; border-radius:50%; border:2px solid #fff; margin-right:10px;">
-                            <span style="font-weight:bold;">@${v.user}</span>
-                        </div>
-                        <div style="font-size:13px; text-shadow:0 1px 3px rgba(0,0,0,0.5);">${v.desc}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
+        // --- 渲染首頁 ---
         function renderHome() {
-            const shortcutsHtml = db.shortcuts.map(b => `
+            const activeShortcuts = shortcutLibrary.filter(s => userShortcuts.includes(s.id));
+            const shortcutsHtml = activeShortcuts.map(b => `
                 <a href="${b.route}" class="shortcut-item" data-link>
                     <div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div>
                     <span>${b.name}</span>
                 </a>`).join('');
             
-            return `
-                <section class="shortcut-grid">${shortcutsHtml}</section>
-                <section style="padding:0 15px;">
-                    ${db.articles.map(i => `
-                        <div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid var(--border-color);">
-                            <img src="${i.img}" style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
-                            <div><h4 style="margin-bottom:5px;">${i.title}</h4><small style="color:var(--text-sub);">${i.date}</small></div>
-                        </div>`).join('')}
-                </section>`;
+            return `<section class="shortcut-grid">${shortcutsHtml}</section>
+                    <section style="padding:0 15px;">
+                        ${db.articles.map(i => `<div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid var(--border-color);"><img src="${i.img}" style="width:80px; height:80px; border-radius:8px; object-fit:cover;"><div><h4 style="margin-bottom:5px;">${i.title}</h4><small style="color:var(--text-sub);">${i.date}</small></div></div>`).join('')}
+                    </section>`;
         }
 
-        // --- 基礎框架邏輯 ---
+        // --- 渲染設定頁 (包含快捷鍵自定義) ---
+        function renderSettings() {
+            const listHtml = shortcutLibrary.map(s => {
+                const isOn = userShortcuts.includes(s.id);
+                return `<div class="setting-row">
+                            <span><i class="fa-solid ${s.icon}" style="margin-right:10px; color:var(--accent-color)"></i>${s.name}</span>
+                            <div class="toggle-switch ${isOn ? 'on' : ''}" onclick="toggleShortcutSetting('${s.id}', this)"></div>
+                        </div>`;
+            }).join('');
+
+            return `<div style="padding:20px;">
+                        <h2 style="margin-bottom:20px;">設定</h2>
+                        <h4 style="color:var(--text-sub); margin-bottom:10px;">自定義首頁快捷鍵</h4>
+                        <div style="background:var(--bg-card); border-radius:12px;">${listHtml}</div>
+                    </div>`;
+        }
+
+        // --- 切換快捷鍵設定 ---
+        function toggleShortcutSetting(id, el) {
+            if (userShortcuts.includes(id)) {
+                userShortcuts = userShortcuts.filter(i => i !== id);
+                el.classList.remove('on');
+            } else {
+                if (userShortcuts.length >= 5) { alert("首頁最多顯示 5 個快捷鍵！"); return; }
+                userShortcuts.push(id);
+                el.classList.add('on');
+            }
+            localStorage.setItem('user_shortcuts', JSON.stringify(userShortcuts));
+        }
+
+        // 基礎功能
         function toggleKeepModal(show) { document.getElementById('keepModal').classList.toggle('show', show); }
+        function renderShorts() { return `` + db.shorts.map(v => `<div class="shorts-card"><video class="shorts-video" src="${v.videoUrl}" autoplay loop muted></video></div>`).join(''); }
         function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2></div>`; }
-        function renderSettings() { return `<div style="padding:20px;"><h2>設定</h2></div>`; }
         const navigateTo = url => { history.pushState(null, null, url); router(); };
         window.addEventListener('popstate', router);
         document.addEventListener('DOMContentLoaded', () => {
@@ -366,21 +207,5 @@
             });
         });
     </script>
-    
-    <script>
-/* 套用設定 */
-const theme = localStorage.getItem("theme");
-const fontSize = localStorage.getItem("fontSize");
-if (fontSize) document.documentElement.style.fontSize = fontSize + "px";
-if (theme === "dark") document.documentElement.style.colorScheme = "dark";
-if (theme === "light") document.documentElement.style.colorScheme = "light";
-
-/* 讀取公告 */
-const notice = JSON.parse(localStorage.getItem("mobispace_notice") || "null");
-if (notice) {
-  console.log("最新公告：", notice.title);
-}
-</script>
-    
 </body>
 </html>
