@@ -76,6 +76,11 @@
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 60px; background-color: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 999; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; width: 25%; font-size: 10px; }
         .nav-item.active { color: var(--text-main); }
+
+        /* 新增：公告視窗專用按鈕樣式 */
+        .modal-btn-group { display: flex; gap: 10px; padding: 15px; background: var(--bg-container); border-top: 1px solid var(--border-color); }
+        .btn-secondary { flex: 1; padding: 12px; border-radius: 8px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer; font-size: 14px; }
+        .btn-primary { flex: 1; padding: 12px; border-radius: 8px; background: var(--accent-color); color: #fff; border: none; cursor: pointer; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -116,10 +121,21 @@
                 <div style="padding:15px; background:var(--bg-container);"><button style="width:100%; padding:12px; border-radius:8px; background:var(--accent-color); color:#fff; border:none;" onclick="toggleKeepModal(false)">關閉</button></div>
             </div>
         </div>
+
+        <div id="announcementModal" class="half-modal-container">
+            <div class="half-modal-content" style="background:var(--bg-card); width:100%; height:85vh; border-radius:20px 20px 0 0; position:absolute; bottom:0; display:flex; flex-direction:column; overflow:hidden;">
+                <div style="padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: bold;">系統公告與入口</div>
+                <iframe src="https://x-easy.github.io/" style="flex:1; border:none; width:100%;"></iframe>
+                <div class="modal-btn-group">
+                    <button class="btn-secondary" onclick="window.open('https://x-easy.github.io/', '_blank')">返回公告原頁面</button>
+                    <button class="btn-primary" onclick="toggleAnnouncement(false)">關閉視窗</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- 快捷鍵庫 (可擴展) ---
+        // --- 快捷鍵庫 ---
         const shortcutLibrary = [
             { id: "rank", name: "排行榜", icon: "fa-chart-line", route: "/rank" },
             { id: "new", name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
@@ -130,7 +146,6 @@
             { id: "mv", name: "影音", icon: "fa-clapperboard", route: "/mv" }
         ];
 
-        // 初始化或讀取用戶設定
         let userShortcuts = JSON.parse(localStorage.getItem('user_shortcuts')) || ["rank", "new", "podcast", "collection", "fav"];
 
         const db = {
@@ -148,7 +163,6 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('href') === path));
         }
 
-        // --- 渲染首頁 ---
         function renderHome() {
             const activeShortcuts = shortcutLibrary.filter(s => userShortcuts.includes(s.id));
             const shortcutsHtml = activeShortcuts.map(b => `
@@ -163,7 +177,6 @@
                     </section>`;
         }
 
-        // --- 渲染設定頁 (包含快捷鍵自定義) ---
         function renderSettings() {
             const listHtml = shortcutLibrary.map(s => {
                 const isOn = userShortcuts.includes(s.id);
@@ -180,7 +193,6 @@
                     </div>`;
         }
 
-        // --- 切換快捷鍵設定 ---
         function toggleShortcutSetting(id, el) {
             if (userShortcuts.includes(id)) {
                 userShortcuts = userShortcuts.filter(i => i !== id);
@@ -193,8 +205,14 @@
             localStorage.setItem('user_shortcuts', JSON.stringify(userShortcuts));
         }
 
-        // 基礎功能
+        // --- 核心彈窗切換功能 ---
         function toggleKeepModal(show) { document.getElementById('keepModal').classList.toggle('show', show); }
+        
+        // 新增：公告彈窗控制
+        function toggleAnnouncement(show) { 
+            document.getElementById('announcementModal').classList.toggle('show', show); 
+        }
+
         function renderShorts() { return `` + db.shorts.map(v => `<div class="shorts-card"><video class="shorts-video" src="${v.videoUrl}" autoplay loop muted></video></div>`).join(''); }
         function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2></div>`; }
         const navigateTo = url => { history.pushState(null, null, url); router(); };
