@@ -3,127 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apple Music Pro｜動態管理版</title>
+    <title>Apple Music Pro Full Suite</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (保留之前的 CSS 樣式並優化) */
         :root {
-            --am-red: #fa243c; --am-bg: #000; --am-card: #1c1c1e;
+            --am-red: #fa243c; --am-bg: #000;
             --am-text-muted: #8e8e93; --am-border: rgba(255, 255, 255, 0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--am-bg); color: white; font-family: -apple-system, system-ui; padding-bottom: 110px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--am-bg); color: white; font-family: -apple-system, system-ui; overflow-x: hidden; }
 
-        /* 頂部自定義標示區 */
-        .admin-note { background: #e74c3c; color: white; text-align: center; padding: 8px; font-size: 14px; font-weight: bold; }
+        /* --- 主頁內容 --- */
+        .main-content { padding-bottom: 80px; transition: transform 0.4s ease; }
+        .main-content.scaled { transform: scale(0.92); border-radius: 20px; overflow: hidden; }
 
-        header { padding: 15px 20px; position: sticky; top: 0; background: var(--am-bg); z-index: 100; }
-        .search-container { background: #2c2c2e; border-radius: 10px; padding: 10px; display: flex; align-items: center; color: var(--am-text-muted); margin-bottom: 15px; }
-        
-        /* 熱門標籤滑塊 */
-        .tag-slider { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
-        .tag-slider::-webkit-scrollbar { display: none; }
-        .tag { background: #2c2c2e; padding: 6px 16px; border-radius: 20px; font-size: 14px; color: var(--am-red); white-space: nowrap; cursor: pointer; }
+        header { padding: 15px 20px; }
+        .search-container { background: #2c2c2e; border-radius: 10px; padding: 10px; color: var(--am-text-muted); margin-bottom: 15px; }
+        .tag-slider { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; scrollbar-width: none; }
+        .tag { background: #2c2c2e; padding: 6px 16px; border-radius: 20px; font-size: 14px; color: var(--am-red); white-space: nowrap; }
 
-        /* 列表排版 */
-        .section-header { display: flex; justify-content: space-between; padding: 20px; font-size: 20px; font-weight: bold; }
-        .song-list-container { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scrollbar-width: none; }
-        .song-column { min-width: 85vw; } /* 讓一欄佔據大部分螢幕，符合截圖感 */
-        .song-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--am-border); cursor: pointer; }
-        .song-cover { width: 55px; height: 55px; border-radius: 8px; margin-right: 15px; }
-        .song-info { flex: 1; }
-        .song-info .title { font-size: 16px; font-weight: 600; }
-        .song-info .artist { font-size: 14px; color: var(--am-text-muted); }
+        .song-item { display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid var(--am-border); }
+        .song-cover { width: 50px; height: 50px; border-radius: 6px; margin-right: 15px; }
 
-        /* 底部播放器 */
-        .mini-player {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: rgba(25, 25, 25, 0.9); backdrop-filter: blur(20px);
-            display: flex; align-items: center; padding: 0 20px; border-top: 1px solid var(--am-border);
+        /* --- 核心：雙模態播放器 --- */
+        .player-wrapper {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            height: 100vh; z-index: 1000;
+            transform: translateY(calc(100% - 70px)); /* 預設只露出 70px 的迷你列 */
+            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
         }
-        .mini-cover { width: 48px; height: 48px; border-radius: 5px; margin-right: 15px; }
-        .mini-controls { display: flex; gap: 25px; font-size: 24px; }
+        .player-wrapper.expanded { transform: translateY(0); }
+
+        /* 迷你模式 (Mini Player) */
+        .mini-player {
+            height: 70px; background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; align-items: center; padding: 0 20px;
+            border-top: 1px solid var(--am-border); cursor: pointer;
+        }
+
+        /* 展開模式 (Full Player) */
+        .full-player {
+            height: calc(100% - 70px); background: #1c1c1e;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px 30px; opacity: 0; transition: opacity 0.3s;
+        }
+        .player-wrapper.expanded .full-player { opacity: 1; }
+
+        .drag-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-bottom: 40px; }
+        .full-cover { width: 85%; aspect-ratio: 1/1; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 40px; }
+        
+        .full-info { width: 100%; text-align: left; margin-bottom: 30px; }
+        .full-info h2 { font-size: 24px; margin-bottom: 5px; }
+        .full-info p { color: var(--am-red); font-size: 18px; }
+
+        .controls-big { display: flex; width: 100%; justify-content: space-around; align-items: center; margin-top: 40px; font-size: 35px; }
+        .play-btn-big { width: 80px; height: 80px; background: white; color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* 進度條 */
+        .progress-container { width: 100%; margin-top: 20px; }
+        .progress-bar { width: 100%; height: 4px; background: #3a3a3c; border-radius: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-note">可自定義添加/刪除音樂網址/檔案</div>
-
-    <header>
-        <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i> 搜尋音樂...</div>
-        <div class="tag-slider" id="tagSlider">
+    <div class="main-content" id="mainContent">
+        <header>
+            <div style="font-size: 34px; font-weight: bold; margin-bottom: 20px;">瀏覽</div>
+            <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i> 搜尋音樂...</div>
+        </header>
+        <div class="tag-slider">
+            <div class="tag">熱門</div><div class="tag">最新</div><div class="tag">放鬆</div><div class="tag">聚會</div>
+        </div>
+        
+        <div id="songList">
             </div>
-    </header>
+    </div>
 
-    <div class="section-header">最新歌曲 <i class="fa-solid fa-chevron-right"></i></div>
-    <div class="song-list-container" id="songList">
+    <div class="player-wrapper" id="playerWrapper">
+        
+        <div class="mini-player" onclick="togglePlayer(true)">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/93/29/9193297a-9762-d4b3-5777-628628929c21/cover.jpg/100x100bb.jpg" class="song-cover" style="width: 45px; height: 45px;">
+            <div style="flex: 1;">
+                <div style="font-size: 15px; font-weight: 600;">無底洞 (Live)</div>
+            </div>
+            <div style="display: flex; gap: 20px; font-size: 20px;">
+                <i class="fa-solid fa-play"></i>
+                <i class="fa-solid fa-forward"></i>
+            </div>
         </div>
 
-    <div class="mini-player">
-        <img id="m-cover" src="" class="mini-cover">
-        <div class="song-info">
-            <div id="m-title" class="title">未在播放</div>
-            <div id="m-artist" class="artist">請選擇歌曲</div>
-        </div>
-        <div class="mini-controls">
-            <i class="fa-solid fa-pause" id="masterPlay"></i>
-            <i class="fa-solid fa-forward"></i>
+        <div class="full-player">
+            <div class="drag-handle" onclick="togglePlayer(false)"></div>
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/93/29/9193297a-9762-d4b3-5777-628628929c21/cover.jpg/600x600bb.jpg" class="full-cover">
+            
+            <div class="full-info">
+                <h2>無底洞 (Live)</h2>
+                <p>蔡健雅</p>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8e8e93; margin-top: 8px;">
+                    <span>1:24</span><span>4:03</span>
+                </div>
+            </div>
+
+            <div class="controls-big">
+                <i class="fa-solid fa-backward-step"></i>
+                <div class="play-btn-big"><i class="fa-solid fa-play"></i></div>
+                <i class="fa-solid fa-forward-step"></i>
+            </div>
         </div>
     </div>
 
     <script>
-        /* ============================================================
-           🎯 核心：自定義音樂資料庫
-           你只需要在下面這個 Array 增加或刪除物件，網頁就會自動更新！
-        ============================================================ */
-        const SONG_DATA = [
-            { id: 1, title: "無底洞 (Live)", artist: "蔡健雅", cover: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/93/29/9193297a-9762-d4b3-5777-628628929c21/cover.jpg/200x200bb.jpg", url: "music/track1.mp3", tags: ["熱門", "華語"] },
-            { id: 2, title: "太麻煩 feat. !", artist: "Leo王", cover: "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2e/7d/50/2e7d5073-6771-419b-a311-667232252750/cover.jpg/200x200bb.jpg", url: "music/track2.mp3", tags: ["饒舌", "潮流"] },
-            { id: 3, title: "我的錯", artist: "Karencici", cover: "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/6e/6e/32/6e6e326b-967e-61b6-758c-859a96e95b00/cover.jpg/200x200bb.jpg", url: "music/track3.mp3", tags: ["R&B"] },
-            { id: 4, title: "404 (New Era)", artist: "KiiiKiii", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=200", url: "music/track4.mp3", tags: ["電子"] }
-        ];
+        const playerWrapper = document.getElementById('playerWrapper');
+        const mainContent = document.getElementById('mainContent');
 
-        // 自動提取所有標籤並生成頂部滑塊
-        const allTags = ["全部", ...new Set(SONG_DATA.flatMap(s => s.tags))];
-        const tagSlider = document.getElementById('tagSlider');
-        allTags.forEach(tag => {
-            const div = document.createElement('div');
-            div.className = 'tag';
-            div.textContent = tag;
-            tagSlider.appendChild(div);
-        });
+        // 切換展開/縮小
+        function togglePlayer(expand) {
+            if (expand) {
+                playerWrapper.classList.add('expanded');
+                mainContent.classList.add('scaled'); // 背景主頁縮小，營造層次感
+            } else {
+                playerWrapper.classList.remove('expanded');
+                mainContent.classList.remove('scaled');
+            }
+        }
 
-        // 動態生成歌曲列表
+        // 模擬生成一些歌曲
         const songList = document.getElementById('songList');
-        function renderSongs() {
-            let html = '<div class="song-column">';
-            SONG_DATA.forEach((song, index) => {
-                if(index > 0 && index % 4 === 0) html += '</div><div class="song-column">'; // 每 4 首切一欄
-                html += `
-                    <div class="song-item" onclick="playSong(${song.id})">
-                        <img src="${song.cover}" class="song-cover">
-                        <div class="song-info">
-                            <div class="title">${song.title}</div>
-                            <div class="artist">${song.artist}</div>
-                        </div>
-                        <i class="fa-solid fa-ellipsis"></i>
+        for(let i=0; i<10; i++) {
+            songList.innerHTML += `
+                <div class="song-item">
+                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2e/7d/50/2e7d5073-6771-419b-a311-667232252750/cover.jpg/100x100bb.jpg" class="song-cover">
+                    <div style="flex:1">
+                        <div style="font-weight:600">測試歌曲 ${i+1}</div>
+                        <div style="color:#8e8e93; font-size:14px">歌手名稱</div>
                     </div>
-                `;
-            });
-            html += '</div>';
-            songList.innerHTML = html;
+                    <i class="fa-solid fa-ellipsis" style="color:var(--am-red)"></i>
+                </div>
+            `;
         }
 
-        // 點擊歌曲更新底部播放器
-        function playSong(id) {
-            const song = SONG_DATA.find(s => s.id === id);
-            document.getElementById('m-cover').src = song.cover;
-            document.getElementById('m-title').textContent = song.title;
-            document.getElementById('m-artist').textContent = song.artist;
-            // 這裡可以串接 audio.src = song.url 並播放
-        }
-
-        renderSongs();
+        // 支援手勢滑動縮小 (簡單實作)
+        let startY = 0;
+        playerWrapper.addEventListener('touchstart', e => startY = e.touches[0].clientY);
+        playerWrapper.addEventListener('touchmove', e => {
+            let moveY = e.touches[0].clientY;
+            if (moveY - startY > 100 && playerWrapper.classList.contains('expanded')) {
+                togglePlayer(false);
+            }
+        });
     </script>
 </body>
 </html>
