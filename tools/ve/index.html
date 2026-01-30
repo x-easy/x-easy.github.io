@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobispace Code Visual Editor</title>
+
+  <!-- =========================================================
+       Mobispace Code Visual Editor｜單欄運行式
+       - 單檔可部署（GitHub Pages）
+       - 單欄：原始碼編輯模式
+       - 點擊「運行」→ 切換至預覽視窗（iframe）
+       - 點擊「暫停」→ 返回原始碼編輯
+       - 內建 console 日誌攔截（debug 可視化）
+  ========================================================== -->
+
+  <style>
+    /* =========================
+       全域樣式（工程師導向）
+    ========================= */
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: .8rem 1rem;
+      background: #020617;
+      border-bottom: 1px solid #1f2937;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      flex: 1;
+      background: #020617;
+      color: #e5e7eb;
+      border: none;
+      padding: 1rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .85rem;
+      line-height: 1.5;
+      resize: none;
+      outline: none;
+    }
+
+    iframe {
+      flex: 1;
+      border: none;
+      background: white;
+      display: none; /* 預設隱藏，僅在運行模式顯示 */
+    }
+
+    footer {
+      padding: .4rem .8rem;
+      font-size: .75rem;
+      background: #020617;
+      border-top: 1px solid #1f2937;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    button {
+      background: #2563eb;
+      border: none;
+      color: white;
+      padding: .35rem .7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: .75rem;
+    }
+
+    button.secondary {
+      background: #374151;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .status {
+      opacity: .7;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  🧩 Mobispace Code Visual Editor（單欄運行式）
+</header>
+
+<main>
+  <!-- ========================
+       原始碼編輯區（單欄）
+  ======================== -->
+  <textarea id="editor"><!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>Preview</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    h1 { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Hello Mobispace</h1>
+  <p>請在此編輯 HTML，點擊「運行」查看效果。</p>
+
+  <script>
+    console.log('頁面已載入');
+  </script>
+</body>
+</html></textarea>
+
+  <!-- ========================
+       預覽視窗（Sandbox iframe）
+  ======================== -->
+  <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+</main>
+
+<footer>
+  <div class="status" id="status">編輯模式</div>
+  <div>
+    <button id="run">▶ 運行</button>
+    <button id="pause" class="secondary">⏸ 暫停</button>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   核心控制邏輯（模式切換 + 日誌）
+============================================================ */
+
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+const status = document.getElementById('status');
+const runBtn = document.getElementById('run');
+const pauseBtn = document.getElementById('pause');
+
+// ------------------------------------------------------------
+// 運行模式：隱藏編輯器 → 顯示 iframe
+// ------------------------------------------------------------
+runBtn.addEventListener('click', () => {
+  console.log('[Editor] Run clicked');
+
+  const code = editor.value;
+
+  preview.srcdoc = code;          // 將原始碼送入 sandbox iframe
+  editor.style.display = 'none';  // 隱藏編輯區
+  preview.style.display = 'block';// 顯示預覽
+
+  status.textContent = '運行中（Preview Mode）';
+});
+
+// ------------------------------------------------------------
+// 暫停模式：停止顯示 iframe → 回到編輯
+// ------------------------------------------------------------
+pauseBtn.addEventListener('click', () => {
+  console.log('[Editor] Pause clicked');
+
+  preview.srcdoc = '';             // 清空 iframe（停止執行）
+  preview.style.display = 'none';  // 隱藏預覽
+  editor.style.display = 'block';  // 顯示編輯器
+
+  status.textContent = '編輯模式';
+});
+
+console.log('[Editor] Mobispace Code Visual Editor initialized');
+</script>
+</body>
+</html>
