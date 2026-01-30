@@ -2,24 +2,12 @@
 <html lang="zh-TW" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>莫比空間</title>
     
     <link rel="icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg" type="image/jpeg">
-    <link rel="apple-touch-icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
-
-    <meta name="description" content="莫比空間 - 全方位的內容聚合平台">
-    <meta name="author" content="莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ">
-    <link rel="canonical" href="https://x-easy.github.io/blog/">
-
-    <meta name="theme-color" content="#111111">
-    <link rel="manifest" href="manifest.json">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
-
+    
     <style>
         :root {
             --bg-body: #000000; --bg-container: #111111; --bg-card: #222222;
@@ -27,180 +15,171 @@
             --border-color: #333333; --accent-color: #06c755; --nav-bg: #111111;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--bg-body); color: var(--text-main); overflow: hidden; }
+        
         #app-container { max-width: 480px; margin: 0 auto; background-color: var(--bg-container); height: 100vh; position: relative; display: flex; flex-direction: column; }
 
-        /* Header & Search */
+        /* 原有樣式保持 */
         .app-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; flex-shrink: 0; }
-        .line-music-player { display: flex; align-items: center; background-color: var(--bg-input); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--border-color); flex: 1; margin-right: 10px; height: 38px; cursor: pointer; min-width: 0; }
-        .music-title-scroll { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); flex: 1; }
-        .header-icons { display: flex; gap: 10px; flex-shrink: 0; }
-        .icon-btn { background: none; border: none; color: var(--text-main); font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; text-decoration: none; }
+        .line-music-player { display: flex; align-items: center; background-color: var(--bg-input); padding: 4px 12px; border-radius: 20px; flex: 1; margin-right: 10px; height: 38px; cursor: pointer; }
+        .music-title-scroll { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-icons { display: flex; gap: 10px; }
+        .icon-btn { background: none; border: none; color: var(--text-main); font-size: 10px; display: flex; flex-direction: column; align-items: center; }
         .icon-btn i { font-size: 18px; margin-bottom: 2px; padding: 5px; border: 1px solid var(--text-main); border-radius: 8px; }
-        .search-section { padding: 5px 15px 10px; flex-shrink: 0; }
-        .search-box { background-color: var(--bg-input); border-radius: 10px; padding: 8px 15px; display: flex; align-items: center; color: var(--text-sub); }
-        .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; margin-left: 10px; font-size: 14px; outline: none; }
 
-        /* Featured Carousel (精選文章輪播) */
-        .featured-carousel { padding: 10px 15px; overflow-x: auto; display: flex; gap: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        /* 新增：新聞列表樣式 */
+        .article-item { display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s; }
+        .article-item:active { background: var(--bg-card); }
+        .article-img { width: 90px; height: 90px; border-radius: 10px; object-fit: cover; background: #333; }
+        .article-content { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .article-title { font-size: 15px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .article-meta { font-size: 11px; color: var(--text-sub); display: flex; justify-content: space-between; }
+
+        /* 輪播與導航 (保持原有樣式) */
+        .featured-carousel { padding: 10px 15px; overflow-x: auto; display: flex; gap: 12px; scroll-snap-type: x mandatory; }
         .featured-carousel::-webkit-scrollbar { display: none; }
-        .featured-card { min-width: 85%; height: 160px; background-size: cover; background-position: center; border-radius: 15px; position: relative; scroll-snap-align: center; flex-shrink: 0; overflow: hidden; }
-        .featured-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 15px 15px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
-
-        /* Main View */
-        #main-view { flex: 1; overflow-y: auto; scroll-behavior: smooth; padding-bottom: 80px; }
-        #main-view::-webkit-scrollbar { display: none; }
-
-        /* Shortcuts */
-        .shortcut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 10px 10px 20px; }
-        .shortcut-item { display: flex; flex-direction: column; align-items: center; color: var(--text-main); text-decoration: none; font-size: 10px; }
-        .shortcut-icon { width: 42px; height: 42px; background-color: var(--bg-card); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 18px; color: var(--accent-color); }
-
-        /* Modals */
-        .modal-overlay, .half-modal-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-overlay.show, .half-modal-container.show { display: flex; }
+        .featured-card { min-width: 85%; height: 160px; background-size: cover; background-position: center; border-radius: 15px; position: relative; scroll-snap-align: center; flex-shrink: 0; }
+        .featured-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 15px 15px; background: linear-gradient(transparent, rgba(0,0,0,0.9)); }
         
         /* 底部導航 */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 60px; background-color: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 999; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; width: 25%; font-size: 10px; }
-        .nav-item.active { color: var(--text-main); }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 60px; background-color: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; font-size: 10px; }
+        .nav-item.active { color: var(--accent-color); }
 
-        /* 公告按鈕組 */
-        .modal-btn-group { display: flex; gap: 10px; padding: 15px; background: var(--bg-container); border-top: 1px solid var(--border-color); }
-        .btn-secondary { flex: 1; padding: 12px; border-radius: 8px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer; font-size: 14px; }
-        .btn-primary { flex: 1; padding: 12px; border-radius: 8px; background: var(--accent-color); color: #fff; border: none; cursor: pointer; font-size: 14px; }
+        /* 全屏閱讀器 */
+        #reader-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-body); z-index: 5000; display: none; flex-direction: column; }
+        .reader-header { padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+        #reader-frame { flex: 1; border: none; width: 100%; }
+
+        /* 模態框與公告樣式保持... */
+        .half-modal-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 4000; display: none; }
+        .half-modal-container.show { display: block; }
+        .modal-btn-group { display: flex; gap: 10px; padding: 15px; background: var(--bg-container); }
     </style>
 </head>
 <body>
 
     <div id="app-container">
-        <header class="app-header" id="appHeader">
+        <header class="app-header">
             <div class="line-music-player" id="miniPlayer">
                 <i class="fa-solid fa-music" style="color: var(--accent-color); margin-right: 8px;"></i>
-                <div class="music-title-scroll" id="playerText">點擊播放推薦音樂...</div>
-                <i class="fa-solid fa-play" style="font-size: 12px; margin-left: 8px; color: var(--text-sub);"></i>
+                <div class="music-title-scroll">自動抓取：今日熱門新聞...</div>
             </div>
             <div class="header-icons">
                 <button class="icon-btn" onclick="toggleAnnouncement(true)"><i class="fa-solid fa-scroll"></i><span>公告</span></button>
-                <button class="icon-btn" onclick="toggleKeepModal(true)"><i class="fa-regular fa-bookmark"></i><span>KEEP</span></button>
-                <a href="/settings" class="icon-btn" data-link><i class="fa-solid fa-gear"></i><span>設定</span></a>
             </div>
         </header>
 
-        <section class="search-section" id="searchSection">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="搜尋歌曲、文章、短片...">
-            </div>
-        </section>
-
-        <main id="main-view"></main>
+        <main id="main-view" style="flex:1; overflow-y:auto; padding-bottom:80px;"></main>
 
         <nav class="bottom-nav">
-            <a href="/" class="nav-item active" data-link><i class="fa-solid fa-house"></i><span>首頁</span></a>
-            <a href="/explore" class="nav-item" data-link><i class="fa-solid fa-compass"></i><span>探索</span></a>
-            <a href="/shorts" class="nav-item" data-link><i class="fa-brands fa-youtube"></i><span>Shorts</span></a>
-            <a href="/settings" class="nav-item" data-link><i class="fa-solid fa-gear"></i><span>設定</span></a>
+            <a href="/" class="nav-item active"><i class="fa-solid fa-house"></i><span>首頁</span></a>
+            <a href="/explore" class="nav-item"><i class="fa-solid fa-compass"></i><span>探索</span></a>
+            <a href="https://x-easy.github.io/shorts" class="nav-item"><i class="fa-brands fa-youtube"></i><span>Shorts</span></a>
+            <a href="/settings" class="nav-item"><i class="fa-solid fa-gear"></i><span>設定</span></a>
         </nav>
+    </div>
 
-        <div id="keepModal" class="half-modal-container">
-            <div class="half-modal-content" style="background:var(--bg-card); width:100%; height:75vh; border-radius:20px 20px 0 0; position:absolute; bottom:0; display:flex; flex-direction:column;">
-                <iframe src="https://x-easy.github.io/tools/keep/index.html" style="flex:1; border:none; width:100%;"></iframe>
-                <div style="padding:15px; background:var(--bg-container);"><button style="width:100%; padding:12px; border-radius:8px; background:var(--accent-color); color:#fff; border:none;" onclick="toggleKeepModal(false)">關閉</button></div>
-            </div>
+    <div id="reader-view">
+        <div class="reader-header">
+            <button onclick="closeReader()" style="background:none; border:none; color:#fff; font-size:20px;"><i class="fa-solid fa-chevron-left"></i></button>
+            <span id="reader-source" style="font-size: 14px; font-weight: bold;">新聞閱讀</span>
+            <button onclick="shareReader()" style="background:none; border:none; color:#fff; font-size:18px;"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
         </div>
+        <iframe id="reader-frame" src=""></iframe>
+    </div>
 
-        <div id="announcementModal" class="half-modal-container">
-            <div class="half-modal-content" style="background:var(--bg-card); width:100%; height:85vh; border-radius:20px 20px 0 0; position:absolute; bottom:0; display:flex; flex-direction:column; overflow:hidden;">
-                <div style="padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: bold;">系統公告與入口</div>
-                <iframe src="https://x-easy.github.io/" style="flex:1; border:none; width:100%;"></iframe>
-                <div class="modal-btn-group">
-                    <button class="btn-secondary" onclick="window.open('https://x-easy.github.io/', '_blank')">返回公告原頁面</button>
-                    <button class="btn-primary" onclick="toggleAnnouncement(false)">關閉視窗</button>
-                </div>
+    <div id="announcementModal" class="half-modal-container">
+        <div style="background:var(--bg-card); width:100%; height:85vh; border-radius:20px 20px 0 0; position:absolute; bottom:0; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="padding: 15px; text-align: center; border-bottom: 1px solid var(--border-color); font-weight: bold;">系統公告</div>
+            <iframe src="https://x-easy.github.io/" style="flex:1; border:none; width:100%;"></iframe>
+            <div class="modal-btn-group">
+                <button style="flex:1; padding:12px; background:var(--bg-input); color:#fff; border-radius:8px; border:none;" onclick="window.open('https://x-easy.github.io/', '_blank')">返回原頁</button>
+                <button style="flex:1; padding:12px; background:var(--accent-color); color:#fff; border-radius:8px; border:none;" onclick="toggleAnnouncement(false)">關閉</button>
             </div>
         </div>
     </div>
 
     <script>
-        const shortcutLibrary = [
-            { id: "rank", name: "排行榜", icon: "fa-chart-line", route: "/rank" },
-            { id: "new", name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
-            { id: "podcast", name: "Podcast", icon: "fa-microphone", route: "/podcast" },
-            { id: "collection", name: "收藏", icon: "fa-bookmark", route: "/collection" },
-            { id: "fav", name: "最愛", icon: "fa-heart", route: "/fav" }
+        // RSS 新聞源 (這些是 LINE TODAY 常見的新聞供應商)
+        const RSS_SOURCES = [
+            "https://feeds.feedburner.com/ettoday/realtime", // ETtoday
+            "https://news.google.com/rss?hl=zh-TW&gl=TW&ceid=TW:zh-Hant" // Google 新聞
         ];
 
-        let userShortcuts = JSON.parse(localStorage.getItem('user_shortcuts')) || ["rank", "new", "podcast", "collection", "fav"];
+        async function fetchNews() {
+            const mainView = document.getElementById('main-view');
+            // 隨機選一個新聞源抓取
+            const selectedRSS = RSS_SOURCES[Math.floor(Math.random() * RSS_SOURCES.length)];
+            const API_URL = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(selectedRSS)}`;
 
-        const db = {
-            // 新增：精選文章資料
-            featured: [
-                { id: 1, title: "2026 莫比音樂精選歌單", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500" },
-                { id: 2, title: "莫比空間 APP 開發進度更新", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500" }
-            ],
-            articles: [{ id: 1, title: "如何選擇你的第一把吉他？", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" }]
-        };
-
-        const routes = { '/': renderHome, '/explore': renderExplore, '/shorts': renderShorts, '/settings': renderSettings };
-
-        async function router() {
-            const path = window.location.pathname;
-            document.getElementById('appHeader').style.display = (path === '/shorts') ? 'none' : 'flex';
-            document.getElementById('searchSection').style.display = (path === '/shorts') ? 'none' : 'block';
-            document.getElementById('main-view').innerHTML = await (routes[path] || routes['/'])();
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('href') === path));
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                if (data.status === 'ok') {
+                    renderHome(data.items);
+                }
+            } catch (err) {
+                mainView.innerHTML = `<div style="padding:50px; text-align:center; color:gray;">新聞加載失敗，請檢查網路。</div>`;
+            }
         }
 
-        // --- 修正後的首頁渲染邏輯 ---
-        function renderHome() {
-            // 1. 精選輪播 HTML
+        function renderHome(articles) {
+            const mainView = document.getElementById('main-view');
+            
+            // 1. 精選文章 (取前 2 則)
             const featuredHtml = `<section class="featured-carousel">
-                ${db.featured.map(f => `
-                    <div class="featured-card" style="background-image: url('${f.img}')">
-                        <div class="featured-overlay"><h4>${f.title}</h4></div>
+                ${articles.slice(0, 3).map(a => `
+                    <div class="featured-card" style="background-image: url('${a.thumbnail || 'https://images.unsplash.com/photo-1504711432869-efd597cdd042?w=500'}')" onclick="openReader('${a.link}', '${a.author}')">
+                        <div class="featured-overlay"><h4>${a.title}</h4></div>
                     </div>
                 `).join('')}
             </section>`;
 
-            // 2. 快捷鍵 HTML
-            const activeShortcuts = shortcutLibrary.filter(s => userShortcuts.includes(s.id));
-            const shortcutsHtml = `<section class="shortcut-grid">
-                ${activeShortcuts.map(b => `
-                    <a href="${b.route}" class="shortcut-item" data-link>
-                        <div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div>
-                        <span>${b.name}</span>
-                    </a>`).join('')}
-            </section>`;
+            // 2. 文章列表 (其餘新聞)
+            const listHtml = articles.slice(3).map(a => `
+                <div class="article-item" onclick="openReader('${a.link}', '${a.author || '莫比新聞'}')">
+                    <img src="${a.thumbnail || 'https://via.placeholder.com/150/222222/ffffff?text=Mobispace'}" class="article-img">
+                    <div class="article-content">
+                        <div class="article-title">${a.title}</div>
+                        <div class="article-meta">
+                            <span>${a.author || '焦點新聞'}</span>
+                            <span>${new Date(a.pubDate).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
 
-            // 3. 文章列表 HTML
-            const articlesHtml = `<section style="padding:0 15px;">
-                ${db.articles.map(i => `
-                    <div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid var(--border-color);">
-                        <img src="${i.img}" style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
-                        <div><h4 style="margin-bottom:5px;">${i.title}</h4><small style="color:var(--text-sub);">${i.date}</small></div>
-                    </div>`).join('')}
-            </section>`;
-
-            return featuredHtml + shortcutsHtml + articlesHtml;
+            mainView.innerHTML = featuredHtml + listHtml;
         }
 
-        // 功能函式
-        function toggleKeepModal(show) { document.getElementById('keepModal').classList.toggle('show', show); }
-        function toggleAnnouncement(show) { document.getElementById('announcementModal').classList.toggle('show', show); }
-        function renderSettings() { return `<div style="padding:20px;"><h2>設定</h2></div>`; }
-        function renderShorts() { return `<div style="height:100vh; background:#000;"></div>`; }
-        function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2></div>`; }
+        // 閱讀器功能
+        let currentUrl = "";
+        function openReader(url, source) {
+            currentUrl = url;
+            document.getElementById('reader-view').style.display = 'flex';
+            document.getElementById('reader-frame').src = url;
+            document.getElementById('reader-source').innerText = source;
+        }
 
-        const navigateTo = url => { history.pushState(null, null, url); router(); };
-        window.addEventListener('popstate', router);
-        document.addEventListener('DOMContentLoaded', () => {
-            router();
-            document.body.addEventListener('click', e => {
-                const link = e.target.closest('[data-link]');
-                if (link) { e.preventDefault(); navigateTo(link.getAttribute('href')); }
-            });
-        });
+        function closeReader() {
+            document.getElementById('reader-view').style.display = 'none';
+            document.getElementById('reader-frame').src = "";
+        }
+
+        function shareReader() {
+            if (navigator.share) {
+                navigator.share({ title: '分享新聞', url: currentUrl });
+            }
+        }
+
+        function toggleAnnouncement(show) {
+            document.getElementById('announcementModal').classList.toggle('show', show);
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', fetchNews);
     </script>
 </body>
 </html>
