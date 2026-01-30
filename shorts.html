@@ -2,51 +2,110 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>莫比空間 | Shorts 旗艦版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>莫比空間 | Shorts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* (保留之前的 CSS 樣式) */
-        :root { --yt-red: #ff0000; --overlay-bg: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%); --icon-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: #000; color: #fff; font-family: "Roboto", Arial, sans-serif; overflow: hidden; }
-        .shorts-wrapper { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+        :root { --icon-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+
+        html, body {
+            height: 100%; width: 100%; margin: 0; padding: 0;
+            overflow: hidden; background-color: #000;
+            position: fixed; font-family: -apple-system, sans-serif;
+        }
+
+        /* 核心磁吸容器 */
+        .shorts-wrapper {
+            height: 100dvh; width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
         .shorts-wrapper::-webkit-scrollbar { display: none; }
-        .short-card { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background-color: #000; display: flex; align-items: center; justify-content: center; }
+
+        .short-card {
+            height: 100dvh; width: 100vw;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            position: relative;
+            background-color: #000;
+        }
+
         video { width: 100%; height: 100%; object-fit: cover; }
-        .side-bar { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 20px; z-index: 10; }
-        .action-item { display: flex; flex-direction: column; align-items: center; text-shadow: var(--icon-shadow); }
-        .action-item i { font-size: 28px; margin-bottom: 5px; }
-        .action-item span { font-size: 12px; font-weight: 500; }
-        .avatar-btn img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #fff; }
-        .bottom-info { position: absolute; bottom: 30px; left: 15px; right: 75px; z-index: 10; }
-        .channel-info { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .channel-name { font-weight: bold; font-size: 16px; }
-        .subscribe-btn { background: #fff; color: #000; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; border: none; }
-        .video-desc { font-size: 14px; margin-bottom: 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); line-height: 1.4; }
-        .music-tag { display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* 右側操作欄 */
+        .side-bar {
+            position: absolute; right: 12px; bottom: 100px;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 25px; z-index: 10;
+        }
+
+        .action-item {
+            display: flex; flex-direction: column; align-items: center;
+            text-shadow: var(--icon-shadow); cursor: pointer;
+        }
+        .action-item i { font-size: 28px; }
+        .action-item span { font-size: 11px; margin-top: 5px; font-weight: 500; }
+
+        /* Logo 圓圈 */
+        .avatar-btn {
+            width: 48px; height: 48px;
+            border-radius: 50%; border: 2px solid #fff;
+            overflow: hidden; cursor: pointer;
+            box-shadow: var(--icon-shadow);
+        }
+        .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* 底部資訊 */
+        .bottom-info {
+            position: absolute; bottom: 40px; left: 15px; right: 80px;
+            z-index: 10; pointer-events: none;
+        }
+        .bottom-info > * { pointer-events: auto; }
+
+        .channel-info { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .channel-name { font-weight: bold; font-size: 16px; text-shadow: var(--icon-shadow); }
+
+        .video-desc {
+            font-size: 14px; margin-bottom: 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,1);
+            line-height: 1.4; opacity: 0.9;
+        }
+
+        .music-tag { display: flex; align-items: center; gap: 8px; font-size: 13px; }
         .music-tag i { animation: rotate 4s linear infinite; }
+
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .top-nav { position: fixed; top: 15px; left: 15px; z-index: 20; display: flex; gap: 20px; font-size: 18px; font-weight: bold; }
-        .top-nav span { opacity: 0.6; }
-        .top-nav span.active { opacity: 1; border-bottom: 2px solid #fff; }
-        .back-btn { position: fixed; top: 15px; right: 15px; z-index: 20; font-size: 24px; color: #fff; }
-        @keyframes heartFade { 0% { transform: translate(-50%,-50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%,-50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(1.5); opacity: 0; } }
+
+        /* 頂部導航 (僅保留 為您推薦) */
+        .top-nav {
+            position: fixed; top: env(safe-area-inset-top, 20px); left: 15px;
+            z-index: 20; font-size: 18px; font-weight: bold;
+        }
+        .top-nav span { border-bottom: 2px solid #fff; padding-bottom: 4px; }
+
+        /* 返回按鈕 */
+        .back-btn {
+            position: fixed; top: env(safe-area-inset-top, 20px); right: 15px;
+            z-index: 20; font-size: 24px; color: #fff; text-decoration: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <span>訂閱中</span>
-        <span class="active">為您推薦</span>
+        <span>為您推薦</span>
     </div>
 
-    <div class="back-btn"><i class="fa-solid fa-xmark"></i></div>
+    <a href="https://x-easy.github.io/blog/" class="back-btn">
+        <i class="fa-solid fa-xmark"></i>
+    </a>
 
     <div class="shorts-wrapper" id="shortsWrapper"></div>
 
     <script>
-        // 影片網址清單
         const videoSources = [
             "https://files.catbox.moe/xh7uyj.mp4", "https://files.catbox.moe/u94tk7.mp4",
             "https://files.catbox.moe/aizh9p.mp4", "https://files.catbox.moe/t9ojp9.mp4",
@@ -59,48 +118,80 @@
             "https://files.catbox.moe/kmgu5w.mp4", "https://files.catbox.moe/dwtlj4.mp4"
         ];
 
-        // 標籤引擎設定
-        const constantTags = "莫比空間Ⓒ 莫比音樂頻道🎵 Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ™️ ÐJ-Ⲙⳝ🎧 Mobi-Music-channel 熱門歌曲 熱播音樂 音樂排行 精選歌曲";
+        const constantTags = "莫比空間Ⓒ 莫比音樂頻道🎵 Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ™️ ÐJ-Ⲙⳝ🎧 Mobi-Music-channel 熱門歌曲";
         const randomOptions = ["Mix", "ReMix", "抒情", "華語流行", "中文電音", "DJ舞曲"];
 
         const wrapper = document.getElementById('shortsWrapper');
+        let isMuted = true; // 預設靜音以符合瀏覽器政策
 
+        // 2. 生成影片卡片
         videoSources.forEach((src, index) => {
-            // 隨機選擇一個標籤
             const randomTag = randomOptions[Math.floor(Math.random() * randomOptions.length)];
-            
             const card = document.createElement('div');
             card.className = 'short-card';
             card.innerHTML = `
-                <video loop preload="metadata" playsinline>
+                <video loop preload="metadata" playsinline muted>
                     <source src="${src}" type="video/mp4">
                 </video>
                 <div class="side-bar">
-                    <div class="action-item"><i class="fa-solid fa-thumbs-up"></i><span>${(Math.random()*20).toFixed(1)}K</span></div>
-                    <div class="action-item"><i class="fa-solid fa-comment"></i><span>${Math.floor(Math.random()*999)}</span></div>
-                    <div class="action-item"><i class="fa-solid fa-share"></i><span>分享</span></div>
-                    <div class="avatar-btn"><img src="https://x-easy.github.io/medias/莫比音樂Logo.jpeg"></div>
+                    <div class="action-item mute-btn" onclick="toggleMute(event)">
+                        <i class="fa-solid fa-volume-xmark"></i>
+                        <span>音量</span>
+                    </div>
+                    <div class="action-item" onclick="shareVideo(event, '${src}')">
+                        <i class="fa-solid fa-share"></i>
+                        <span>分享</span>
+                    </div>
+                    <div class="avatar-btn" onclick="location.href='https://x-easy.github.io/blog/'">
+                        <img src="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+                    </div>
                 </div>
                 <div class="bottom-info">
                     <div class="channel-info">
                         <span class="channel-name">@Mobispace_Music</span>
-                        <button class="subscribe-btn">訂閱</button>
                     </div>
                     <div class="video-desc">
-                        ${constantTags}<br>
-                        <span style="color: #FFD700;">#${randomTag}</span> 系列影音 #${index + 1}
+                        ${constantTags} <span style="color: #FFD700;">#${randomTag}</span>
                     </div>
                     <div class="music-tag">
-                        <i class="fa-solid fa-music"></i> 
-                        ${randomTag} - 莫比空間原創頻道
+                        <i class="fa-solid fa-music"></i> 原聲 - 莫比空間頻道
                     </div>
                 </div>
             `;
             wrapper.appendChild(card);
         });
 
-        // 智慧播放控制
-        const videos = document.querySelectorAll('video');
+        // 3. 靜音切換功能
+        function toggleMute(e) {
+            e.stopPropagation();
+            isMuted = !isMuted;
+            const allVideos = document.querySelectorAll('video');
+            const allMuteIcons = document.querySelectorAll('.mute-btn i');
+            
+            allVideos.forEach(v => v.muted = isMuted);
+            allMuteIcons.forEach(icon => {
+                icon.className = isMuted ? 'fa-solid fa-volume-xmark' : 'fa-solid fa-volume-high';
+            });
+        }
+
+        // 4. iOS 原生分享功能
+        async function shareVideo(e, url) {
+            e.stopPropagation();
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: '莫比空間 Shorts',
+                        text: '來看看莫比空間精彩短影音！',
+                        url: window.location.href // 分享當前網頁連結
+                    });
+                } catch (err) { console.log('分享取消'); }
+            } else {
+                alert('您的瀏覽器不支援原生分享，已為您複製連結。');
+                navigator.clipboard.writeText(window.location.href);
+            }
+        }
+
+        // 5. 智慧播放邏輯
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 const v = entry.target;
@@ -113,18 +204,13 @@
             });
         }, { root: wrapper, threshold: 0.6 });
 
-        videos.forEach(v => observer.observe(v));
+        document.querySelectorAll('video').forEach(v => observer.observe(v));
 
-        // 交互：點擊暫停/播放，雙擊愛心
+        // 點擊畫面暫停/播放
         document.querySelectorAll('.short-card').forEach(card => {
-            const v = card.querySelector('video');
-            card.addEventListener('click', () => v.paused ? v.play() : v.pause());
-            card.addEventListener('dblclick', (e) => {
-                const heart = document.createElement('i');
-                heart.className = 'fa-solid fa-heart';
-                heart.style.cssText = `position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:100px; color:rgba(255,255,255,0.9); z-index:100; pointer-events:none; animation: heartFade 0.8s ease-out forwards;`;
-                card.appendChild(heart);
-                setTimeout(() => heart.remove(), 800);
+            card.addEventListener('click', () => {
+                const v = card.querySelector('video');
+                v.paused ? v.play() : v.pause();
             });
         });
     </script>
