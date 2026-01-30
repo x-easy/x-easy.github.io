@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Apple Music Pro Full Suite</title>
+    <title>My Personal Apple Music</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -11,61 +11,67 @@
             --am-text-muted: #8e8e93; --am-border: rgba(255, 255, 255, 0.1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--am-bg); color: white; font-family: -apple-system, system-ui; overflow-x: hidden; }
+        body { background: var(--am-bg); color: white; font-family: -apple-system, system-ui, sans-serif; overflow-x: hidden; }
 
-        /* --- 主頁內容 --- */
-        .main-content { padding-bottom: 80px; transition: transform 0.4s ease; }
-        .main-content.scaled { transform: scale(0.92); border-radius: 20px; overflow: hidden; }
+        /* 主頁內容 */
+        .main-content { padding-bottom: 120px; transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1); background: var(--am-bg); min-height: 100vh; }
+        .main-content.scaled { transform: scale(0.92); border-radius: 20px; filter: brightness(0.5); }
 
-        header { padding: 15px 20px; }
-        .search-container { background: #2c2c2e; border-radius: 10px; padding: 10px; color: var(--am-text-muted); margin-bottom: 15px; }
-        .tag-slider { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 10px; scrollbar-width: none; }
-        .tag { background: #2c2c2e; padding: 6px 16px; border-radius: 20px; font-size: 14px; color: var(--am-red); white-space: nowrap; }
+        header { padding: 40px 20px 10px; }
+        .search-container { background: #1c1c1e; border-radius: 10px; padding: 10px; color: var(--am-text-muted); margin-bottom: 15px; }
+        .tag-slider { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 20px; scrollbar-width: none; border-bottom: 1px solid var(--am-border); }
+        .tag-slider::-webkit-scrollbar { display: none; }
+        .tag { background: #1c1c1e; padding: 6px 16px; border-radius: 20px; font-size: 14px; color: var(--am-red); white-space: nowrap; font-weight: 500; }
 
-        .song-item { display: flex; align-items: center; padding: 10px 20px; border-bottom: 1px solid var(--am-border); }
-        .song-cover { width: 50px; height: 50px; border-radius: 6px; margin-right: 15px; }
+        /* 歌曲列表 */
+        .section-title { padding: 20px 20px 10px; font-size: 22px; font-weight: bold; }
+        .song-list-container { display: flex; overflow-x: auto; padding: 0 20px; gap: 20px; scrollbar-width: none; }
+        .song-list-container::-webkit-scrollbar { display: none; }
+        .song-column { min-width: 88vw; }
+        .song-item { display: flex; align-items: center; padding: 10px 0; border-bottom: 0.5px solid var(--am-border); cursor: pointer; }
+        .song-cover { width: 48px; height: 48px; border-radius: 6px; margin-right: 15px; background: #333; }
+        .song-info { flex: 1; }
+        .song-info .title { font-size: 16px; font-weight: 500; margin-bottom: 2px; }
+        .song-info .artist { font-size: 13px; color: var(--am-text-muted); }
 
-        /* --- 核心：雙模態播放器 --- */
+        /* 播放器容器 */
         .player-wrapper {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: 100vh; z-index: 1000;
-            transform: translateY(calc(100% - 70px)); /* 預設只露出 70px 的迷你列 */
-            transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 100vh; z-index: 1000;
+            transform: translateY(calc(100% - 70px)); 
+            transition: transform 0.6s cubic-bezier(0.32, 0.72, 0, 1);
         }
         .player-wrapper.expanded { transform: translateY(0); }
 
-        /* 迷你模式 (Mini Player) */
+        /* 迷你播放器 */
         .mini-player {
-            height: 70px; background: rgba(30, 30, 30, 0.95);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            display: flex; align-items: center; padding: 0 20px;
-            border-top: 1px solid var(--am-border); cursor: pointer;
+            height: 70px; background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            display: flex; align-items: center; padding: 0 20px; border-top: 0.5px solid var(--am-border);
         }
 
-        /* 展開模式 (Full Player) */
+        /* 展開播放器 */
         .full-player {
-            height: calc(100% - 70px); background: #1c1c1e;
-            display: flex; flex-direction: column; align-items: center;
-            padding: 20px 30px; opacity: 0; transition: opacity 0.3s;
+            height: calc(100% - 70px); background: #1c1c1e; display: flex; flex-direction: column; align-items: center;
+            padding: 20px 30px; opacity: 0; transition: opacity 0.4s;
         }
         .player-wrapper.expanded .full-player { opacity: 1; }
-
-        .drag-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-bottom: 40px; }
-        .full-cover { width: 85%; aspect-ratio: 1/1; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 40px; }
+        .drag-handle { width: 36px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-bottom: 50px; cursor: pointer; }
+        .full-cover { width: 100%; aspect-ratio: 1/1; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 40px; object-fit: cover; }
         
-        .full-info { width: 100%; text-align: left; margin-bottom: 30px; }
-        .full-info h2 { font-size: 24px; margin-bottom: 5px; }
-        .full-info p { color: var(--am-red); font-size: 18px; }
+        .full-info { width: 100%; text-align: left; }
+        .full-info h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        .full-info p { color: var(--am-red); font-size: 18px; margin-bottom: 30px; }
 
-        .controls-big { display: flex; width: 100%; justify-content: space-around; align-items: center; margin-top: 40px; font-size: 35px; }
-        .play-btn-big { width: 80px; height: 80px; background: white; color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
-
-        /* 進度條 */
-        .progress-container { width: 100%; margin-top: 20px; }
-        .progress-bar { width: 100%; height: 4px; background: #3a3a3c; border-radius: 2px; }
+        /* 控制區域 */
+        .slider-container { width: 100%; margin-bottom: 40px; }
+        .slider { -webkit-appearance: none; width: 100%; height: 4px; background: #3a3a3c; border-radius: 2px; outline: none; }
+        .slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: white; border-radius: 50%; }
+        .controls-big { display: flex; width: 100%; justify-content: space-around; align-items: center; font-size: 38px; }
+        .play-btn-big { width: 75px; height: 75px; background: white; color: black; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; }
     </style>
 </head>
 <body>
+
+    <audio id="audioPlayer"></audio>
 
     <div class="main-content" id="mainContent">
         <header>
@@ -73,89 +79,144 @@
             <div class="search-container"><i class="fa-solid fa-magnifying-glass"></i> 搜尋音樂...</div>
         </header>
         <div class="tag-slider">
-            <div class="tag">熱門</div><div class="tag">最新</div><div class="tag">放鬆</div><div class="tag">聚會</div>
+            <div class="tag">我的收藏</div><div class="tag">最新發行</div><div class="tag">熱門標籤</div><div class="tag">Chill</div>
         </div>
         
-        <div id="songList">
-            </div>
+        <div class="section-title">我的清單</div>
+        <div class="song-list-container" id="songList"></div>
     </div>
 
     <div class="player-wrapper" id="playerWrapper">
-        
-        <div class="mini-player" onclick="togglePlayer(true)">
-            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/93/29/9193297a-9762-d4b3-5777-628628929c21/cover.jpg/100x100bb.jpg" class="song-cover" style="width: 45px; height: 45px;">
-            <div style="flex: 1;">
-                <div style="font-size: 15px; font-weight: 600;">無底洞 (Live)</div>
+        <div class="mini-player" onclick="expandPlayer()">
+            <img id="miniCover" src="https://via.placeholder.com/150" class="song-cover" style="width: 44px; height: 44px;">
+            <div style="flex: 1; overflow: hidden;">
+                <div id="miniTitle" style="font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">請選擇歌曲</div>
             </div>
-            <div style="display: flex; gap: 20px; font-size: 20px;">
-                <i class="fa-solid fa-play"></i>
-                <i class="fa-solid fa-forward"></i>
+            <div style="display: flex; gap: 20px; font-size: 22px; padding-left: 10px;">
+                <i class="fa-solid fa-play" id="miniPlayBtn" onclick="togglePlay(event)"></i>
+                <i class="fa-solid fa-forward" onclick="nextSong(event)"></i>
             </div>
         </div>
 
         <div class="full-player">
-            <div class="drag-handle" onclick="togglePlayer(false)"></div>
-            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/91/93/29/9193297a-9762-d4b3-5777-628628929c21/cover.jpg/600x600bb.jpg" class="full-cover">
-            
+            <div class="drag-handle" onclick="shrinkPlayer()"></div>
+            <img id="fullCover" src="https://via.placeholder.com/600" class="full-cover">
             <div class="full-info">
-                <h2>無底洞 (Live)</h2>
-                <p>蔡健雅</p>
+                <h2 id="fullTitle">歌曲名稱</h2>
+                <p id="fullArtist">歌手名稱</p>
             </div>
-
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8e8e93; margin-top: 8px;">
-                    <span>1:24</span><span>4:03</span>
+            <div class="slider-container">
+                <input type="range" class="slider" id="progressSlider" value="0">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8e8e93; margin-top: 10px;">
+                    <span id="curTime">0:00</span><span id="durTime">0:00</span>
                 </div>
             </div>
-
             <div class="controls-big">
-                <i class="fa-solid fa-backward-step"></i>
-                <div class="play-btn-big"><i class="fa-solid fa-play"></i></div>
-                <i class="fa-solid fa-forward-step"></i>
+                <i class="fa-solid fa-backward-step" onclick="prevSong()"></i>
+                <div class="play-btn-big" onclick="togglePlay()"><i class="fa-solid fa-play" id="fullPlayBtn"></i></div>
+                <i class="fa-solid fa-forward-step" onclick="nextSong()"></i>
             </div>
         </div>
     </div>
 
     <script>
-        const playerWrapper = document.getElementById('playerWrapper');
-        const mainContent = document.getElementById('mainContent');
+        // 1. 音樂資料庫
+        const SONG_DATA = [
+            "https://files.catbox.moe/ocebsa.mp3", "https://files.catbox.moe/lo1exa.m4a", "https://files.catbox.moe/w3qgjo.mp3",
+            "https://files.catbox.moe/zr3ha8.mp3", "https://files.catbox.moe/m49x71.mp3", "https://files.catbox.moe/udcdl5.mp3",
+            "https://files.catbox.moe/fmrgqt.mp3", "https://files.catbox.moe/ggdjqe.mp3", "https://files.catbox.moe/gbkrop.mp3",
+            "https://files.catbox.moe/05adiw.mp3", "https://files.catbox.moe/t61rjo.mp3", "https://files.catbox.moe/s6662l.mp3",
+            "https://files.catbox.moe/j3foo2.mp3", "https://files.catbox.moe/z1qb3p.mp3", "https://files.catbox.moe/q9649k.mp3",
+            "https://files.catbox.moe/wxwvg9.mp3", "https://files.catbox.moe/oef4qx.mp3", "https://files.catbox.moe/vvzr52.mp3",
+            "https://files.catbox.moe/nhi6n5.mp3", "https://files.catbox.moe/ynz008.mp3", "https://files.catbox.moe/944tyc.mp3",
+            "https://files.catbox.moe/mnj40z.mp3", "https://files.catbox.moe/yk9kad.mp3", "https://files.catbox.moe/hhc57r.m4a",
+            "https://files.catbox.moe/w7rs9n.mp3"
+        ].map((url, i) => ({
+            id: i,
+            title: `My Track ${i + 1}`,
+            artist: "Cloud Library",
+            cover: `https://picsum.photos/seed/${i+50}/400/400`, // 自動隨機生成好看的封面
+            url: url
+        }));
 
-        // 切換展開/縮小
-        function togglePlayer(expand) {
-            if (expand) {
-                playerWrapper.classList.add('expanded');
-                mainContent.classList.add('scaled'); // 背景主頁縮小，營造層次感
-            } else {
-                playerWrapper.classList.remove('expanded');
-                mainContent.classList.remove('scaled');
-            }
-        }
+        const audio = document.getElementById('audioPlayer');
+        let currentIdx = 0;
 
-        // 模擬生成一些歌曲
+        // 渲染列表
         const songList = document.getElementById('songList');
-        for(let i=0; i<10; i++) {
-            songList.innerHTML += `
-                <div class="song-item">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/2e/7d/50/2e7d5073-6771-419b-a311-667232252750/cover.jpg/100x100bb.jpg" class="song-cover">
-                    <div style="flex:1">
-                        <div style="font-weight:600">測試歌曲 ${i+1}</div>
-                        <div style="color:#8e8e93; font-size:14px">歌手名稱</div>
-                    </div>
-                    <i class="fa-solid fa-ellipsis" style="color:var(--am-red)"></i>
-                </div>
-            `;
+        function render() {
+            let html = '<div class="song-column">';
+            SONG_DATA.forEach((s, i) => {
+                if(i > 0 && i % 4 === 0) html += '</div><div class="song-column">';
+                html += `
+                    <div class="song-item" onclick="loadSong(${i})">
+                        <img src="${s.cover}" class="song-cover">
+                        <div class="song-info">
+                            <div class="title">${s.title}</div>
+                            <div class="artist">${s.artist}</div>
+                        </div>
+                    </div>`;
+            });
+            songList.innerHTML = html + '</div>';
         }
 
-        // 支援手勢滑動縮小 (簡單實作)
-        let startY = 0;
-        playerWrapper.addEventListener('touchstart', e => startY = e.touches[0].clientY);
-        playerWrapper.addEventListener('touchmove', e => {
-            let moveY = e.touches[0].clientY;
-            if (moveY - startY > 100 && playerWrapper.classList.contains('expanded')) {
-                togglePlayer(false);
-            }
-        });
+        function loadSong(i) {
+            currentIdx = i;
+            const s = SONG_DATA[i];
+            audio.src = s.url;
+            document.getElementById('miniTitle').textContent = s.title;
+            document.getElementById('fullTitle').textContent = s.title;
+            document.getElementById('fullArtist').textContent = s.artist;
+            document.getElementById('miniCover').src = s.cover;
+            document.getElementById('fullCover').src = s.cover;
+            audio.play();
+            updatePlayIcons(true);
+        }
+
+        function togglePlay(e) {
+            if(e) e.stopPropagation();
+            if(audio.paused) { audio.play(); updatePlayIcons(true); }
+            else { audio.pause(); updatePlayIcons(false); }
+        }
+
+        function updatePlayIcons(playing) {
+            const icon = playing ? 'fa-pause' : 'fa-play';
+            document.getElementById('miniPlayBtn').className = `fa-solid ${icon}`;
+            document.getElementById('fullPlayBtn').className = `fa-solid ${icon}`;
+        }
+
+        function nextSong(e) { if(e) e.stopPropagation(); currentIdx = (currentIdx + 1) % SONG_DATA.length; loadSong(currentIdx); }
+        function prevSong() { currentIdx = (currentIdx - 1 + SONG_DATA.length) % SONG_DATA.length; loadSong(currentIdx); }
+
+        // 介面展開邏輯
+        function expandPlayer() { 
+            document.getElementById('playerWrapper').classList.add('expanded');
+            document.getElementById('mainContent').classList.add('scaled');
+        }
+        function shrinkPlayer() { 
+            document.getElementById('playerWrapper').classList.remove('expanded');
+            document.getElementById('mainContent').classList.remove('scaled');
+        }
+
+        // 進度條控制
+        audio.ontimeupdate = () => {
+            const p = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progressSlider').value = p || 0;
+            document.getElementById('curTime').textContent = formatTime(audio.currentTime);
+            document.getElementById('durTime').textContent = formatTime(audio.duration);
+        };
+        document.getElementById('progressSlider').oninput = (e) => {
+            audio.currentTime = (e.target.value / 100) * audio.duration;
+        };
+        function formatTime(s) {
+            if(!s) return "0:00";
+            let m = Math.floor(s/60); let sec = Math.floor(s%60);
+            return `${m}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        render();
+        loadSong(0); // 預載入第一首
+        audio.pause(); // 預設不要一進網頁就吵人
     </script>
 </body>
 </html>
