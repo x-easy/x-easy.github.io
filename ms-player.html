@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Personal Apple Music</title>
+    <script src="data.js"></script>
+<script>
+  // 自動套用設定頁儲存的字體與模式
+  (function applyGlobalSettings() {
+      const theme = localStorage.getItem('mobi_theme');
+      const font = localStorage.getItem('mobi_font');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      if (font) document.documentElement.style.fontSize = font + 'px';
+  })();
+</script>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
