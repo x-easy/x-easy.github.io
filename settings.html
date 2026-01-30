@@ -2,159 +2,212 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>設定中心｜莫比空間</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>管理後台 | 莫比空間</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 :root {
-  --bg:#f6f7f9;
-  --card:#fff;
-  --text:#222;
-  --border:#ddd;
-  --primary:#0984e3;
+  --bg-body: #000000; --bg-card: #111111; --text-main: #ffffff;
+  --text-sub: #aaaaaa; --accent-color: #06c755; --border: #333333;
 }
+
+/* 全域樣式 - 支援光暗切換與字體大小 */
 body {
-  font-family: system-ui;
-  background: var(--bg);
-  color: var(--text);
-  margin: 0;
-  padding: 20px;
+  font-family: -apple-system, system-ui;
+  background: var(--bg-body); color: var(--text-main);
+  margin: 0; padding: 20px 15px 100px;
+  transition: all 0.3s ease;
+  font-size: 16px; /* 預設 */
 }
-.container {
-  max-width: 900px;
-  margin: auto;
-}
+
+.container { max-width: 500px; margin: auto; }
 .card {
-  background: var(--card);
-  padding: 20px;
-  border-radius: 14px;
-  margin-bottom: 20px;
+  background: var(--bg-card); padding: 20px;
+  border-radius: 18px; margin-bottom: 20px;
   border: 1px solid var(--border);
 }
-h2 { margin-top: 0; }
-label { display:block; margin: 8px 0; }
-input, textarea, select, button {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+
+h2 { font-size: 18px; margin-bottom: 15px; color: var(--accent-color); display: flex; align-items: center; gap: 10px; }
+label { display: block; margin: 12px 0 6px; font-size: 14px; color: var(--text-sub); }
+
+input, textarea, select {
+  width: 100%; padding: 12px; border-radius: 10px;
+  border: 1px solid var(--border); background: #222; color: #fff;
+  outline: none; font-size: 14px;
 }
+
 button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  cursor: pointer;
+  width: 100%; padding: 14px; border-radius: 12px;
+  background: var(--accent-color); color: white;
+  border: none; cursor: pointer; font-weight: bold; margin-top: 15px;
 }
-.row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.danger-btn { background: #ff3b30; margin-top: 10px; }
+
+/* 黑色區塊用於顯示生成的代碼 */
+#output-box {
+  background: #000; color: #00ff00; font-family: monospace;
+  padding: 15px; border-radius: 10px; border: 1px solid #00ff00;
+  white-space: pre-wrap; word-break: break-all; font-size: 12px; margin-top: 10px;
+  max-height: 200px; overflow-y: auto; display: none;
+}
+
+/* 底部導覽列樣式 (同步你所有頁面的 UI) */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 70px; background: #111; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+}
+.nav-item {
+  color: #888; text-decoration: none; font-size: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.nav-item.active { color: var(--accent-color); }
+.nav-item i { font-size: 20px; }
 </style>
 </head>
-<body>
+<body id="global-body">
 
 <div class="container">
+  <h1 style="font-size: 24px; margin-bottom: 25px;">⚙️ 莫比全站管理</h1>
 
-  <h1>⚙️ 莫比空間 · 全站設定中心</h1>
-
-  <!-- 公告管理 -->
   <div class="card">
-    <h2>📢 公告後台管理</h2>
-    <label>公告標題</label>
-    <input id="noticeTitle" placeholder="輸入公告標題">
-
-    <label>公告內容</label>
-    <textarea id="noticeContent" rows="4"></textarea>
-
-    <label>公告分類</label>
-    <select id="noticeType">
-      <option>系統</option>
-      <option>維護</option>
-      <option>法律</option>
-      <option>功能</option>
+    <h2><i class="fa-solid fa-palette"></i> 全域顯示設定</h2>
+    
+    <label>光暗模式切換</label>
+    <select id="themeMode" onchange="applySettings()">
+      <option value="dark">深黑極簡 (預設)</option>
+      <option value="light">明亮模式</option>
     </select>
 
-    <button onclick="publishNotice()">發佈公告（全站同步）</button>
+    <label>全站字體大小 (<span id="fs-val">16</span>px)</label>
+    <input type="range" min="12" max="24" value="16" id="fontRange" oninput="applySettings()">
   </div>
 
-  <!-- 顯示設定 -->
   <div class="card">
-    <h2>🎨 外觀設定</h2>
-
-    <label>模式</label>
-    <select id="themeSelect" onchange="saveTheme()">
-      <option value="system">系統預設</option>
-      <option value="light">淺色模式</option>
-      <option value="dark">深色模式</option>
+    <h2><i class="fa-solid fa-cloud-arrow-up"></i> 內容增刪 (Shorts / 音樂)</h2>
+    
+    <label>內容類型</label>
+    <select id="dataType">
+      <option value="shorts">Shorts 影片 (.mp4)</option>
+      <option value="music">音樂播放器 (.mp3)</option>
+      <option value="wiki">支援中心帖文</option>
     </select>
 
-    <label>全站字體大小</label>
-    <input type="range" min="12" max="22" id="fontSize" oninput="saveFont()">
+    <label>標題 / 網址</label>
+    <input type="text" id="dataTitle" placeholder="標題 (音樂/文章需填)">
+    <input type="text" id="dataUrl" placeholder="Catbox 網址 (https://...)">
+
+    <button onclick="generateData()">新增並產生更新代碼</button>
+    
+    <div id="output-box"></div>
+    <button id="copyBtn" style="display:none; background:#444;" onclick="copyCode()">複製代碼並前往 GitHub 更新</button>
   </div>
 
-  <!-- 快捷鍵模組 -->
   <div class="card">
-    <h2>🎛 快捷功能模組</h2>
-    <label><input type="checkbox" id="showShortcuts"> 顯示快捷按鈕</label>
-    <button onclick="saveModules()">儲存模組設定</button>
+    <h2><i class="fa-solid fa-info-circle"></i> 系統狀態</h2>
+    <p style="font-size: 12px; color: var(--text-sub);">
+        目前檔案結構：已偵測到 /blog, /shorts, /ms-player<br>
+        儲存狀態：<span id="save-status">已同步至本地快取</span>
+    </p>
+    <button class="danger-btn" onclick="resetSystem()">重置所有本地設定</button>
   </div>
-
-  <!-- 會員系統 -->
-  <div class="card">
-    <h2>👤 會員系統（前端狀態）</h2>
-    <label>使用者名稱</label>
-    <input id="username">
-
-    <label>會員狀態</label>
-    <select id="role">
-      <option>訪客</option>
-      <option>會員</option>
-      <option>管理員</option>
-    </select>
-
-    <button onclick="saveUser()">儲存會員資料</button>
-  </div>
-
 </div>
 
+<nav class="bottom-nav">
+  <a href="/ms-player.html" class="nav-item"><i class="fa-solid fa-music"></i><span>音樂</span></a>
+  <a href="/shorts.html" class="nav-item"><i class="fa-brands fa-youtube"></i><span>Shorts</span></a>
+  <a href="/blog/" class="nav-item"><i class="fa-solid fa-house"></i><span>主頁</span></a>
+  <a href="/wiki.html" class="nav-item"><i class="fa-solid fa-circle-info"></i><span>支援</span></a>
+  <a href="/settings.html" class="nav-item active"><i class="fa-solid fa-gear"></i><span>設定</span></a>
+</nav>
+
 <script>
-/* ===== 公告發佈 ===== */
-function publishNotice() {
-  const data = {
-    title: noticeTitle.value,
-    content: noticeContent.value,
-    type: noticeType.value,
-    time: new Date().toISOString()
-  };
-  localStorage.setItem("mobispace_notice", JSON.stringify(data));
-  alert("公告已全站同步發佈");
+// 初始化模擬資料庫 (應與你的 data.js 同步)
+let MOBI_DATA = {
+    shorts: [],
+    music: [],
+    wiki: []
+};
+
+// --- 功能：套用與儲存外觀設定 ---
+function applySettings() {
+    const theme = document.getElementById('themeMode').value;
+    const fontSize = document.getElementById('fontRange').value;
+    const body = document.getElementById('global-body');
+
+    // 更新介面數值
+    document.getElementById('fs-val').innerText = fontSize;
+    body.style.fontSize = fontSize + 'px';
+
+    if(theme === 'light') {
+        document.documentElement.style.setProperty('--bg-body', '#ffffff');
+        document.documentElement.style.setProperty('--bg-card', '#f2f2f7');
+        document.documentElement.style.setProperty('--text-main', '#000000');
+        document.documentElement.style.setProperty('--border', '#dddddd');
+    } else {
+        document.documentElement.style.setProperty('--bg-body', '#000000');
+        document.documentElement.style.setProperty('--bg-card', '#111111');
+        document.documentElement.style.setProperty('--text-main', '#ffffff');
+        document.documentElement.style.setProperty('--border', '#333333');
+    }
+
+    // 存入 LocalStorage (全站各頁面需讀取此設定)
+    localStorage.setItem('mobi_theme', theme);
+    localStorage.setItem('mobi_font', fontSize);
 }
 
-/* ===== 主題 ===== */
-function saveTheme() {
-  localStorage.setItem("theme", themeSelect.value);
-}
-function saveFont() {
-  localStorage.setItem("fontSize", fontSize.value);
-}
-function saveModules() {
-  localStorage.setItem("showShortcuts", showShortcuts.checked);
-  alert("模組已更新");
-}
-function saveUser() {
-  localStorage.setItem("user", JSON.stringify({
-    name: username.value,
-    role: role.value
-  }));
-  alert("會員資料已儲存");
+// --- 功能：內容產生器 ---
+function generateData() {
+    const type = document.getElementById('dataType').value;
+    const title = document.getElementById('dataTitle').value;
+    const url = document.getElementById('dataUrl').value;
+
+    if(!url) return alert("請輸入網址！");
+
+    if(type === 'shorts') {
+        MOBI_DATA.shorts.unshift(url);
+    } else if(type === 'music') {
+        MOBI_DATA.music.unshift({ title: title || "未命名歌曲", url: url });
+    } else {
+        MOBI_DATA.wiki.unshift({ title: title, content: "內容預設", date: new Date().toLocaleDateString() });
+    }
+
+    // 顯示產出的 JSON
+    const output = document.getElementById('output-box');
+    const copyBtn = document.getElementById('copyBtn');
+    output.style.display = 'block';
+    copyBtn.style.display = 'block';
+    
+    const code = `const MOBI_DATA = ${JSON.stringify(MOBI_DATA, null, 4)};`;
+    output.innerText = code;
 }
 
-/* 預載設定 */
-(function load(){
-  themeSelect.value = localStorage.getItem("theme") || "system";
-  fontSize.value = localStorage.getItem("fontSize") || 16;
-  showShortcuts.checked = localStorage.getItem("showShortcuts")==="true";
-  const user = JSON.parse(localStorage.getItem("user")||"{}");
-  username.value = user.name || "";
-  role.value = user.role || "訪客";
-})();
+function copyCode() {
+    const text = document.getElementById('output-box').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("代碼已複製！請前往 GitHub 將其貼入 data.js 檔案中。");
+        window.open('https://github.com/', '_blank');
+    });
+}
+
+function resetSystem() {
+    if(confirm("確定要清除所有自訂設定嗎？")) {
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+// --- 初始化加載 ---
+window.onload = () => {
+    const savedTheme = localStorage.getItem('mobi_theme') || 'dark';
+    const savedFont = localStorage.getItem('mobi_font') || '16';
+    
+    document.getElementById('themeMode').value = savedTheme;
+    document.getElementById('fontRange').value = savedFont;
+    applySettings();
+};
 </script>
 
 </body>
