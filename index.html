@@ -3,135 +3,159 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
 <title>網站公告｜莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</title>
-<meta name="description" content="莫比空間官方入口公告頁，整合 Blog、Tools、Shorts、Music、App 等資源入口。" />
 
-<!-- SEO Canonical -->
+<meta name="description" content="莫比空間官方入口公告頁，整合 Blog、Tools、Shorts、Music、App 等資源入口。" />
 <link rel="canonical" href="https://x-easy.github.io/" />
 
-<!-- Favicon & PWA -->
-<link rel="icon" href="/favicon.ico">
-<link rel="manifest" href="/manifest.json">
-
-<!-- Open Graph -->
-<meta property="og:title" content="莫比空間｜官方入口" />
-<meta property="og:description" content="線上工具、Shorts、音樂、教學資源入口。" />
-<meta property="og:url" content="https://x-easy.github.io/" />
-<meta property="og:type" content="website" />
-
-<!-- JSON-LD 結構化資料 -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "莫比空間 Mobispace",
-  "url": "https://x-easy.github.io/",
-  "publisher": {
-    "@type": "Organization",
-    "name": "莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ"
-  }
-}
-</script>
-
 <style>
-/* === 原樣式完全保留 === */
 :root {
   --bg-color: #f4f6f8;
-  --card-bg: #ffffff;
+  --card-bg: rgba(255, 255, 255, 0.9);
   --text-main: #2c3e50;
   --text-sub: #636e72;
   --primary-color: #0984e3;
   --primary-hover: #74b9ff;
-  --shadow: 0 10px 30px rgba(0,0,0,.1);
+  --accent-color: #ff7675;
+  --shadow: 0 15px 35px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-color: #1a1a1a;
-    --card-bg: #2d2d2d;
-    --text-main: #ecf0f1;
-    --text-sub: #b2bec3;
+    --bg-color: #121212;
+    --card-bg: rgba(45, 45, 45, 0.9);
+    --text-main: #f1f2f6;
+    --text-sub: #a4b0be;
     --primary-color: #00cec9;
     --primary-hover: #81ecec;
-    --shadow: 0 10px 30px rgba(0,0,0,.4);
+    --shadow: 0 15px 35px rgba(0,0,0,0.5);
   }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: system-ui;
-  background: var(--bg-color);
+  font-family: 'PingFang TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  background: linear-gradient(135deg, var(--bg-color) 0%, #dfe6e9 100%);
   color: var(--text-main);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  line-height: 1.6;
+}
+
+/* 入場動畫 */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .notice-card {
   background: var(--card-bg);
+  backdrop-filter: blur(10px); /* 玻璃擬態效果 */
   padding: 40px;
-  border-radius: 16px;
+  border-radius: 24px;
   max-width: 560px;
   width: 100%;
   text-align: center;
   box-shadow: var(--shadow);
-  border-top: 5px solid var(--primary-color);
+  border-top: 6px solid var(--primary-color);
+  animation: fadeInUp 0.8s ease-out;
 }
 
+h1 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+}
+
+.badge {
+  font-size: 12px;
+  background: var(--accent-color);
+  color: white;
+  padding: 4px 14px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.content-text {
+  margin-bottom: 30px;
+  color: var(--text-sub);
+}
+
+/* 按鈕群組優化 */
 .action-group {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .action-btn {
   text-decoration: none;
   background: var(--primary-color);
   color: #fff;
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-size: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.badge {
-  font-size: 12px;
-  background: #ff7675;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 999px;
-  display: inline-block;
-  margin-bottom: 10px;
+.action-btn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
 }
 
 .footer {
-  margin-top: 20px;
-  font-size: 12px;
-  opacity: .6;
+  margin-top: 30px;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* 自定義公告彈窗樣式 */
+#custom-modal {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-color);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 50px;
+  z-index: 1000;
+  box-shadow: var(--shadow);
+  cursor: pointer;
 }
 </style>
 </head>
 
 <body>
 
+<div id="custom-modal" onclick="this.style.display='none'">
+  📢 歡迎來到莫比空間！點擊關閉此通知。
+</div>
+
 <div class="notice-card">
-
-  <!-- 分類 + 版本 -->
-  <div class="badge">📌 系統公告 · v1.0 · 更新：2026-01-30</div>
-
+  <div class="badge">📌 系統公告 · v1.1</div>
   <h1>莫比空間 Ⓒ Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</h1>
 
-  <p>
-    歡迎進入莫比空間官方入口。<br><br>
-    提供線上工具、教學資源、Shorts、音樂分享、App 內容。<br><br>
-    主要內容由 <strong>莫比空間 / 莫比音樂頻道™️</strong> 原創製作。
-  </p>
+  <div class="content-text">
+    <p>歡迎進入官方入口。</p>
+    <p>整合教學、音樂與工具資源，</p>
+    <p>由 <strong>莫比音樂頻道™️</strong> 製作提供。</p>
+  </div>
 
-  <!-- 多入口 -->
   <div class="action-group">
     <a href="/blog/" class="action-btn">Blog</a>
     <a href="/tools/" class="action-btn">Tools</a>
@@ -146,32 +170,36 @@ body {
   </div>
 </div>
 
-<!-- 首次訪問彈窗公告 -->
 <script>
-if (!localStorage.getItem("mobispace_notice")) {
-  alert("📢 歡迎來到莫比空間\n本站為官方入口與聲明頁。");
-  localStorage.setItem("mobispace_notice", "seen");
+/* 1. 優雅的公告提醒 */
+window.onload = () => {
+  if (!localStorage.getItem("mobispace_notice_v1.1")) {
+    const modal = document.getElementById('custom-modal');
+    modal.style.display = 'block';
+    setTimeout(() => { modal.style.display = 'none'; }, 5000);
+    localStorage.setItem("mobispace_notice_v1.1", "seen");
+  }
+};
+
+/* 2. 智慧跳轉（加上一點延遲，提升穩定性） */
+const ref = document.referrer.toLowerCase();
+const autoRedirect = (path) => {
+  console.log(`偵測到來源，即將導向至 ${path}...`);
+  setTimeout(() => { location.href = path; }, 1500); 
+};
+
+// 避免在開發環境重複跳轉，僅在有來源時觸發
+if (ref) {
+  if (ref.includes("youtube")) autoRedirect("/music/");
+  else if (ref.includes("google")) autoRedirect("/blog/");
 }
 
-/* 智能入口推薦（依來源 referrer 推薦） */
-const ref = document.referrer;
-if (ref.includes("youtube")) location.href = "/music/";
-if (ref.includes("google")) location.href = "/blog/";
-</script>
-
-<script>
-/* 套用設定 */
-const theme = localStorage.getItem("theme");
-const fontSize = localStorage.getItem("fontSize");
-if (fontSize) document.documentElement.style.fontSize = fontSize + "px";
-if (theme === "dark") document.documentElement.style.colorScheme = "dark";
-if (theme === "light") document.documentElement.style.colorScheme = "light";
-
-/* 讀取公告 */
-const notice = JSON.parse(localStorage.getItem("mobispace_notice") || "null");
-if (notice) {
-  console.log("最新公告：", notice.title);
-}
+/* 3. 主題管理 */
+const applyTheme = () => {
+  const theme = localStorage.getItem("theme");
+  if (theme) document.documentElement.style.colorScheme = theme;
+};
+applyTheme();
 </script>
 
 </body>
