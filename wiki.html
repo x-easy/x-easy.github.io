@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <title>支援中心 | 莫比空間 Mobispace</title>
+    <meta name="description" content="莫比空間全域支援中心：提供各類教學、常見問題 Q&A 及錯誤回報功能。">
+    <meta name="keywords" content="莫比空間, 教學, Q&A, 音樂教程, 錯誤回報, Mobispace">
+    <meta property="og:title" content="莫比空間 | 支援中心">
+    <meta property="og:image" content="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+    <meta name="theme-color" content="#000000">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --am-red: #fa243c;
+            --am-gray: #1c1c1e;
+            --am-text-muted: #8e8e93;
+            --glass: rgba(28, 28, 30, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* --- 頂部導航 --- */
+        header {
+            padding: 40px 20px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        h1 { font-size: 34px; font-weight: 800; letter-spacing: -1px; }
+
+        .notice-trigger {
+            width: 40px; height: 40px;
+            background: var(--am-gray);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 18px; color: var(--am-red);
+            cursor: pointer;
+        }
+
+        /* --- 分段切換器 --- */
+        .tabs {
+            display: flex;
+            background: var(--am-gray);
+            margin: 0 20px 25px;
+            border-radius: 10px;
+            padding: 2px;
+        }
+
+        .tab-btn {
+            flex: 1; padding: 8px 0; text-align: center;
+            font-size: 14px; font-weight: 600;
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active { background: #3a3a3c; color: #fff; }
+
+        /* --- 內容區塊 --- */
+        .content-section { display: none; padding: 0 20px 100px; animation: fadeIn 0.4s ease; }
+        .content-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 教程卡片 --- */
+        .tutorial-card {
+            background: var(--am-gray);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .tutorial-card i { font-size: 24px; color: var(--am-red); width: 40px; text-align: center; }
+        .tutorial-card h3 { font-size: 17px; margin-bottom: 4px; }
+        .tutorial-card p { font-size: 13px; color: var(--am-text-muted); }
+
+        /* --- Q&A 風琴 --- */
+        .qa-item {
+            background: var(--am-gray);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        .qa-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .qa-body { padding: 0 20px; max-height: 0; overflow: hidden; transition: all 0.3s ease-out; color: var(--am-text-muted); font-size: 14px; }
+        .qa-item.open .qa-body { padding: 0 20px 15px; max-height: 200px; }
+        .qa-item.open i { transform: rotate(180deg); color: var(--am-red); }
+
+        /* --- 錯誤回報表單 --- */
+        .report-form { background: var(--am-gray); border-radius: 15px; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: var(--am-text-muted); margin-bottom: 5px; text-transform: uppercase; }
+        input, textarea {
+            width: 100%; background: #2c2c2e; border: none; border-radius: 8px;
+            padding: 12px; color: #fff; font-size: 16px; outline: none;
+        }
+        .submit-btn {
+            width: 100%; background: var(--am-red); color: #fff; border: none;
+            padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px;
+        }
+
+        /* --- 公告彈窗 (Modal) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(20px);
+            z-index: 1000; display: none; justify-content: center; align-items: center;
+        }
+        .modal-card {
+            width: 85%; max-width: 400px; background: #1c1c1e; border-radius: 20px;
+            padding: 30px 20px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .modal-card i { font-size: 50px; color: var(--am-red); margin-bottom: 20px; }
+        .modal-card h2 { margin-bottom: 15px; }
+        .modal-card p { color: var(--am-text-muted); margin-bottom: 30px; font-size: 14px; }
+        
+        .modal-footer { display: flex; flex-direction: column; gap: 10px; }
+        .btn-link { color: var(--am-red); text-decoration: none; font-size: 14px; font-weight: 600; padding: 10px; }
+        .btn-close { background: #3a3a3c; color: #fff; padding: 12px; border-radius: 10px; border: none; cursor: pointer; }
+
+        /* --- 返回按鈕 --- */
+        .bottom-nav {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--glass); backdrop-filter: blur(20px);
+            padding: 12px 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+        .bottom-nav a { color: #fff; text-decoration: none; font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <p style="color: var(--am-red); font-weight: bold; font-size: 13px;">MOBISPACE</p>
+            <h1>支援中心</h1>
+        </div>
+        <div class="notice-trigger" onclick="toggleModal(true)">
+            <i class="fa-solid fa-bullhorn"></i>
+        </div>
+    </header>
+
+    <div class="tabs">
+        <div class="tab-btn active" onclick="switchTab('tutorial')">教程</div>
+        <div class="tab-btn" onclick="switchTab('qa')">Q&A</div>
+        <div class="tab-btn" onclick="switchTab('report')">回報</div>
+    </div>
+
+    <section id="tutorial" class="content-section active">
+        <div class="tutorial-card">
+            <i class="fa-solid fa-music"></i>
+            <div>
+                <h3>音樂播放器使用教學</h3>
+                <p>了解如何切換歌曲與管理播放清單。</p>
+            </div>
+        </div>
+        <div class="tutorial-card">
+            <i class="fa-solid fa-video"></i>
+            <div>
+                <h3>Shorts 短影音功能</h3>
+                <p>沉浸式捲動與原生分享功能說明。</p>
+            </div>
+        </div>
+        <div class="tutorial-card">
+            <i class="fa-solid fa-code"></i>
+            <div>
+                <h3>網站開源與架設</h3>
+                <p>如何在 GitHub 上建立屬於你的音樂空間。</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="qa" class="content-section">
+        <div class="qa-item">
+            <div class="qa-header" onclick="toggleQA(this)">
+                <span>音樂無法播放怎麼辦？</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="qa-body">請檢查網路連線，或確認您的手機未開啟靜音模式。建議使用 Safari 或 Chrome 瀏覽。</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-header" onclick="toggleQA(this)">
+                <span>可以下載這裡的音樂嗎？</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="qa-body">本站僅供線上試聽，音樂版權歸原作者所有。</div>
+        </div>
+        <div class="qa-item">
+            <div class="qa-header" onclick="toggleQA(this)">
+                <span>Shorts 影片卡頓？</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="qa-body">由於是靜態託管，高畫質影片加載較慢。建議等待進度條跑一段後再觀看。</div>
+        </div>
+    </section>
+
+    <section id="report" class="content-section">
+        <form class="report-form" onsubmit="event.preventDefault(); alert('感謝回報！我們會盡快處理。');">
+            <div class="form-group">
+                <label>您的名稱</label>
+                <input type="text" placeholder="輸入您的稱呼">
+            </div>
+            <div class="form-group">
+                <label>問題描述</label>
+                <textarea rows="5" placeholder="請詳細說明您遇到的錯誤..."></textarea>
+            </div>
+            <button type="submit" class="submit-btn">送出回報</button>
+        </form>
+    </section>
+
+    <div class="modal-overlay" id="noticeModal">
+        <div class="modal-card">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <h2>系統公告</h2>
+            <p>歡迎來到莫比支援中心！我們最近更新了 Shorts 的磁吸滾動機制與 PWA 離線支援，建議將網頁「加入主畫面」以獲得最佳體驗。</p>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="toggleModal(false)">關閉視窗</button>
+                <a href="https://x-easy.github.io/blog/" class="btn-link">返回公告頁面</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <a href="https://x-easy.github.io/blog/"><i class="fa-solid fa-house"></i> 回到部落格首頁</a>
+    </div>
+
+    <script>
+        // 切換分頁邏輯
+        function switchTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Q&A 展開邏輯
+        function toggleQA(element) {
+            const item = element.parentElement;
+            item.classList.toggle('open');
+        }
+
+        // 彈窗控制邏輯
+        function toggleModal(show) {
+            const modal = document.getElementById('noticeModal');
+            modal.style.display = show ? 'flex' : 'none';
+        }
+    </script>
+</body>
+</html>
