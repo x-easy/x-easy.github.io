@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+        <script src="data.js"></script>
+<script>
+  // 自動套用設定頁儲存的字體與模式
+  (function applyGlobalSettings() {
+      const theme = localStorage.getItem('mobi_theme');
+      const font = localStorage.getItem('mobi_font');
+      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      if (font) document.documentElement.style.fontSize = font + 'px';
+  })();
+</script>
+
     <title>莫比空間</title>
     
     <link rel="icon" href="https://x-easy.github.io/medias/莫比音樂Logo.jpeg" type="image/jpeg">
