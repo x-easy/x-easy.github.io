@@ -41,43 +41,31 @@
         .search-box { background-color: var(--bg-input); border-radius: 10px; padding: 8px 15px; display: flex; align-items: center; color: var(--text-sub); }
         .search-box input { background: transparent; border: none; color: var(--text-main); width: 100%; margin-left: 10px; font-size: 14px; outline: none; }
 
+        /* Featured Carousel (精選文章輪播) */
+        .featured-carousel { padding: 10px 15px; overflow-x: auto; display: flex; gap: 12px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+        .featured-carousel::-webkit-scrollbar { display: none; }
+        .featured-card { min-width: 85%; height: 160px; background-size: cover; background-position: center; border-radius: 15px; position: relative; scroll-snap-align: center; flex-shrink: 0; overflow: hidden; }
+        .featured-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 40px 15px 15px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
+
         /* Main View */
         #main-view { flex: 1; overflow-y: auto; scroll-behavior: smooth; padding-bottom: 80px; }
         #main-view::-webkit-scrollbar { display: none; }
 
         /* Shortcuts */
-        .shortcut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 20px 10px; }
+        .shortcut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 10px 10px 20px; }
         .shortcut-item { display: flex; flex-direction: column; align-items: center; color: var(--text-main); text-decoration: none; font-size: 10px; }
         .shortcut-icon { width: 42px; height: 42px; background-color: var(--bg-card); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 18px; color: var(--accent-color); }
-
-        /* Shorts */
-        .shorts-container { height: 100%; width: 100%; background-color: #000; overflow-y: scroll; scroll-snap-type: y mandatory; }
-        .shorts-card { height: 100%; width: 100%; scroll-snap-align: start; position: relative; background-color: #000; display: flex; justify-content: center; align-items: center; }
-        .shorts-video { width: 100%; height: 100%; object-fit: cover; }
-        .shorts-ui-right { position: absolute; right: 10px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 20; }
-        .shorts-action-btn { color: white; display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; }
-        .shorts-action-btn i { font-size: 24px; margin-bottom: 5px; background: rgba(0,0,0,0.3); width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
 
         /* Modals */
         .modal-overlay, .half-modal-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 4000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-overlay.show, .half-modal-container.show { display: flex; }
-        .action-sheet { position: absolute; bottom: 0; width: 100%; max-width: 480px; background: var(--bg-card); border-radius: 20px 20px 0 0; padding: 20px; transform: translateY(100%); transition: transform 0.3s; }
-        .show .action-sheet { transform: translateY(0); }
-        .sheet-item { display: flex; align-items: center; padding: 15px; color: var(--text-main); border-bottom: 1px solid var(--border-color); cursor: pointer; }
-
-        /* Settings Style */
-        .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid var(--border-color); }
-        .toggle-switch { width: 40px; height: 20px; background: var(--bg-input); border-radius: 20px; position: relative; cursor: pointer; transition: .3s; }
-        .toggle-switch.on { background: var(--accent-color); }
-        .toggle-switch::after { content: ''; position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: .3s; }
-        .toggle-switch.on::after { left: 22px; }
-
-        /* Nav */
+        
+        /* 底部導航 */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; height: 60px; background-color: var(--nav-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 999; }
         .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-sub); text-decoration: none; width: 25%; font-size: 10px; }
         .nav-item.active { color: var(--text-main); }
 
-        /* 新增：公告視窗專用按鈕樣式 */
+        /* 公告按鈕組 */
         .modal-btn-group { display: flex; gap: 10px; padding: 15px; background: var(--bg-container); border-top: 1px solid var(--border-color); }
         .btn-secondary { flex: 1; padding: 12px; border-radius: 8px; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); cursor: pointer; font-size: 14px; }
         .btn-primary { flex: 1; padding: 12px; border-radius: 8px; background: var(--accent-color); color: #fff; border: none; cursor: pointer; font-size: 14px; }
@@ -135,22 +123,23 @@
     </div>
 
     <script>
-        // --- 快捷鍵庫 ---
         const shortcutLibrary = [
             { id: "rank", name: "排行榜", icon: "fa-chart-line", route: "/rank" },
             { id: "new", name: "新歌首發", icon: "fa-compact-disc", route: "/new" },
             { id: "podcast", name: "Podcast", icon: "fa-microphone", route: "/podcast" },
             { id: "collection", name: "收藏", icon: "fa-bookmark", route: "/collection" },
-            { id: "fav", name: "最愛", icon: "fa-heart", route: "/fav" },
-            { id: "radio", name: "電台", icon: "fa-radio", route: "/radio" },
-            { id: "mv", name: "影音", icon: "fa-clapperboard", route: "/mv" }
+            { id: "fav", name: "最愛", icon: "fa-heart", route: "/fav" }
         ];
 
         let userShortcuts = JSON.parse(localStorage.getItem('user_shortcuts')) || ["rank", "new", "podcast", "collection", "fav"];
 
         const db = {
-            articles: [{ id: 1, title: "如何選擇你的第一把吉他？", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" }],
-            shorts: [{ id: 1, user: "莫比音樂頻道", desc: "DJ Ⲹⳝ 2024 Mix 🔥", videoUrl: "https://raw.githubusercontent.com/x-easy/x-easy.github.io/0cac4dc74d1050f9cd627bc165d3d43cc95bc484/medias/%E8%B7%9F%E8%91%97%E7%AF%80%E5%A5%8F%E4%B8%80%E8%B5%B7%E6%90%96%E9%A0%AD%E5%8F%88%E6%99%83%E8%85%A6%20DJ%20%E2%B2%98%E2%B3%9D%202024%20Mix.mp4", avatar: "https://x-easy.github.io/medias/莫比音樂Logo.jpeg" }]
+            // 新增：精選文章資料
+            featured: [
+                { id: 1, title: "2026 莫比音樂精選歌單", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500" },
+                { id: 2, title: "莫比空間 APP 開發進度更新", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500" }
+            ],
+            articles: [{ id: 1, title: "如何選擇你的第一把吉他？", date: "2小時前", img: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=200" }]
         };
 
         const routes = { '/': renderHome, '/explore': renderExplore, '/shorts': renderShorts, '/settings': renderSettings };
@@ -163,58 +152,46 @@
             document.querySelectorAll('.nav-item').forEach(el => el.classList.toggle('active', el.getAttribute('href') === path));
         }
 
+        // --- 修正後的首頁渲染邏輯 ---
         function renderHome() {
+            // 1. 精選輪播 HTML
+            const featuredHtml = `<section class="featured-carousel">
+                ${db.featured.map(f => `
+                    <div class="featured-card" style="background-image: url('${f.img}')">
+                        <div class="featured-overlay"><h4>${f.title}</h4></div>
+                    </div>
+                `).join('')}
+            </section>`;
+
+            // 2. 快捷鍵 HTML
             const activeShortcuts = shortcutLibrary.filter(s => userShortcuts.includes(s.id));
-            const shortcutsHtml = activeShortcuts.map(b => `
-                <a href="${b.route}" class="shortcut-item" data-link>
-                    <div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div>
-                    <span>${b.name}</span>
-                </a>`).join('');
-            
-            return `<section class="shortcut-grid">${shortcutsHtml}</section>
-                    <section style="padding:0 15px;">
-                        ${db.articles.map(i => `<div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid var(--border-color);"><img src="${i.img}" style="width:80px; height:80px; border-radius:8px; object-fit:cover;"><div><h4 style="margin-bottom:5px;">${i.title}</h4><small style="color:var(--text-sub);">${i.date}</small></div></div>`).join('')}
-                    </section>`;
+            const shortcutsHtml = `<section class="shortcut-grid">
+                ${activeShortcuts.map(b => `
+                    <a href="${b.route}" class="shortcut-item" data-link>
+                        <div class="shortcut-icon"><i class="fa-solid ${b.icon}"></i></div>
+                        <span>${b.name}</span>
+                    </a>`).join('')}
+            </section>`;
+
+            // 3. 文章列表 HTML
+            const articlesHtml = `<section style="padding:0 15px;">
+                ${db.articles.map(i => `
+                    <div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid var(--border-color);">
+                        <img src="${i.img}" style="width:80px; height:80px; border-radius:8px; object-fit:cover;">
+                        <div><h4 style="margin-bottom:5px;">${i.title}</h4><small style="color:var(--text-sub);">${i.date}</small></div>
+                    </div>`).join('')}
+            </section>`;
+
+            return featuredHtml + shortcutsHtml + articlesHtml;
         }
 
-        function renderSettings() {
-            const listHtml = shortcutLibrary.map(s => {
-                const isOn = userShortcuts.includes(s.id);
-                return `<div class="setting-row">
-                            <span><i class="fa-solid ${s.icon}" style="margin-right:10px; color:var(--accent-color)"></i>${s.name}</span>
-                            <div class="toggle-switch ${isOn ? 'on' : ''}" onclick="toggleShortcutSetting('${s.id}', this)"></div>
-                        </div>`;
-            }).join('');
-
-            return `<div style="padding:20px;">
-                        <h2 style="margin-bottom:20px;">設定</h2>
-                        <h4 style="color:var(--text-sub); margin-bottom:10px;">自定義首頁快捷鍵</h4>
-                        <div style="background:var(--bg-card); border-radius:12px;">${listHtml}</div>
-                    </div>`;
-        }
-
-        function toggleShortcutSetting(id, el) {
-            if (userShortcuts.includes(id)) {
-                userShortcuts = userShortcuts.filter(i => i !== id);
-                el.classList.remove('on');
-            } else {
-                if (userShortcuts.length >= 5) { alert("首頁最多顯示 5 個快捷鍵！"); return; }
-                userShortcuts.push(id);
-                el.classList.add('on');
-            }
-            localStorage.setItem('user_shortcuts', JSON.stringify(userShortcuts));
-        }
-
-        // --- 核心彈窗切換功能 ---
+        // 功能函式
         function toggleKeepModal(show) { document.getElementById('keepModal').classList.toggle('show', show); }
-        
-        // 新增：公告彈窗控制
-        function toggleAnnouncement(show) { 
-            document.getElementById('announcementModal').classList.toggle('show', show); 
-        }
-
-        function renderShorts() { return `` + db.shorts.map(v => `<div class="shorts-card"><video class="shorts-video" src="${v.videoUrl}" autoplay loop muted></video></div>`).join(''); }
+        function toggleAnnouncement(show) { document.getElementById('announcementModal').classList.toggle('show', show); }
+        function renderSettings() { return `<div style="padding:20px;"><h2>設定</h2></div>`; }
+        function renderShorts() { return `<div style="height:100vh; background:#000;"></div>`; }
         function renderExplore() { return `<div style="padding:20px;"><h2>探索</h2></div>`; }
+
         const navigateTo = url => { history.pushState(null, null, url); router(); };
         window.addEventListener('popstate', router);
         document.addEventListener('DOMContentLoaded', () => {
