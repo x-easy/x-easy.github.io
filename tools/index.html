@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-TW" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>工具箱 | 莫比空間</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-card: #161616;
+            --accent: #06c755;
+            --text-main: #ffffff;
+            --text-sub: #888888;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html { scroll-behavior: smooth; } /* 平滑捲動關鍵 */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-primary); color: var(--text-main); font-family: sans-serif; min-height: 100vh; padding-bottom: 100px; }
+
+        /* 標題與搜尋 */
+        .header { padding: 60px 20px 40px; text-align: center; }
+        .search-container { padding: 0 20px; max-width: 600px; margin: 0 auto 40px; }
+        .search-box { background: var(--bg-card); border: 1px solid #333; border-radius: 15px; padding: 12px 20px; display: flex; align-items: center; }
+        .search-box input { background: transparent; border: none; color: #fff; width: 100%; margin-left: 10px; outline: none; }
+
+        /* 分類區塊樣式 */
+        .category-section { padding: 20px; max-width: 1000px; margin: 0 auto; scroll-margin-top: 20px; }
+        .category-title { font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--accent); padding-left: 15px; }
+
+        /* 工具網格 */
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-bottom: 40px; }
+        .tool-card { background: var(--bg-card); border-radius: 20px; padding: 20px; text-align: center; text-decoration: none; color: var(--text-main); border: 1px solid #222; transition: var(--transition); display: flex; flex-direction: column; align-items: center; }
+        .tool-card:hover { transform: translateY(-5px); border-color: var(--accent); box-shadow: 0 10px 20px rgba(6, 199, 85, 0.2); }
+        .tool-icon { width: 50px; height: 50px; background: #222; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 20px; color: var(--accent); }
+
+        /* 懸浮漢堡按鈕 (固定右側) */
+        .fab-menu { position: fixed; right: 20px; bottom: 40px; z-index: 1000; }
+        .hamburger-btn { width: 56px; height: 56px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: none; transition: var(--transition); }
+        .hamburger-btn.active { transform: rotate(90deg); background: #333; }
+
+        /* 側邊導航彈窗 */
+        .side-nav-modal { position: fixed; right: 20px; bottom: 110px; background: var(--bg-card); border: 1px solid #333; border-radius: 20px; width: 200px; padding: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.9); opacity: 0; visibility: hidden; transition: var(--transition); z-index: 999; }
+        .side-nav-modal.show { transform: translateY(0) scale(1); opacity: 1; visibility: visible; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 12px 15px; color: var(--text-main); text-decoration: none; border-radius: 10px; font-size: 14px; transition: 0.2s; cursor: pointer; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--accent); }
+
+        @media (max-width: 400px) { .tool-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>工具展示牆</h1>
+        <p>快速找到您需要的開發或生活工具</p>
+    </header>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass" style="color:var(--text-sub)"></i>
+            <input type="text" id="toolSearch" placeholder="搜尋工具...">
+        </div>
+    </div>
+
+    <div id="categoryContainer"></div>
+
+    <div class="fab-menu" id="fabMenu">
+        <button class="hamburger-btn" id="hamburgerBtn">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="side-nav-modal" id="navModal">
+            <div style="padding: 10px; font-size: 12px; color: var(--text-sub); border-bottom: 1px solid #222; margin-bottom: 5px;">選擇分類</div>
+            <div id="navList"></div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * 🛠️ 修改區：在這裡增加工具與分類
+         * category: 分類名稱 (會自動群組化並生成導覽選單)
+         */
+        const toolsData = [
+            { name: "Keep 筆記", icon: "fa-note-sticky", category: "開發日常", url: "#" },
+            { name: "代碼壓縮", icon: "fa-file-code", category: "開發日常", url: "#" },
+            { name: "短影音", icon: "fa-play", category: "多媒體", url: "#" },
+            { name: "影片下載", icon: "fa-download", category: "多媒體", url: "#" },
+            { name: "單位換算", icon: "fa-calculator", category: "生活輔助", url: "#" },
+            { name: "密碼產生", icon: "fa-key", category: "生活輔助", url: "#" },
+            { name: "匯率查詢", icon: "fa-money-bill-trend-up", category: "生活輔助", url: "#" }
+        ];
+
+        const container = document.getElementById('categoryContainer');
+        const navList = document.getElementById('navList');
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navModal = document.getElementById('navModal');
+
+        // 核心渲染函式
+        function renderContent(data) {
+            // 1. 依分類群組化資料
+            const groups = data.reduce((acc, tool) => {
+                if (!acc[tool.category]) acc[tool.category] = [];
+                acc[tool.category].push(tool);
+                return acc;
+            }, {});
+
+            // 2. 生成頁面內容與選單
+            container.innerHTML = '';
+            navList.innerHTML = '';
+
+            Object.keys(groups).forEach(cat => {
+                // 生成頁面區塊
+                const section = document.createElement('section');
+                section.className = 'category-section';
+                section.id = `cat-${cat}`; // 設定 ID 供跳轉
+                section.innerHTML = `
+                    <h2 class="category-title">${cat} <span style="font-size:12px; color:var(--text-sub); font-weight:normal;">(${groups[cat].length})</span></h2>
+                    <div class="tool-grid">
+                        ${groups[cat].map(tool => `
+                            <a href="${tool.url}" class="tool-card">
+                                <div class="tool-icon"><i class="fa-solid ${tool.icon}"></i></div>
+                                <h3>${tool.name}</h3>
+                            </a>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(section);
+
+                // 生成漢堡導覽項目
+                const navItem = document.createElement('div');
+                navItem.className = 'nav-item';
+                navItem.innerHTML = `<i class="fa-solid fa-chevron-right" style="font-size:10px;"></i> ${cat}`;
+                navItem.onclick = () => {
+                    document.getElementById(`cat-${cat}`).scrollIntoView();
+                    closeModal();
+                };
+                navList.appendChild(navItem);
+            });
+        }
+
+        // 初始化
+        renderContent(toolsData);
+
+        // --- 漢堡選單邏輯 ---
+        function toggleModal() {
+            const isOpen = navModal.classList.toggle('show');
+            hamburgerBtn.classList.toggle('active');
+            hamburgerBtn.innerHTML = isOpen ? '<i class="fa-solid fa-xmark"></i>' : '<i class="fa-solid fa-bars"></i>';
+        }
+
+        function closeModal() {
+            navModal.classList.remove('show');
+            hamburgerBtn.classList.remove('active');
+            hamburgerBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        }
+
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止點擊按鈕觸發視窗關閉
+            toggleModal();
+        });
+
+        // 點擊視窗外任何地方關閉
+        document.addEventListener('click', (e) => {
+            if (!navModal.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+                closeModal();
+            }
+        });
+
+        // 搜尋功能
+        document.getElementById('toolSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = toolsData.filter(t => t.name.toLowerCase().includes(term));
+            renderContent(filtered);
+        });
+    </script>
+</body>
+</html>
