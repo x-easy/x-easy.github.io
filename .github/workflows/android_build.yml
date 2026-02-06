@@ -1,0 +1,30 @@
+name: Build Android APK
+on: [push] # 當你推送程式碼時自動啟動
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          npm install @capacitor/cli @capacitor/core @capacitor/android
+          npx cap add android
+
+      - name: Build Android Project
+        run: |
+          npx cap copy android
+          cd android && ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
