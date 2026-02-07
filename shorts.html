@@ -4,16 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>莫比空間 | Shorts</title>
-    <script src="data.js"></script>
-<script>
-  // 自動套用設定頁儲存的字體與模式
-  (function applyGlobalSettings() {
-      const theme = localStorage.getItem('mobi_theme');
-      const font = localStorage.getItem('mobi_font');
-      if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      if (font) document.documentElement.style.fontSize = font + 'px';
-  })();
-</script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -107,7 +97,7 @@
 <body>
 
     <div class="top-nav">
-        <span>為您推薦</span>
+        <span>推薦</span>
     </div>
 
     <a href="https://x-easy.github.io/blog/" class="back-btn">
@@ -197,7 +187,7 @@
                     });
                 } catch (err) { console.log('分享取消'); }
             } else {
-                alert('您的瀏覽器不支援原生分享，已為您複製連結。');
+                alert('您的瀏覽器不支援原生分享，已複製連結。');
                 navigator.clipboard.writeText(window.location.href);
             }
         }
