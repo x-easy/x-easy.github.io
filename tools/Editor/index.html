@@ -120,13 +120,51 @@
         }
 
         @keyframes blink { 50% { opacity: 0.4; } }
+        
+        .save-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--syntax-blue);
+    font-weight: bold;
+}
+
+.save-icon {
+    width: 14px;
+    height: 14px;
+    /* 呼吸燈效果：模擬正在同步的感覺 */
+    animation: pulse 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
+    50% { opacity: 1; filter: drop-shadow(0 0 4px var(--syntax-blue)); }
+    100% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
+}
+
+/* 成功存檔時的閃爍效果 */
+.save-flash {
+    animation: flash-green 0.5s ease-out;
+}
+
+@keyframes flash-green {
+    0% { color: var(--syntax-white); }
+    100% { color: var(--syntax-blue); }
+}
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">MobiSpace Tools<span class="live-tag">Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</span></div>
-    <div style="font-size: 11px; color: var(--syntax-blue);">AUTO-SAVE ON</div>
+    <div class="logo">Tools|Editor<span class="live-tag">Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</span></div>
+    <div class="save-status">
+    <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+    </svg>
+    <span id="save-text">自動保存</span>
+</div>
+
 </header>
 
 <div class="tabs">
@@ -173,15 +211,33 @@
         previewFrame.close();
     }
 
-    // 3. 自動執行與存檔
+        // 3. 自動執行與存檔 (帶有視覺回饋效果)
     function autoRun() {
+        // 抓取欄位內容
         const data = {
             h: document.getElementById('html-code').value,
             c: document.getElementById('css-code').value,
             j: document.getElementById('js-code').value
         };
+        
+        // 【自動存檔關鍵】：存入手機 LocalStorage
         localStorage.setItem('mobi_editor_v1', JSON.stringify(data));
-        // 手機效能考量，僅在輸入時存檔，點擊預覽時才渲染
+
+        // --- 右上角「自動保存」狀態聯動 ---
+        const saveText = document.getElementById('save-text');
+        const saveIcon = document.querySelector('.save-icon');
+
+        if (saveText && saveIcon) {
+            // 打字瞬間：變白色 + 圖示快速旋轉/閃爍
+            saveText.style.color = '#ffffff'; 
+            saveIcon.style.animationDuration = '0.3s'; 
+            
+            // 0.3秒後恢復：變回藍色 + 慢速呼吸
+            setTimeout(() => {
+                saveText.style.color = 'var(--syntax-blue)';
+                saveIcon.style.animationDuration = '2s';
+            }, 300);
+        }
     }
 
     // 4. 載入存檔
