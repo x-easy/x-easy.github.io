@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>莫比空間|可視化編輯器</title>
+    <title>莫比空間 | 可視化編輯器</title>
     <script src="data.js"></script>
     <style>
         :root {
@@ -53,6 +53,23 @@
             border: 1px solid var(--syntax-red-bright);
             animation: blink 1.5s infinite; 
             margin-left: 8px;
+        }
+
+        /* 自動保存狀態欄 */
+        .save-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--syntax-blue);
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+        .save-icon {
+            width: 14px;
+            height: 14px;
+            animation: pulse 2s infinite ease-in-out;
+            transition: transform 0.2s;
         }
 
         /* 頁籤控制 */
@@ -120,82 +137,60 @@
         }
 
         @keyframes blink { 50% { opacity: 0.4; } }
-        
-        .save-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--syntax-blue);
-    font-weight: bold;
-}
-
-.save-icon {
-    width: 14px;
-    height: 14px;
-    /* 呼吸燈效果：模擬正在同步的感覺 */
-    animation: pulse 2s infinite ease-in-out;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
-    50% { opacity: 1; filter: drop-shadow(0 0 4px var(--syntax-blue)); }
-    100% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
-}
-
-/* 成功存檔時的閃爍效果 */
-.save-flash {
-    animation: flash-green 0.5s ease-out;
-}
-
-@keyframes flash-green {
-    0% { color: var(--syntax-white); }
-    100% { color: var(--syntax-blue); }
-}
+        @keyframes pulse {
+            0% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 4px var(--syntax-blue)); }
+            100% { opacity: 0.4; filter: drop-shadow(0 0 1px var(--syntax-blue)); }
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">Tools|Editor<span class="live-tag">Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</span></div>
+    <div class="logo">工具庫|可視化編輯器<span class="live-tag">Ⲙ𝔬ⲃ¡ⳝ𝔭ⲁ𝔠ⲉ</span></div>
     <div class="save-status">
-    <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-    </svg>
-    <span id="save-text">自動保存</span>
-</div>
-
+        <svg class="save-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+        </svg>
+        <span id="save-text">自動保存</span>
+    </div>
 </header>
 
 <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('html')">HTML</button>
-    <button class="tab-btn" onclick="switchTab('css')">CSS</button>
-    <button class="tab-btn" onclick="switchTab('js')">JS</button>
-    <button class="tab-btn" onclick="switchTab('preview')">預覽</button>
+    <button class="tab-btn active" onclick="switchTab('html', this)">HTML</button>
+    <button class="tab-btn" onclick="switchTab('css', this)">CSS</button>
+    <button class="tab-btn" onclick="switchTab('js', this)">JS</button>
+    <button class="tab-btn" onclick="switchTab('preview', this)">預覽</button>
 </div>
 
 <div class="main-content">
     <div id="pane-html" class="pane active"><textarea id="html-code" spellcheck="false" placeholder="" oninput="autoRun()"></textarea></div>
-    <div id="pane-css" class="pane"><textarea id="css-code" spellcheck="false" placeholder="/* CSS Area */" oninput="autoRun()"></textarea></div>
-    <div id="pane-js" class="pane"><textarea id="js-code" spellcheck="false" placeholder="// JS Area" oninput="autoRun()"></textarea></div>
+    <div id="pane-css" class="pane"><textarea id="css-code" spellcheck="false" placeholder="/* CSS */" oninput="autoRun()"></textarea></div>
+    <div id="pane-js" class="pane"><textarea id="js-code" spellcheck="false" placeholder="// JS" oninput="autoRun()"></textarea></div>
     <div id="pane-preview" class="pane"><iframe id="preview"></iframe></div>
 </div>
 
 <div class="controls">
     <button class="btn btn-run" onclick="switchTab('preview')">執行預覽</button>
-    <button class="btn" onclick="loadSample()">載入資料範例</button>
+    <button class="btn" onclick="loadSample()">資料範例</button>
     <button class="btn" onclick="clearAll()">重置</button>
 </div>
 
 <script>
-    // 1. 切換頁籤
-    function switchTab(tab) {
+    // 1. 頁籤切換邏輯 (優化對應手機瀏覽器)
+    function switchTab(tab, btn) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
         
-        event.target.classList.add('active');
+        // 如果有傳入按鈕物件就直接選中，否則根據 tab 找尋
+        if (btn) {
+            btn.classList.add('active');
+        } else {
+            const targetBtn = document.querySelector(`.tab-btn[onclick*="'${tab}'"]`);
+            if (targetBtn) targetBtn.classList.add('active');
+        }
+
         document.getElementById('pane-' + tab).classList.add('active');
-        
         if(tab === 'preview') render();
     }
 
@@ -211,36 +206,33 @@
         previewFrame.close();
     }
 
-        // 3. 自動執行與存檔 (帶有視覺回饋效果)
+    // 3. 自動存檔與視覺回饋
     function autoRun() {
-        // 抓取欄位內容
         const data = {
             h: document.getElementById('html-code').value,
             c: document.getElementById('css-code').value,
             j: document.getElementById('js-code').value
         };
         
-        // 【自動存檔關鍵】：存入手機 LocalStorage
         localStorage.setItem('mobi_editor_v1', JSON.stringify(data));
 
-        // --- 右上角「自動保存」狀態聯動 ---
         const saveText = document.getElementById('save-text');
         const saveIcon = document.querySelector('.save-icon');
 
         if (saveText && saveIcon) {
-            // 打字瞬間：變白色 + 圖示快速旋轉/閃爍
             saveText.style.color = '#ffffff'; 
+            saveIcon.style.transform = 'scale(1.2)';
             saveIcon.style.animationDuration = '0.3s'; 
             
-            // 0.3秒後恢復：變回藍色 + 慢速呼吸
             setTimeout(() => {
                 saveText.style.color = 'var(--syntax-blue)';
+                saveIcon.style.transform = 'scale(1)';
                 saveIcon.style.animationDuration = '2s';
             }, 300);
         }
     }
 
-    // 4. 載入存檔
+    // 4. 初始化
     function init() {
         const saved = localStorage.getItem('mobi_editor_v1');
         if (saved) {
@@ -253,11 +245,11 @@
         }
     }
 
-    // 5. 整合 data.js 範例
+    // 5. 資料測試範例
     function loadSample() {
         if (typeof MOBI_DATA !== 'undefined') {
             document.getElementById('html-code').value = `<div style="padding:20px; background:#000; color:red; border:2px solid red;">\n  <h2>正在讀取：MOBI_DATA</h2>\n  <div id="display"></div>\n</div>`;
-            document.getElementById('js-code').value = `// 調用外部 data.js 資料\nconst info = document.getElementById('display');\ninfo.innerHTML = "最新 Shorts 網址: " + MOBI_DATA.shorts[0];`;
+            document.getElementById('js-code').value = `// 調用外部 data.js 資料\nconst info = document.getElementById('display');\ninfo.innerHTML = "最新資料: " + MOBI_DATA.shorts[0];`;
             switchTab('preview');
         } else {
             alert('找不到 data.js，請確保檔案在同一個目錄下。');
@@ -265,7 +257,7 @@
     }
 
     function clearAll() {
-        if(confirm('要清空代碼嗎？')) {
+        if(confirm('確定要清空所有代碼嗎？')) {
             localStorage.removeItem('mobi_editor_v1');
             location.reload();
         }
