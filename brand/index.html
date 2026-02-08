@@ -3,244 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>x-easy Engine Ultimate</title>
+    <title>x-easy Brand Asset Engine</title>
     <style>
         :root {
-            --bg: #000000; --text: #ffffff; --card: #1c1c1e; --border: #2c2c2e; --accent: #0A84FF; --nav-bg: rgba(28, 28, 30, 0.8);
+            --bg: #000000; --text: #ffffff; --card: #1c1c1e; --border: #2c2c2e; --accent: #0A84FF;
+            --nav-bg: rgba(28, 28, 30, 0.85); --toast-bg: rgba(10, 132, 255, 0.9);
         }
-        [data-theme="light"] {
-            --bg: #f2f2f7; --text: #000000; --card: #ffffff; --border: #e5e5ea; --accent: #007AFF; --nav-bg: rgba(255, 255, 255, 0.8);
-        }
-
-        html, body { 
-            height: 100%; margin: 0; padding: 0; overflow: hidden; 
-            background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif;
-            -webkit-tap-highlight-color: transparent;
+        body { 
+            margin: 0; background: var(--bg); color: var(--text); 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden; height: 100vh;
         }
 
-        /* 骨架屏載入動畫 */
-        @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
-        .skeleton { animation: shimmer 1.5s infinite; background: var(--card); border-radius: 15px; height: 80px; margin-bottom: 12px; }
+        /* 頂部導覽 */
+        .header { padding: 40px 20px 10px; background: var(--bg); }
+        .header h1 { font-size: 26px; font-weight: 700; margin: 0 0 15px 0; letter-spacing: -0.5px; }
 
-        .top-bar { padding: 20px 20px 10px; background: var(--bg); }
-        .search-container {
-            background: var(--card); border-radius: 12px; padding: 10px 15px;
-            display: flex; align-items: center; gap: 10px; border: 1px solid var(--border);
+        /* 搜尋框 */
+        .search-box {
+            background: var(--card); border-radius: 12px; padding: 12px 16px;
+            display: flex; align-items: center; border: 1px solid var(--border);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .search-container input { background: none; border: none; color: var(--text); flex: 1; outline: none; font-size: 15px; }
-        .clear-btn { color: gray; cursor: pointer; display: none; font-size: 18px; }
+        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2); }
+        .search-box input {
+            background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; margin-left: 10px;
+        }
 
-        .slider-wrapper {
-            overflow-x: auto; white-space: nowrap; padding: 10px 20px;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none;
-        }
-        .slider-wrapper::-webkit-scrollbar { display: none; }
-        .filter-btn {
-            display: inline-block; background: var(--card); border: 1px solid var(--border);
-            padding: 8px 18px; border-radius: 20px; margin-right: 8px;
-            font-size: 13px; cursor: pointer; transition: 0.2s; color: gray;
-        }
-        .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        /* 內容區 */
+        .scroll-area { height: calc(100vh - 220px); overflow-y: auto; padding: 10px 20px; padding-bottom: 100px; }
+        .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-        .main-content { height: calc(100% - 220px); overflow-y: auto; padding: 10px 20px; }
+        /* 資產卡片 */
+        .card {
+            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+            padding: 18px; display: flex; align-items: center; gap: 16px;
+            transition: 0.2s; cursor: pointer; position: relative;
+        }
+        .card:active { transform: scale(0.96); background: #2c2c2e; }
         
-        /* 卡片設計 */
-        .asset-card {
-            background: var(--card); border: 1px solid var(--border);
-            border-radius: 15px; padding: 18px; margin-bottom: 12px;
-            display: flex; align-items: center; gap: 15px; position: relative;
-            transition: 0.2s; animation: fadeIn 0.3s ease-out;
+        .icon-wrapper {
+            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.03); border-radius: 12px;
         }
-        .asset-card:active { transform: scale(0.96); opacity: 0.7; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .asset-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
-        .asset-icon svg { width: 28px; height: 28px; stroke: var(--text); stroke-width: 1.5; fill: none; }
-        .asset-info { flex: 1; }
-        .asset-name { font-size: 15px; font-weight: 500; }
-        .asset-tag { font-size: 10px; color: gray; text-transform: uppercase; }
+        .icon-wrapper svg { width: 32px; height: 32px; fill: none; stroke: white; stroke-width: 1.5; }
+        /* 針對你 JSON 內自帶顏色或填充的 SVG 做調整 */
+        .icon-wrapper svg path, .icon-wrapper svg circle { stroke: white; }
 
-        /* 收藏按鈕 */
-        .fav-btn { color: #333; transition: 0.2s; padding: 5px; }
-        .fav-btn.active { color: #ff3b30; }
+        .info { flex: 1; }
+        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; }
+        .tag { font-size: 11px; color: #666; margin-top: 2px; }
 
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 85px;
-            background: var(--nav-bg); backdrop-filter: blur(25px);
+        /* 底部導覽列 */
+        .tab-bar {
+            position: fixed; bottom: 0; width: 100%; height: 85px;
+            background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding-top: 10px;
         }
-        .nav-item { text-align: center; color: var(--text); opacity: 0.4; font-size: 10px; flex: 1; cursor: pointer; }
-        .nav-item.active { opacity: 1; color: var(--accent); }
-        .nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+        .tab-item { color: #666; text-align: center; flex: 1; }
+        .tab-item.active { color: var(--accent); }
+        .tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
+        .tab-label { font-size: 10px; font-weight: 500; }
 
-        /* 彈窗 */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; display: none; flex-direction: column; }
-        .modal.active { display: flex; animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        .modal-body { flex: 1; padding: 60px 24px 20px; overflow-y: auto; }
-        .modal-footer { padding: 20px 24px 40px; }
-        .btn-full { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 16px; border-radius: 14px; width: 100%; font-size: 16px; cursor: pointer; }
-
+        /* Toast */
         .toast {
-            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
-            background: var(--accent); color: white; padding: 10px 22px;
-            border-radius: 25px; font-size: 13px; font-weight: 500; display: none; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+            background: var(--toast-bg); color: white; padding: 10px 20px;
+            border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 100;
         }
     </style>
 </head>
 <body>
 
-    <div class="toast" id="toast">已複製 SVG 代碼</div>
+<div id="copyToast" class="toast">已複製 SVG 代碼</div>
 
-    <div class="top-bar">
-        <h1 style="font-size: 22px; margin: 0 0 15px 0; font-weight: 600;">品牌資產引擎</h1>
-        <div class="search-container">
-            <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke:gray; fill:none; stroke-width:2;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchInput" placeholder="搜尋全站圖示..." oninput="handleSearch()">
-            <div id="clearSearch" class="clear-btn" onclick="resetSearch()">×</div>
+<div class="header">
+    <h1>Asset Engine</h1>
+    <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="search" placeholder="搜尋您的資產庫..." oninput="doSearch()">
+    </div>
+</div>
+
+<div class="scroll-area">
+    <div class="grid" id="assetGrid">
         </div>
+</div>
+
+<nav class="tab-bar">
+    <div class="tab-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <div class="tab-label">主頁</div>
     </div>
-
-    <div class="slider-wrapper" id="categorySlider">
-        <div class="filter-btn active" style="width:60px; height:15px;"></div>
-        <div class="filter-btn" style="width:60px; height:15px;"></div>
+    <div class="tab-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <div class="tab-label">收藏</div>
     </div>
+</nav>
 
-    <div class="main-content" id="contentArea">
-        <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-    </div>
+<script>
+    let rawData = {};
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="location.reload()"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><div>主頁</div></div>
-        <div class="nav-item" onclick="openModal('favModal')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><div>收藏</div></div>
-        <div class="nav-item" onclick="openModal('qaModal')"><svg viewBox="0 0 24 24"><circle cx='12' cy='12' r='10'/><path d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/></svg><div>Q&A</div></div>
-        <div class="nav-item" onclick="openModal('setModal')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0a2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0a2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><div>設定</div></div>
-    </nav>
+    // 載入 JSON
+    async function loadAssets() {
+        try {
+            const response = await fetch('assets.json');
+            const data = await response.json();
+            rawData = data.library;
+            render("All Icons");
+        } catch (e) {
+            console.error("無法讀取 assets.json", e);
+        }
+    }
 
-    <div id="setModal" class="modal"><div class="modal-body"><h2>設定</h2><div style="background:var(--card);padding:20px;border-radius:15px;display:flex;justify-content:space-between;">暗模式切換 <input type="checkbox" checked onchange="toggleTheme()"></div></div><div class="modal-footer"><button class="btn-full" onclick="closeModal('setModal')">關閉</button></div></div>
-    <div id="favModal" class="modal"><div class="modal-body"><h2>收藏的資產</h2><div id="favList"></div></div><div class="modal-footer"><button class="btn-full" onclick="closeModal('favModal')">返回探索</button></div></div>
-    <div id="qaModal" class="modal"><div class="modal-body"><h2>Q&A</h2><p>點擊資產即可複製 SVG。點擊愛心可加入收藏。</p></div><div class="modal-footer"><button class="btn-full" onclick="closeModal('qaModal')">關閉</button></div></div>
-
-    <script>
-        let assetData = {};
-        let favorites = JSON.parse(localStorage.getItem('x-easy-favs')) || [];
-
-        async function init() {
-            try {
-                const res = await fetch('./assets.json');
-                if(!res.ok) throw new Error("JSON 載入錯誤");
-                assetData = await res.json();
-                renderCategories();
-                renderAssets(Object.keys(assetData.library)[0]);
-            } catch (e) {
-                document.getElementById('contentArea').innerHTML = `<p style="color:red;text-align:center;">⚠️ 載入失敗: 請檢查 assets.json 格式</p>`;
+    function render(category, filter = "") {
+        const grid = document.getElementById('assetGrid');
+        grid.innerHTML = "";
+        
+        const items = rawData[category];
+        Object.keys(items).forEach(name => {
+            if (name.toLowerCase().includes(filter.toLowerCase())) {
+                const svgCode = items[name];
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="icon-wrapper">${svgCode}</div>
+                    <div class="info">
+                        <div class="name">${name.replace(/_/g, ' ')}</div>
+                        <div class="tag">${category}</div>
+                    </div>
+                `;
+                card.onclick = () => copyToClipboard(svgCode);
+                grid.appendChild(card);
             }
-        }
+        });
+    }
 
-        function renderCategories() {
-            const slider = document.getElementById('categorySlider');
-            slider.innerHTML = '';
-            Object.keys(assetData.library).forEach((cat, i) => {
-                const btn = document.createElement('div');
-                btn.className = `filter-btn ${i===0?'active':''}`;
-                btn.innerText = cat;
-                btn.onclick = () => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    resetSearch();
-                    renderAssets(cat);
-                };
-                slider.appendChild(btn);
-            });
-        }
+    function doSearch() {
+        const q = document.getElementById('search').value;
+        render("All Icons", q);
+    }
 
-        function renderAssets(category) {
-            const area = document.getElementById('contentArea');
-            area.innerHTML = '';
-            const items = assetData.library[category];
-            Object.keys(items).forEach(name => createCard(area, name, items[name], category));
-        }
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        const toast = document.getElementById('copyToast');
+        toast.style.display = 'block';
+        if(window.navigator.vibrate) window.navigator.vibrate(20);
+        setTimeout(() => toast.style.display = 'none', 1500);
+    }
 
-        function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const clearBtn = document.getElementById('clearSearch');
-            const area = document.getElementById('contentArea');
-            
-            clearBtn.style.display = query ? 'block' : 'none';
-            if(!query) { renderAssets(document.querySelector('.filter-btn.active').innerText); return; }
-            
-            area.innerHTML = '';
-            Object.keys(assetData.library).forEach(cat => {
-                Object.keys(assetData.library[cat]).forEach(name => {
-                    if(name.toLowerCase().includes(query)) createCard(area, name, assetData.library[cat][name], cat);
-                });
-            });
-        }
+    window.onload = loadAssets;
+</script>
 
-        function resetSearch() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('clearSearch').style.display = 'none';
-            renderAssets(document.querySelector('.filter-btn.active').innerText);
-        }
-
-        function createCard(parent, name, svg, cat) {
-            const isFav = favorites.includes(name);
-            const card = document.createElement('div');
-            card.className = 'asset-card';
-            card.innerHTML = `
-                <div class="asset-icon">${svg}</div>
-                <div class="asset-info"><div class="asset-name">${name}</div><div class="asset-tag">${cat}</div></div>
-                <div class="fav-btn ${isFav?'active':''}" onclick="toggleFav(event, '${name}')">
-                    <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:currentColor;fill:${isFav?'currentColor':'none'};"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                </div>
-            `;
-            card.onclick = (e) => {
-                if(e.target.closest('.fav-btn')) return;
-                navigator.clipboard.writeText(svg);
-                if(window.navigator.vibrate) window.navigator.vibrate(10); // 震動回饋
-                showToast();
-            };
-            parent.appendChild(card);
-        }
-
-        function toggleFav(e, name) {
-            e.stopPropagation();
-            if(favorites.includes(name)) favorites = favorites.filter(f => f !== name);
-            else favorites.push(name);
-            localStorage.setItem('x-easy-favs', JSON.stringify(favorites));
-            handleSearch(); // 刷新顯示
-            renderFavs();
-        }
-
-        function renderFavs() {
-            const list = document.getElementById('favList');
-            list.innerHTML = '';
-            if(favorites.length === 0) { list.innerHTML = '<p style="opacity:0.5;text-align:center;padding-top:40px;">尚未收藏任何資產</p>'; return; }
-            Object.keys(assetData.library).forEach(cat => {
-                Object.keys(assetData.library[cat]).forEach(name => {
-                    if(favorites.includes(name)) createCard(list, name, assetData.library[cat][name], cat);
-                });
-            });
-        }
-
-        function showToast() {
-            const t = document.getElementById('toast');
-            t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 1500);
-        }
-
-        function toggleTheme() {
-            const curr = document.documentElement.getAttribute('data-theme');
-            document.documentElement.setAttribute('data-theme', curr === 'dark' ? 'light' : 'dark');
-        }
-
-        function openModal(id) { 
-            if(id === 'favModal') renderFavs();
-            document.getElementById(id).classList.add('active'); 
-        }
-        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        init();
-    </script>
 </body>
 </html>
