@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h3>正在轉換資產... 請開啟控制台 (F12) 查看進度</h3>
+    <pre id="output">正在處理中，請稍候...</pre>
+
+    <script>
+        const ICON_URLS = [
+            "https://x-easy.github.io/assets/icons/svg/youtube.svg",
+            "https://x-easy.github.io/assets/icons/svg/wave_pulse_1.svg",
+            "https://x-easy.github.io/assets/icons/svg/warning.svg",
+            // ... (請將你上面提供的所有網址完整貼在這裡)
+        ];
+
+        async function convert() {
+            const library = { "All Icons": {} };
+            
+            for (const url of ICON_URLS) {
+                try {
+                    const response = await fetch(url);
+                    const svgText = await response.text();
+                    
+                    // 從 URL 提取檔名當作 Key (例如 youtube)
+                    const name = url.split('/').pop().replace('.svg', '');
+                    
+                    // 清理 SVG 代碼（移除換行與多餘空白，讓 JSON 乾淨）
+                    const cleanSvg = svgText.replace(/\r?\n|\r/g, "").trim();
+                    
+                    library["All Icons"][name] = cleanSvg;
+                    console.log(`✅ 已處理: ${name}`);
+                } catch (e) {
+                    console.error(`❌ 抓取失敗: ${url}`);
+                }
+            }
+
+            const finalJson = { "library": library };
+            document.getElementById('output').textContent = JSON.stringify(finalJson, null, 2);
+            
+            // 自動下載 JSON
+            const blob = new Blob([JSON.stringify(finalJson, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'assets.json';
+            a.click();
+        }
+
+        convert();
+    </script>
+</body>
+</html>
