@@ -15,11 +15,9 @@
             overflow-x: hidden; height: 100vh;
         }
 
-        /* 頂部導覽 */
         .header { padding: 40px 20px 10px; background: var(--bg); }
         .header h1 { font-size: 26px; font-weight: 700; margin: 0 0 15px 0; letter-spacing: -0.5px; }
 
-        /* 搜尋框 */
         .search-box {
             background: var(--card); border-radius: 12px; padding: 12px 16px;
             display: flex; align-items: center; border: 1px solid var(--border);
@@ -28,11 +26,9 @@
             background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; margin-left: 10px;
         }
 
-        /* 內容區 */
         .scroll-area { height: calc(100vh - 220px); overflow-y: auto; padding: 10px 20px; padding-bottom: 100px; }
         .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-        /* 資產卡片 */
         .card {
             background: var(--card); border: 1px solid var(--border); border-radius: 16px;
             padding: 18px; display: flex; align-items: center; gap: 16px;
@@ -44,15 +40,14 @@
             width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.05); border-radius: 12px;
         }
-        /* 強制讓所有 SVG 顯示為白色，並適應大小 */
+        /* 強制圖示適配大小並改為白色 */
         .icon-wrapper svg { width: 32px; height: 32px; fill: white; display: block; }
         .icon-wrapper svg[fill="none"] { fill: none; stroke: white; stroke-width: 1.5; }
 
         .info { flex: 1; }
-        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; margin-bottom: 2px; }
-        .tag { font-size: 11px; color: #888; background: #2c2c2e; display: inline-block; padding: 2px 8px; border-radius: 4px; }
+        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; color: #fff; }
+        .tag { font-size: 10px; color: #888; background: #2c2c2e; display: inline-block; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
 
-        /* 底部導覽 */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; height: 85px;
             background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -62,7 +57,6 @@
         .tab-item.active { color: var(--accent); }
         .tab-label { font-size: 10px; font-weight: 500; margin-top: 5px; }
 
-        /* 彈出提示 */
         .toast {
             position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
             background: var(--toast-bg); color: white; padding: 10px 24px;
@@ -102,23 +96,25 @@
 
     async function loadAssets() {
         try {
-            const response = await fetch('./assets.json');
+            // 使用時間戳防止 GitHub Pages 快取舊資料
+            const response = await fetch(`./assets.json?t=${new Date().getTime()}`);
             const data = await response.json();
             rawData = data.library;
-            renderAll(); // 初始載入顯示全部分類
+            renderAll();
         } catch (e) {
-            console.error("無法載入 JSON:", e);
+            console.error("載入失敗:", e);
         }
     }
 
-    // 核心渲染邏輯：遍歷所有分類
     function renderAll(filter = "") {
         const grid = document.getElementById('assetGrid');
         grid.innerHTML = "";
         
+        // 遍歷 JSON 內的所有分類
         Object.keys(rawData).forEach(category => {
             const items = rawData[category];
             Object.keys(items).forEach(name => {
+                // 搜尋邏輯：名稱匹配
                 if (name.toLowerCase().includes(filter.toLowerCase())) {
                     const svgCode = items[name];
                     const card = document.createElement('div');
@@ -131,11 +127,12 @@
                         </div>
                     `;
                     card.onclick = () => {
-                        if(svgCode === "...") return; // 如果是點點點就不複製
-                        navigator.clipboard.writeText(svgCode);
-                        const toast = document.getElementById('copyToast');
-                        toast.style.display = 'block';
-                        setTimeout(() => toast.style.display = 'none', 1500);
+                        if (svgCode === "...") return;
+                        navigator.clipboard.writeText(svgCode).then(() => {
+                            const toast = document.getElementById('copyToast');
+                            toast.style.display = 'block';
+                            setTimeout(() => toast.style.display = 'none', 1500);
+                        });
                     };
                     grid.appendChild(card);
                 }
@@ -150,6 +147,5 @@
 
     window.onload = loadAssets;
 </script>
-
 </body>
 </html>
