@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>x-easy 品牌資產引擎</title>
+    <style>
+        :root { 
+            --brand: #1a1a1a; 
+            --soft: #888; 
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --accent: #007AFF; 
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Microsoft JhengHei", "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); 
+            padding: 50px; 
+            color: var(--brand);
+            line-height: 1.6;
+        }
+        .header { 
+            display: flex; 
+            flex-wrap: wrap;
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 40px; 
+            gap: 20px;
+        }
+        h1 { 
+            font-weight: 300; 
+            letter-spacing: -1px; 
+            margin: 0; 
+            font-size: 2rem;
+        }
+        
+        /* 操作區按鈕 */
+        .btn-download { 
+            background: var(--brand); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-download:hover { 
+            opacity: 0.9; 
+            transform: translateY(-1px); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* 網格佈局 */
+        .category-title {
+            font-size: 0.9rem;
+            color: var(--soft);
+            margin: 30px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+            gap: 15px; 
+            margin-bottom: 30px;
+        }
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid #eee; 
+            border-radius: 8px; 
+            padding: 25px 15px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .card:hover { 
+            border-color: var(--brand); 
+            transform: translateY(-3px); 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); 
+        }
+        .card:active {
+            transform: scale(0.98);
+        }
+        
+        svg { 
+            width: 32px; 
+            height: 32px; 
+            stroke: var(--brand); 
+            transition: stroke 0.3s; 
+        }
+        .label { 
+            font-size: 11px; 
+            color: var(--soft); 
+            margin-top: 15px; 
+            font-family: monospace;
+        }
+        
+        /* 複製提示 */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>x-easy Asset Engine</h1>
+            <small style="color:var(--soft)">自有品牌構建工具 | 旗艦版圖示資產</small>
+        </div>
+        <button class="btn-download" onclick="downloadTemplate()">下載部落格落地頁模板</button>
+    </div>
+
+    <div id="icon-factory">
+        <div style="color: var(--soft);">正在載入資產庫...</div>
+    </div>
+    
+    <div id="toast" class="toast">已複製 SVG 代碼</div>
+
+    <script>
+        const assetUrl = './assets.json';
+        let loadedData = null; // 儲存載入的數據供下載功能使用
+
+        // 顯示複製成功提示
+        function showToast(name) {
+            const toast = document.getElementById('toast');
+            toast.innerText = `已複製 ${name} 代碼`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 初始化引擎
+        async function initBuilder() {
+            try {
+                const res = await fetch(assetUrl);
+                if (!res.ok) throw new Error('無法讀取 assets.json');
+                
+                const data = await res.json();
+                loadedData = data; // 存入全域變數
+                const factory = document.getElementById('icon-factory');
+                factory.innerHTML = ''; // 清空載入中提示
+
+                // 遍歷分類
+                Object.keys(data.library).forEach(category => {
+                    // 建立分類標題
+                    const title = document.createElement('div');
+                    title.className = 'category-title';
+                    title.innerText = category;
+                    factory.appendChild(title);
+
+                    // 建立網格容器
+                    const grid = document.createElement('div');
+                    grid.className = 'grid';
+
+                    // 遍歷圖示
+                    const group = data.library[category];
+                    Object.keys(group).forEach(name => {
+                        const svgStr = group[name];
+                        const el = document.createElement('div');
+                        el.className = 'card';
+                        el.innerHTML = `${svgStr}<div class="label">${name}</div>`;
+                        el.title = "點擊複製 SVG";
+                        
+                        // 點擊複製功能
+                        el.onclick = () => {
+                            navigator.clipboard.writeText(svgStr);
+                            showToast(name);
+                        };
+                        
+                        grid.appendChild(el);
+                    });
+                    factory.appendChild(grid);
+                });
+            } catch (e) {
+                document.getElementById('icon-factory').innerHTML = `<p style="color:red">錯誤: ${e.message}<br>請確認 assets.json 是否存在於同級目錄。</p>`;
+            }
+        }
+
+        // 下載模板功能
+        function downloadTemplate() {
+            if (!loadedData) {
+                alert("資產庫尚未載入，請稍候。");
+                return;
+            }
+
+            // 隨機選一個圖示作為範例 (這裡選用 Pen)
+            const demoIcon = loadedData.library.editorial.pen || '<svg>...</svg>';
+            const brandName = loadedData.meta.brand || 'My Brand';
+
+            const templateContent = `<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${brandName} - Blog</title>
+    <style>
+        /* x-easy 極簡樣式核心 */
+        :root { --text: #111; --bg: #fff; --sub: #666; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 80px 20px; 
+            line-height: 1.8;
+        }
+        header { margin-bottom: 60px; text-align: center; }
+        .brand-icon { width: 48px; height: 48px; color: var(--text); margin-bottom: 20px; }
+        h1 { font-weight: 300; letter-spacing: -0.5px; font-size: 2.5rem; margin: 0; }
+        p.subtitle { color: var(--sub); font-size: 1.1rem; margin-top: 10px; }
+        
+        article { border-top: 1px solid #eee; padding: 40px 0; }
+        h2 { font-weight: 400; margin-bottom: 10px; }
+        .meta { font-size: 0.9rem; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; }
+        .read-more { display: inline-block; margin-top: 10px; color: #000; text-decoration: underline; text-underline-offset: 4px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand-icon">${demoIcon}</div>
+        <h1>${brandName}</h1>
+        <p class="subtitle">由 x-easy 引擎構建的極簡部落格</p>
+    </header>
+
+    <main>
+        <article>
+            <div class="meta">Editorial • Feb 08, 2026</div>
+            <h2>極致美學的設計哲學</h2>
+            <p>當我們談論 1.25px 的線條時，我們談論的不僅是視覺，而是一種對於清晰與留白的堅持...</p>
+            <a href="#" class="read-more">閱讀全文</a>
+        </article>
+
+        <article>
+            <div class="meta">Updates • Feb 01, 2026</div>
+            <h2>自動化工作流的未來</h2>
+            <p>只需維護一個 JSON 檔案，就能驅動整個品牌的數位資產。這就是 x-easy 的核心價值。</p>
+            <a href="#" class="read-more">閱讀全文</a>
+        </article>
+    </main>
+</body>
+</html>`;
+
+            const blob = new Blob([templateContent], { type: 'text/html' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'brand-landing-page.html';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('模板下載成功');
+        }
+
+        // 啟動引擎
+        initBuilder();
+    </script>
+</body>
+</html>
