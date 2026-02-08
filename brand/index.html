@@ -2,183 +2,187 @@
 <html lang="zh-Hant" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>x-easy 品牌資產引擎</title>
     <style>
         :root {
-            --bg: #ffffff; --text: #1a1a1a; --card: #f9f9f9; --border: #eeeeee; --accent: #007AFF;
+            --bg: #000000; --text: #ffffff; --card: #1c1c1e; --border: #2c2c2e; --accent: #0A84FF; --nav-bg: rgba(28, 28, 30, 0.8);
         }
-        [data-theme="dark"] {
-            --bg: #0a0a0a; --text: #f5f5f5; --card: #161616; --border: #222222; --accent: #0A84FF;
-        }
-
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-            background: var(--bg); color: var(--text); 
-            margin: 0; padding: 40px 20px 100px 20px; transition: 0.3s;
+        [data-theme="light"] {
+            --bg: #f2f2f7; --text: #000000; --card: #ffffff; --border: #e5e5ea; --accent: #007AFF; --nav-bg: rgba(255, 255, 255, 0.8);
         }
 
-        /* 頁首 */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        h1 { font-weight: 300; letter-spacing: -1px; margin: 0; }
-
-        /* 圖示網格 */
-        .category-title { font-size: 11px; color: gray; text-transform: uppercase; letter-spacing: 2px; margin: 30px 0 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 15px; }
-        .card { 
-            background: var(--card); border: 1px solid var(--border); 
-            border-radius: 12px; padding: 25px 10px; text-align: center; 
-            cursor: pointer; transition: 0.2s; 
+        /* 禁止全域滾動，模擬 App 體感 */
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif;
         }
-        .card:hover { border-color: var(--accent); transform: translateY(-3px); }
-        svg { width: 28px; height: 28px; stroke: var(--text); stroke-width: 1.25; fill: none; }
-        .label { font-size: 10px; opacity: 0.6; margin-top: 12px; font-family: monospace; }
 
-        /* 底部導覽列 */
+        /* 頂部搜尋欄與標題 */
+        .top-bar { padding: 20px; background: var(--bg); }
+        .search-box {
+            background: var(--card); border-radius: 10px; padding: 12px;
+            display: flex; align-items: center; gap: 10px; color: gray; font-size: 14px;
+        }
+
+        /* ✨ 橫向滑動按鈕區 (如附圖所示) */
+        .slider-wrapper {
+            overflow-x: auto; white-space: nowrap; padding: 10px 20px;
+            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+        }
+        .slider-wrapper::-webkit-scrollbar { display: none; }
+        .filter-btn {
+            display: inline-block; background: var(--card); border: 1px solid var(--border);
+            padding: 10px 20px; border-radius: 8px; margin-right: 10px;
+            font-size: 13px; cursor: pointer; transition: 0.2s;
+        }
+        .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+        /* ✨ 內容滾動區 (隨機文章卡片輪播風格) */
+        .main-content {
+            height: calc(100% - 220px); /* 扣除頂部與底部 */
+            overflow-y: auto; padding: 10px 20px;
+        }
+        .asset-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 15px; padding: 20px; margin-bottom: 15px;
+            display: flex; align-items: center; gap: 15px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .asset-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; }
+        .asset-icon svg { width: 30px; height: 30px; stroke: var(--text); stroke-width: 1.25; }
+        .asset-info { flex: 1; }
+        .asset-name { font-size: 16px; font-weight: 500; }
+        .asset-tag { font-size: 11px; color: gray; text-transform: uppercase; }
+
+        /* 底部導覽列 (固定) */
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(var(--bg), 0.8); backdrop-filter: blur(20px);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 85px;
+            background: var(--nav-bg); backdrop-filter: blur(20px);
             border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; padding: 15px 0 30px; z-index: 100;
+            display: flex; justify-content: space-around; padding-top: 10px;
         }
-        .nav-item { text-align: center; cursor: pointer; color: var(--text); opacity: 0.7; font-size: 10px; transition: 0.2s; }
-        .nav-item:hover { opacity: 1; }
-        .nav-item svg { width: 22px; height: 22px; display: block; margin: 0 auto 5px; }
+        .nav-item { text-align: center; color: var(--text); opacity: 0.5; font-size: 10px; flex: 1; }
+        .nav-item.active { opacity: 1; color: var(--accent); }
+        .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; stroke: currentColor; stroke-width: 1.25; fill: none; }
 
-        /* 全螢幕彈窗 (Modal) */
+        /* 全螢幕彈窗 */
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 1000;
-            display: none; flex-direction: column; padding: 40px 20px;
-            box-sizing: border-box;
+            background: var(--bg); z-index: 1000; display: none;
+            flex-direction: column; transition: 0.3s;
         }
-        .modal.active { display: flex; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
-        .modal-content { flex: 1; overflow-y: auto; text-align: center; }
-        .modal-footer { display: flex; justify-content: center; gap: 20px; padding: 20px 0; }
-        
-        .btn-close { 
-            padding: 12px 30px; border-radius: 30px; border: 1px solid var(--border);
-            background: var(--card); color: var(--text); cursor: pointer;
-        }
-
-        /* 開關樣式 */
-        .switch-row { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: var(--card); border-radius: 10px; }
+        .modal.active { display: flex; }
+        .modal-body { flex: 1; padding: 40px 20px; overflow-y: auto; }
+        .modal-footer { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-full { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 12px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>x-easy Engine</h1>
+    <div class="top-bar">
+        <h1 style="font-size: 24px; margin-bottom: 15px;">探索資產</h1>
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" style="width:16px; height:16px; stroke:gray;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            搜尋多功能全站引擎...
+        </div>
     </div>
 
-    <div id="factory"></div>
+    <div class="slider-wrapper" id="categorySlider">
+        </div>
+
+    <div class="main-content" id="contentArea">
+        </div>
 
     <nav class="bottom-nav">
-        <div class="nav-item" onclick="location.reload()">
+        <div class="nav-item active" onclick="location.reload()">
             <svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            主頁
+            <div>首頁</div>
         </div>
         <div class="nav-item" onclick="openModal('catModal')">
             <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            類別
+            <div>類別</div>
         </div>
         <div class="nav-item" onclick="openModal('qaModal')">
             <svg viewBox="0 0 24 24"><circle cx='12' cy='12' r='10'/><path d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/><line x1='12' y1='17' x2='12.01' y2='17'/></svg>
-            Q&A
+            <div>Q&A</div>
         </div>
         <div class="nav-item" onclick="openModal('setModal')">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            設定
+            <div>設定</div>
         </div>
     </nav>
 
     <div id="setModal" class="modal">
-        <div class="modal-content">
-            <h2>系統設定</h2>
-            <div class="switch-row">
-                <span>暗模式切換 (Dark Mode)</span>
+        <div class="modal-body">
+            <h2>設定</h2>
+            <div style="background:var(--card); padding:20px; border-radius:15px; display:flex; justify-content:space-between;">
+                <span>暗模式 (Dark Mode)</span>
                 <input type="checkbox" id="themeToggle" checked onchange="toggleTheme()">
             </div>
-            <br>
-            <button class="btn-close" style="background:var(--accent); color:white; border:none;" onclick="downloadTemplate()">下載部落格模板</button>
         </div>
         <div class="modal-footer">
-            <button class="btn-close" onclick="closeModal('setModal')">關閉視窗</button>
-        </div>
-    </div>
-
-    <div id="catModal" class="modal">
-        <div class="modal-content">
-            <h2>資產類別</h2>
-            <p>快速跳轉至：Editorial / Social / Utility</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-close" onclick="closeModal('catModal')">關閉視窗</button>
-        </div>
-    </div>
-
-    <div id="qaModal" class="modal">
-        <div class="modal-content">
-            <h2>常見問題</h2>
-            <p>Q: 如何使用圖示？<br>A: 點擊首頁卡片即可自動複製 SVG 代碼。</p>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-close" onclick="closeModal('qaModal')">關閉視窗</button>
+            <button class="btn-full" style="background:var(--accent); color:white; border:none;" onclick="downloadTemplate()">下載部落格模板</button>
+            <button class="btn-full" onclick="closeModal('setModal')">縮小視窗</button>
         </div>
     </div>
 
     <script>
-        // 切換主題
+        let assetData = {};
+
+        async function init() {
+            const res = await fetch('./assets.json');
+            assetData = await res.json();
+            renderCategories();
+            renderAssets('editorial'); // 預設顯示第一類
+        }
+
+        function renderCategories() {
+            const slider = document.getElementById('categorySlider');
+            Object.keys(assetData.library).forEach((cat, index) => {
+                const btn = document.createElement('div');
+                btn.className = `filter-btn ${index === 0 ? 'active' : ''}`;
+                btn.innerText = cat;
+                btn.onclick = () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderAssets(cat);
+                };
+                slider.appendChild(btn);
+            });
+        }
+
+        function renderAssets(category) {
+            const area = document.getElementById('contentArea');
+            area.innerHTML = '';
+            const items = assetData.library[category];
+            Object.keys(items).forEach(name => {
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.innerHTML = `
+                    <div class="asset-icon">${items[name]}</div>
+                    <div class="asset-info">
+                        <div class="asset-name">${name}</div>
+                        <div class="asset-tag">${category}</div>
+                    </div>
+                `;
+                card.onclick = () => {
+                    navigator.clipboard.writeText(items[name]);
+                    alert('SVG 已複製');
+                };
+                area.appendChild(card);
+            });
+        }
+
         function toggleTheme() {
             const isDark = document.getElementById('themeToggle').checked;
             document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         }
 
-        // 彈窗控制
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-        // 初始化資產
-        async function init() {
-            const res = await fetch('./assets.json');
-            const data = await res.json();
-            const factory = document.getElementById('factory');
-
-            Object.keys(data.library).forEach(cat => {
-                const title = document.createElement('div');
-                title.className = 'category-title';
-                title.innerText = cat;
-                factory.appendChild(title);
-
-                const grid = document.createElement('div');
-                grid.className = 'grid';
-                Object.keys(data.library[cat]).forEach(name => {
-                    const svg = data.library[cat][name];
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `${svg}<div class="label">${name}</div>`;
-                    card.onclick = () => {
-                        navigator.clipboard.writeText(svg);
-                        const label = card.querySelector('.label');
-                        label.innerText = 'COPIED!';
-                        setTimeout(() => label.innerText = name, 1000);
-                    };
-                    grid.appendChild(card);
-                });
-                factory.appendChild(grid);
-            });
-        }
-
-        function downloadTemplate() {
-            const content = `<html><body style="background:#000;color:#fff;text-align:center;padding:100px;"><h1>x-easy Generated</h1></body></html>`;
-            const blob = new Blob([content], {type: 'text/html'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'x-easy-project.html';
-            a.click();
-        }
 
         init();
     </script>
