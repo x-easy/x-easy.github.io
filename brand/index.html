@@ -12,33 +12,27 @@
         body { 
             margin: 0; background: var(--bg); color: var(--text); 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            overflow: hidden; height: 100vh;
+            overflow-x: hidden; height: 100vh;
         }
 
-        /* 頂部導覽 */
         .header { padding: 40px 20px 10px; background: var(--bg); }
         .header h1 { font-size: 26px; font-weight: 700; margin: 0 0 15px 0; letter-spacing: -0.5px; }
 
-        /* 搜尋框 */
         .search-box {
             background: var(--card); border-radius: 12px; padding: 12px 16px;
             display: flex; align-items: center; border: 1px solid var(--border);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .search-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2); }
         .search-box input {
             background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; margin-left: 10px;
         }
 
-        /* 內容區 */
         .scroll-area { height: calc(100vh - 220px); overflow-y: auto; padding: 10px 20px; padding-bottom: 100px; }
         .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
-        /* 資產卡片 */
         .card {
             background: var(--card); border: 1px solid var(--border); border-radius: 16px;
             padding: 18px; display: flex; align-items: center; gap: 16px;
-            transition: 0.2s; cursor: pointer; position: relative;
+            transition: 0.2s; cursor: pointer;
         }
         .card:active { transform: scale(0.96); background: #2c2c2e; }
         
@@ -46,15 +40,14 @@
             width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
             background: rgba(255,255,255,0.03); border-radius: 12px;
         }
-        .icon-wrapper svg { width: 32px; height: 32px; fill: none; stroke: white; stroke-width: 1.5; }
-        /* 針對你 JSON 內自帶顏色或填充的 SVG 做調整 */
-        .icon-wrapper svg path, .icon-wrapper svg circle { stroke: white; }
+        /* 優化：讓所有的 SVG 在深色背景下都能看見 */
+        .icon-wrapper svg { width: 32px; height: 32px; fill: white; }
+        .icon-wrapper svg[fill="none"], .icon-wrapper svg:not([fill]) { fill: none; stroke: white; stroke-width: 1.5; }
 
         .info { flex: 1; }
-        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; }
+        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; color: #fff; }
         .tag { font-size: 11px; color: #666; margin-top: 2px; }
 
-        /* 底部導覽列 */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; height: 85px;
             background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -62,14 +55,13 @@
         }
         .tab-item { color: #666; text-align: center; flex: 1; }
         .tab-item.active { color: var(--accent); }
-        .tab-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
-        .tab-label { font-size: 10px; font-weight: 500; }
+        .tab-label { font-size: 10px; font-weight: 500; margin-top: 5px; }
 
-        /* Toast */
         .toast {
             position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-            background: var(--toast-bg); color: white; padding: 10px 20px;
+            background: var(--toast-bg); color: white; padding: 10px 24px;
             border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -92,27 +84,38 @@
 
 <nav class="tab-bar">
     <div class="tab-item active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
         <div class="tab-label">主頁</div>
     </div>
     <div class="tab-item">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         <div class="tab-label">收藏</div>
     </div>
 </nav>
 
 <script>
     let rawData = {};
+    let currentCategory = "";
 
-    // 載入 JSON
     async function loadAssets() {
+        const grid = document.getElementById('assetGrid');
         try {
-            const response = await fetch('assets.json');
+            // 使用相對路徑 ./ 確保在 GitHub Pages /brand/ 子目錄下運作正常
+            const response = await fetch('./assets.json');
+            if (!response.ok) throw new Error("找不到 assets.json");
+            
             const data = await response.json();
             rawData = data.library;
-            render("All Icons");
+            
+            // 自動偵測第一個分類（例如 "Social"）
+            const categories = Object.keys(rawData);
+            if (categories.length > 0) {
+                currentCategory = categories[0];
+                render(currentCategory);
+            }
         } catch (e) {
-            console.error("無法讀取 assets.json", e);
+            console.error(e);
+            grid.innerHTML = `<div style="text-align:center;color:#666;margin-top:40px;">⚠️ 無法載入資產庫<br><small>${e.message}</small></div>`;
         }
     }
 
@@ -120,10 +123,20 @@
         const grid = document.getElementById('assetGrid');
         grid.innerHTML = "";
         
-        const items = rawData[category];
-        Object.keys(items).forEach(name => {
+        // 合併所有分類進行搜尋，或是顯示特定分類
+        let itemsToRender = {};
+        if (filter) {
+            // 搜尋模式：遍歷所有分類
+            Object.keys(rawData).forEach(cat => {
+                Object.assign(itemsToRender, rawData[cat]);
+            });
+        } else {
+            itemsToRender = rawData[category];
+        }
+
+        Object.keys(itemsToRender).forEach(name => {
             if (name.toLowerCase().includes(filter.toLowerCase())) {
-                const svgCode = items[name];
+                const svgCode = itemsToRender[name];
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
@@ -141,15 +154,16 @@
 
     function doSearch() {
         const q = document.getElementById('search').value;
-        render("All Icons", q);
+        render(currentCategory, q);
     }
 
     function copyToClipboard(text) {
-        navigator.clipboard.writeText(text);
-        const toast = document.getElementById('copyToast');
-        toast.style.display = 'block';
-        if(window.navigator.vibrate) window.navigator.vibrate(20);
-        setTimeout(() => toast.style.display = 'none', 1500);
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('copyToast');
+            toast.style.display = 'block';
+            if (window.navigator.vibrate) window.navigator.vibrate(20);
+            setTimeout(() => toast.style.display = 'none', 1500);
+        });
     }
 
     window.onload = loadAssets;
