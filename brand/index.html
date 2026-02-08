@@ -15,9 +15,11 @@
             overflow-x: hidden; height: 100vh;
         }
 
+        /* 頂部導覽 */
         .header { padding: 40px 20px 10px; background: var(--bg); }
         .header h1 { font-size: 26px; font-weight: 700; margin: 0 0 15px 0; letter-spacing: -0.5px; }
 
+        /* 搜尋框 */
         .search-box {
             background: var(--card); border-radius: 12px; padding: 12px 16px;
             display: flex; align-items: center; border: 1px solid var(--border);
@@ -26,9 +28,11 @@
             background: none; border: none; color: white; flex: 1; outline: none; font-size: 16px; margin-left: 10px;
         }
 
+        /* 內容區 */
         .scroll-area { height: calc(100vh - 220px); overflow-y: auto; padding: 10px 20px; padding-bottom: 100px; }
         .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
 
+        /* 資產卡片 */
         .card {
             background: var(--card); border: 1px solid var(--border); border-radius: 16px;
             padding: 18px; display: flex; align-items: center; gap: 16px;
@@ -38,16 +42,17 @@
         
         .icon-wrapper {
             width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,0.03); border-radius: 12px;
+            background: rgba(255,255,255,0.05); border-radius: 12px;
         }
-        /* 優化：讓所有的 SVG 在深色背景下都能看見 */
-        .icon-wrapper svg { width: 32px; height: 32px; fill: white; }
-        .icon-wrapper svg[fill="none"], .icon-wrapper svg:not([fill]) { fill: none; stroke: white; stroke-width: 1.5; }
+        /* 強制讓所有 SVG 顯示為白色，並適應大小 */
+        .icon-wrapper svg { width: 32px; height: 32px; fill: white; display: block; }
+        .icon-wrapper svg[fill="none"] { fill: none; stroke: white; stroke-width: 1.5; }
 
         .info { flex: 1; }
-        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; color: #fff; }
-        .tag { font-size: 11px; color: #666; margin-top: 2px; }
+        .name { font-size: 16px; font-weight: 600; text-transform: capitalize; margin-bottom: 2px; }
+        .tag { font-size: 11px; color: #888; background: #2c2c2e; display: inline-block; padding: 2px 8px; border-radius: 4px; }
 
+        /* 底部導覽 */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; height: 85px;
             background: var(--nav-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -57,11 +62,11 @@
         .tab-item.active { color: var(--accent); }
         .tab-label { font-size: 10px; font-weight: 500; margin-top: 5px; }
 
+        /* 彈出提示 */
         .toast {
             position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
             background: var(--toast-bg); color: white; padding: 10px 24px;
             border-radius: 20px; font-size: 14px; font-weight: 600; display: none; z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -78,8 +83,7 @@
 </div>
 
 <div class="scroll-area">
-    <div class="grid" id="assetGrid">
-        </div>
+    <div class="grid" id="assetGrid"></div>
 </div>
 
 <nav class="tab-bar">
@@ -95,75 +99,53 @@
 
 <script>
     let rawData = {};
-    let currentCategory = "";
 
     async function loadAssets() {
-        const grid = document.getElementById('assetGrid');
         try {
-            // 使用相對路徑 ./ 確保在 GitHub Pages /brand/ 子目錄下運作正常
             const response = await fetch('./assets.json');
-            if (!response.ok) throw new Error("找不到 assets.json");
-            
             const data = await response.json();
             rawData = data.library;
-            
-            // 自動偵測第一個分類（例如 "Social"）
-            const categories = Object.keys(rawData);
-            if (categories.length > 0) {
-                currentCategory = categories[0];
-                render(currentCategory);
-            }
+            renderAll(); // 初始載入顯示全部分類
         } catch (e) {
-            console.error(e);
-            grid.innerHTML = `<div style="text-align:center;color:#666;margin-top:40px;">⚠️ 無法載入資產庫<br><small>${e.message}</small></div>`;
+            console.error("無法載入 JSON:", e);
         }
     }
 
-    function render(category, filter = "") {
+    // 核心渲染邏輯：遍歷所有分類
+    function renderAll(filter = "") {
         const grid = document.getElementById('assetGrid');
         grid.innerHTML = "";
         
-        // 合併所有分類進行搜尋，或是顯示特定分類
-        let itemsToRender = {};
-        if (filter) {
-            // 搜尋模式：遍歷所有分類
-            Object.keys(rawData).forEach(cat => {
-                Object.assign(itemsToRender, rawData[cat]);
+        Object.keys(rawData).forEach(category => {
+            const items = rawData[category];
+            Object.keys(items).forEach(name => {
+                if (name.toLowerCase().includes(filter.toLowerCase())) {
+                    const svgCode = items[name];
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="icon-wrapper">${svgCode}</div>
+                        <div class="info">
+                            <div class="name">${name.replace(/_/g, ' ')}</div>
+                            <div class="tag">${category}</div>
+                        </div>
+                    `;
+                    card.onclick = () => {
+                        if(svgCode === "...") return; // 如果是點點點就不複製
+                        navigator.clipboard.writeText(svgCode);
+                        const toast = document.getElementById('copyToast');
+                        toast.style.display = 'block';
+                        setTimeout(() => toast.style.display = 'none', 1500);
+                    };
+                    grid.appendChild(card);
+                }
             });
-        } else {
-            itemsToRender = rawData[category];
-        }
-
-        Object.keys(itemsToRender).forEach(name => {
-            if (name.toLowerCase().includes(filter.toLowerCase())) {
-                const svgCode = itemsToRender[name];
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div class="icon-wrapper">${svgCode}</div>
-                    <div class="info">
-                        <div class="name">${name.replace(/_/g, ' ')}</div>
-                        <div class="tag">${category}</div>
-                    </div>
-                `;
-                card.onclick = () => copyToClipboard(svgCode);
-                grid.appendChild(card);
-            }
         });
     }
 
     function doSearch() {
         const q = document.getElementById('search').value;
-        render(currentCategory, q);
-    }
-
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            const toast = document.getElementById('copyToast');
-            toast.style.display = 'block';
-            if (window.navigator.vibrate) window.navigator.vibrate(20);
-            setTimeout(() => toast.style.display = 'none', 1500);
-        });
+        renderAll(q);
     }
 
     window.onload = loadAssets;
